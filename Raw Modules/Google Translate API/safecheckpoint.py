@@ -1,8 +1,10 @@
 import googletrans
+import json
 class GT:
     def __init__(self):
         self.lines=['']
         self.from_,self.to_=None,None
+        self.c_from,self.c_to=None,None
         self.origin,self.translated,self.pronunciation=str(),str(),str()
     def get_Input(self,file_import=None,text=None):
         if file_import is not None:
@@ -15,13 +17,22 @@ class GT:
                 print('Selected File is Not Supported For now..')
                 return False
         self.lines=text.split('\n')
-    def translate(self,from_='en',to_='ja'):
+    def translate(self,from_='english',to_='japanese'):
+        from_=from_.lower()
+        to_=to_.lower()
+        with open('Raw Modules\Google Translate API\languages.json','r') as hand:
+            lan=json.loads(hand.read())
+        self.c_from=lan['Languages'][from_]
+        self.c_to=lan['Languages'][to_]
         translator=googletrans.Translator()
         self.from_,self.to_=from_,to_
         for i in self.lines:
-            result=translator.translate(i,src=from_,dest=to_)
+            result=translator.translate(i,src=self.c_from,dest=self.c_to)
             self.origin+=result.origin+'\n'
-            self.pronunciation+=result.pronunciation+'\n'
+            try:
+                self.pronunciation+=result.pronunciation+'\n'
+            except:
+                self.pronunciation+=result.origin+'\n'
             self.translated+=result.text+'\n'
     def export(self):
         # TODO: Script inside this method is used to design the output text file
@@ -50,11 +61,11 @@ class GT:
         hand.close()
 if __name__=='__main__':
     test=GT()
-    test.get_Input(text='Hello there\n How Are You?')
-    # !from_=input('Enter the Language Code:')
-    # !to_=input('Enter the Language Code:')
+    test.get_Input(text=input('Enter the Text: '))
+    from_=input('From: ')
+    to_=input('To: ')
     # TODO: add a search bar and drop down list to choose languages
-    test.translate(to_='ja')
+    test.translate(from_,to_)
     # TODO: Label
     print(test.origin)
     # TODO: Label
@@ -71,4 +82,5 @@ if __name__=='__main__':
     print(test.translated)
     # TODO: Label
     print(test.pronunciation)
+    # TODO: exports the results into a text file
     test.export()
