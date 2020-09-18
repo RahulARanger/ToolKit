@@ -55,7 +55,6 @@ class Mini(Tk):
     def __init__(self):
         super().__init__()
         self.failed=False
-        print('*')
         self.check='https://www.google.co.in/'
         self.iconbitmap('Resources\Media\download.ico')
         self['bg']='#FFFFFF'
@@ -64,6 +63,7 @@ class Mini(Tk):
         y=int((self.winfo_screenheight()-400)/2)
         self.geometry('360x400+{}+{}'.format(x,y))
         self.result=None
+        self.completed=False
         self.arrange()
     def arrange(self):
         self.hi=AnimatedGif(self,'Resources\Media\\welcoming.gif',0.06)
@@ -73,7 +73,6 @@ class Mini(Tk):
         self.hi.start()
         self.place=threading.Thread(target=self.work,name='Wait')
         self.place.start()
-        
     def work(self):
         time.sleep(1.2)
         self.pb=Progressbar(self,orient=HORIZONTAL,length=260,mode='determinate')
@@ -128,11 +127,24 @@ class Mini(Tk):
             installing_thread=threading.Thread(target=self.checking.install,args=(self.lb,),name='Installer')
             installing_thread.start()
             installing_thread.join()
-        self.pb.destroy()
-        self.lb.config(text='Opening...')
-        self.lb.place_configure(x=60,y=350)
-        time.sleep(1)
+        self.pb.destroy()        
+        self.lb.config(text='Click Continue to start...')
+        self.bt=Button(self,text='Continue',command=self.register)
+        self.bt.config(relief='ridge',width=10,height=1)
+        self.bt['bg']='#33FFDD'
+        self.bt.bind('<Leave>',lambda x:self.bthover(False))
+        self.bt.bind('<Enter>',lambda x:self.bthover(True))
+        self.bt.bind('<Return>',lambda x:self.bthover(None))
+        self.lb.place_configure(x=50,y=300)
+        self.bt.place(x=250,y=355)
+    def register(self):
+        self.completed=True
+        self.destroy()
+    def bthover(self,state):
+        if state is None:
+            self.destroy()
+        else:
+            self.bt['bg']='#FF7E00' if state else '#33FFDD'
 if __name__=='__main__':
     a=Mini()
     a.mainloop()
-    del a
