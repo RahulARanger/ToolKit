@@ -19,6 +19,7 @@ import time
 import urllib.request
 from tkinter import font
 from tkinter.ttk import Progressbar
+from tkinter import messagebox
 import threading
 try:
     from root.animatedgif import * # When executed from this file
@@ -54,97 +55,130 @@ class StepZero:
 class Mini(Tk):
     def __init__(self):
         super().__init__()
-        self.failed=False
         self.check='https://www.google.co.in/'
         self.iconbitmap('Resources\Media\download.ico')
+        self.increment=0
+        self.balance()
         self['bg']='#FFFFFF'
         self.title('Welcome to Anvandbar')
-        x=int((self.winfo_screenwidth()-360)/2)
-        y=int((self.winfo_screenheight()-400)/2)
-        self.geometry('360x400+{}+{}'.format(x,y))
-        self.result=None
+        self.connected=None
         self.completed=False
         self.arrange()
-    def arrange(self):
-        self.hi=AnimatedGif(self,'Resources\Media\\welcoming.gif',0.06)
-        self.checking=StepZero()
-        self.resizable(0,0) # No maximize button
-        self.hi.place(x=0,y=0)
-        self.hi.start()
-        self.place=threading.Thread(target=self.work,name='Wait')
-        self.place.start()
-    def work(self):
-        time.sleep(1.2)
-        self.pb=Progressbar(self,orient=HORIZONTAL,length=260,mode='determinate')
-        self.pb.place(x=50,y=315)
-        self.pb['value']=0
-        checker=threading.Thread(target=self.checking.check,args=(self.pb,))
-        checker.start()
-        self.lb=Label(self,text='Checking Modules...',font=('Comic Sans MS',12,'bold'))
-        self.lb['bg']='#FFFFFF'
-        self.lb.place(x=80,y=350)
-        checker.join()
-        self.start_install()
+    def balance(self):
+        height=340+self.increment
+        x=int((self.winfo_screenwidth()-380)/2)
+        y=int((self.winfo_screenheight()-height)/2)
+        self.geometry('{}x{}+{}+{}'.format(380,height,x,y))
+        self.increment+=30
     def test(self):
         try:
             urllib.request.urlopen(self.check)
-            self.result=True
+            self.connected=True
         except:
             print('No Internet Connection')
             self.result=False
-    def start_install(self):
-        result=True if len(self.checking.to_install)>0 else False
-        self.pb.destroy()
-        self.pb=Progressbar(self,orient=HORIZONTAL,length=260,mode='indeterminate')
-        if result:
-            self.test()
-            if self.result is False:
-                self.lb.destroy()
-                self.hi.destroy()
-                self['bg']='black'
-                self.title('Modules Download Failed...')
-                x=int((self.winfo_screenwidth()-350)/2)
-                y=int((self.winfo_screenheight()-500)/2)
-                self.geometry('350x500+{}+{}'.format(x,y))
-                self.iconbitmap('Resources\Media\error.ico')
-                self.sorry=AnimatedGif(self,'Resources\Media\\sorry.gif',0.03)
-                self.sorry.start()
-                self.lb=Label(self,text='No Internet Connection',font=('Arial',15,'bold'))
-                self.lb2=Label(self,text='Please Try again later after connecting to Internet\n (for downloading Modules)',font=('Arial',10))
-                self.lb2['fg']='orange'
-                self.lb['bg']='black'
-                self.lb2['bg']='black'
-                self.lb['fg']='red'
-                self.sorry.place(x=0,y=0)
-                self.lb2.place(x=30,y=450)
-                self.resizable(0,0)
-                self.lb.place(x=70,y=420)
-                return None
-            self.pb.place(x=50,y=315)
-            self.pb.start()
-            self.lb.place_configure(x=50,y=350)
-            self.lb.config(text='Downloading and Installing Modules...')
-            installing_thread=threading.Thread(target=self.checking.install,args=(self.lb,),name='Installer')
-            installing_thread.start()
-            installing_thread.join()
-        self.pb.destroy()        
-        self.lb.config(text='Click Continue to start...')
-        self.bt=Button(self,text='Continue',command=self.register)
-        self.bt.config(relief='ridge',width=10,height=1)
-        self.bt['bg']='#33FFDD'
-        self.bt.bind('<Leave>',lambda x:self.bthover(False))
-        self.bt.bind('<Enter>',lambda x:self.bthover(True))
-        self.bt.bind('<Return>',lambda x:self.bthover(None))
-        self.lb.place_configure(x=50,y=300)
-        self.bt.place(x=250,y=355)
+    def arrange(self):
+        self.checking=StepZero()
+        self.resizable(0,0) # No maximize button
+        self.attributes('-disabled', True)
+        self.backg=Frame(self,background='#B3FFE5')
+        self.backg.pack(expand=True,fill=BOTH)
+        self.hi=AnimatedGif(self.backg,'Resources\Media\\welcoming.gif',0.06)
+        self.hi.pack(padx=6,pady=6)
+        self.hi.start()
+        self.workingpanel=Frame(self.backg,width=380)
+        self.workingpanel2=Frame(self.backg,width=380)
+        self.workingpanel3=Frame(self.backg,width=380)
+        self.workingpanel4=Frame(self.backg,width=380)
+        self.workingpanel.pack()
+        self.workingpanel2.pack(padx=6,fill=BOTH,expand=1,pady=2)
+        self.workingpanel3.pack(padx=6,fill=BOTH,expand=1,pady=2)
+        self.workingpanel4.pack(padx=6,fill=BOTH,expand=1)
+        self.place=threading.Thread(target=self.work,name='Wait')
+        self.place.start()
+    def work(self):
+        time.sleep(1)
+        self.workingpanel.config(background='#B3FFE5')
+        self.workingpanel.pack_configure(padx=6,fill=BOTH,expand=1)
+        self.contbt=Button(self.workingpanel,text='Continue')
+        self.bt=Button(self.workingpanel,text='Continue',relief=FLAT)
+        self.note=Label(self.workingpanel,text='Checking Modules',font=('verdana',10,'bold'),background='#0099E6')
+        self.note.pack(side=LEFT,anchor='nw',padx=2)
+        self.pb1=Progressbar(self.workingpanel,orient=HORIZONTAL,length=260,mode='determinate')
+        self.pb1.pack(side=LEFT,anchor='nw',padx=3)
+        self.pb1['value']=0
+        checker=threading.Thread(target=self.checking.check,args=(self.pb1,))
+        checker.start()
+        checker.join()
+        self.pb1.destroy()
+        self.needin=AnimatedGif(self.workingpanel,'Resources\\Media\\tick2.gif')
+        self.needin.start()
+        self.needin.pack(side=LEFT,anchor='nw',padx=3)
+        self.balance()
+        need=True if len(self.checking.to_install)>0 else False
+        if need:
+            self.start_install()
+        self.attributes('-disabled', False)
+        self.workingpanel3.config(background='#B3FFE5')
+        self.workingpanel3.pack_configure(padx=6,fill=BOTH,expand=1)
+        self.note2=Label(self.workingpanel3,text='Installation:',font=('verdana',10,'bold'),background='#0099E6')
+        self.note2.pack(side=LEFT,anchor='nw',padx=2,pady=3)
+        self.needin=AnimatedGif(self.workingpanel3,'Resources\\Media\\tick2.gif')
+        self.needin.start()
+        self.needin.pack(side=LEFT,anchor='nw',padx=3)
+        self.workingpanel4.config(background='#B3FFE5')
+        self.workingpanel4.pack_configure(padx=6,fill=BOTH,expand=1)
+        self.note4=Button(self.workingpanel4,text='Continue',command=self.register)
+        self.note4.config(relief='flat',width=10,height=2,bg='#FF8000',font=('Comic Sans MS',10,'bold'))
+        self.note4.pack(side=RIGHT,anchor='se',padx=3,pady=3)
+        self.note4.bind('<Leave>',lambda x:self.bthover(False))
+        self.note4.bind('<Enter>',lambda x:self.bthover(True))
+        self.note4.bind('<Return>',lambda x:self.bthover(None))
+        self.balance()
     def register(self):
         self.completed=True
         self.destroy()
-    def bthover(self,state):
-        if state is None:
-            self.destroy()
+    def bthover(self,status):
+        if status is None:
+            self.register()
         else:
-            self.bt['bg']='#FF7E00' if state else '#33FFDD'
+            if status:
+                self.note4['bg']='#FFFF00'
+                self.note4.pack_configure(padx=0,pady=0)
+                self.note4.config(relief='ridge')
+            else:
+                self.note4['bg']='#FF8000'
+                self.note4.pack_configure(padx=3,pady=3)
+                self.note4.config(relief='flat')
+    def start_install(self):
+        self.test()
+        print(self.connected)
+        if self.connected:
+            self.pb2=Progressbar(self.workingpanel2,orient=HORIZONTAL,length=260,mode='indeterminate')
+            self.workingpanel2.pack_configure(padx=6,fill=BOTH,expand=1)
+            self.pname=Label(self.workingpanel2,text='Downloading..',font=('verdana',8,'bold'),background='#0099E6')
+            self.pname.pack(side=LEFT,anchor='nw',padx=2)
+            self.pb2.pack(side=LEFT,anchor='nw',padx=3)
+            self.pb2.start()
+            installing_thread=threading.Thread(target=self.checking.install,args=(self.pname,),name='Installer')
+            installing_thread.start()
+            a=messagebox.showinfo('Don\'t Worry happens only at once','Need Some Modules!!! Downloading those so please wait!!!')
+            installing_thread.join()
+            self.pb2.destroy()
+            self.workingpanel2.destroy()
+            self.pname.destroy()
+        else:
+            widgets=self.winfo_children()
+            for i in widgets:
+                i.pack_forget()
+            self.title='No Internet Connection'
+            frame=Frame(self,background='#B3FFE5')
+            frame.pack(expand=True,fill=BOTH)
+            sorry=AnimatedGif(frame,'Resources\Media\\sorry.gif',0.03)
+            sorry.pack(padx=6,pady=6)
+            sorry.start()
+            a=messagebox.showinfo('Need Internet Connection','It seems some modules are needed!!! So for next time try opening this with Internet connection.')
 if __name__=='__main__':
     a=Mini()
     a.mainloop()
+    

@@ -4,10 +4,15 @@ class ToolKit:
     def __init__(self):
         self.PageZero=Mini()
     def start(self):
-        self.PageZero.mainloop()
-        if self.PageZero.failed or not self.PageZero.completed:
-            print(threading.active_count())
+        try:
+            self.PageZero.mainloop()
+            if self.PageZero.completed is False:
+                print('wht',self.PageZero.completed)
+                assert(False)
+        except:
+            print('Failed..')
             sys.exit(0)
         print('Page 0 is succesfully Completed')
 if __name__=='__main__':
-    ToolKit().start()
+    kit=ToolKit()
+    kit.start()
