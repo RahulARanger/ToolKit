@@ -4,10 +4,9 @@ from tkinter.ttk import Progressbar
 from tkinter import messagebox
 from tkinter import *
 import threading
-import time
 try:
     from root.animatedgif import *
-except:
+except:    
     from dir.root.animatedgif import *
 try:
     from dir.root.NetTest import *
@@ -33,7 +32,8 @@ class Installer(Tk):
         self.geometry('{}x{}+{}+{}'.format(360,300,int((self.winfo_screenwidth()-360)/2),int((self.winfo_screenheight()-300)/2)))
         self.MFrame=Frame(self,background='#84bbf8')
         self.HiFrame=Frame(self.MFrame,background='#84bbf8')
-        self.Hi=AnimatedGif(self.HiFrame,'Resources\Media\welcoming.gif',0.05)
+        self.Hi=AnimatedGif(self.HiFrame,'Resources\\Media\\welcoming.gif',0.05)
+        self.Hi.start()
         self.NFrame1=Frame(self.MFrame,background='#84bbf8')
         self.NFrame2=Frame(self.MFrame,background='#84bbf8')
         self.NFrame3=Frame(self.MFrame,background='#84bbf8')
@@ -78,8 +78,7 @@ class Installer(Tk):
         self.MFrame.pack(expand=True,fill=BOTH)
         self.HiFrame.pack(fill=X)
         self.Hi.pack(side=LEFT,padx=3,pady=3,anchor='nw')
-        self.NFrame1.pack(fill=X)
-        self.Hi.start()                
+        self.NFrame1.pack(fill=X)          
         self.after(1000,self.setup_1)               
         
     def check_modules(self,package):
@@ -199,8 +198,4 @@ class Installer(Tk):
             self.geometry('{}x{}+{}+{}'.format(360,self.height,int((self.winfo_screenwidth()-360)/2),int((self.winfo_screenheight()-self.height)/2)))
 if __name__=='__main__':
     a=Installer()
-    a.mainloop()
-    try:
-        Tk().mainloop()
-    except:
-        print('wow')
+    a.mainloop()    
