@@ -59,7 +59,8 @@ class Installer(Tk):
         self.completed=False
         self.arrange()
     def register(self):
-        self.completed=True
+        self.completed=True   
+        self.Hi.Stop()
         self.destroy()
     def bthover(self,status):
         if status is None:
@@ -79,7 +80,7 @@ class Installer(Tk):
         self.Hi.pack(side=LEFT,padx=3,pady=3,anchor='nw')
         self.NFrame1.pack(fill=X)
         self.Hi.start()                
-        self.after(1000,self.setup_1)        
+        self.after(1000,self.setup_1)               
         
     def check_modules(self,package):
         statement='import '+package
@@ -117,7 +118,7 @@ class Installer(Tk):
             except:
                 print('wht')
                 os.system('pip install {}'.format(package))
-    def setup_1(self):
+    def setup_1(self):        
         if self.setup1 is None:
             self.NFrame1.pack(fill=X)
             self.balance()
@@ -170,6 +171,7 @@ class Installer(Tk):
             else:    
                 self.setup2=69
                 self.attributes('-disabled', False)
+                self.installing.stop()
                 self.NFrame2.pack_forget()
                 self.balance(69)
         elif self.setup3 is None:
@@ -184,6 +186,9 @@ class Installer(Tk):
             self.NFrame4.pack(fill=X)
             self.Note4.pack(side=RIGHT,padx=3,pady=3,anchor='ne')
             self.setup4=69
+        else:
+            print('Hello')
+            return None
         self.after(1000,self.setup_1)   
     def balance(self,minus=None):
         if minus is None:
@@ -195,3 +200,7 @@ class Installer(Tk):
 if __name__=='__main__':
     a=Installer()
     a.mainloop()
+    try:
+        Tk().mainloop()
+    except:
+        print('wow')

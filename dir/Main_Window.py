@@ -6,6 +6,12 @@ try:
 except:
     from dir.GoogleTranslate import *
 import time
+import webbrowser
+
+def Open(x):
+	new=2
+	url=x
+	webbrowser.open(url,new=new)
 class Page1:
     def __init__(self,win,win2):
         self.frame=Frame(win,bg='#2d2d2d')
@@ -78,10 +84,10 @@ class Main(Tk):
         self.New.bind('<Button-1>',self.summonmain)
         self.New.bind('<Leave>',lambda x:self.bthover_menu(self.New,False))
         self.About.bind('<Enter>',lambda x:self.bthover_menu(self.About,True))
-        self.About.bind('<Button-1>',lambda x:self.bthover_menu(self.About,None))
+        self.About.bind('<Button-1>',lambda x:self.bthover_menu(self.About,None,'https://github.com/RahulARanger/ToolKit'))
         self.About.bind('<Leave>',lambda x:self.bthover_menu(self.About,False))
         self.Help.bind('<Enter>',lambda x:self.bthover_menu(self.Help,True))
-        self.Help.bind('<Button-1>',lambda x:self.bthover_menu(self.Help,None))
+        self.Help.bind('<Button-1>',lambda x:self.bthover_menu(self.Help,None,'https://github.com/RahulARanger/ToolKit/issues'))
         self.Help.bind('<Leave>',lambda x:self.bthover_menu(self.Help,False))
         self.arrange()
     def arrange(self):
@@ -101,9 +107,10 @@ class Main(Tk):
         self.Help.pack(side=LEFT,anchor='nw',padx=3)
         self.TimeNow.pack(side=RIGHT)
         self.ActiveFrame.pack(expand=True,fill=BOTH)
-    def bthover_menu(self,bt,status):
+    def bthover_menu(self,bt,status,link=''):
         if status is None:
             print('Clicked')
+            Open(link)
         else:
             bt['bg']='#4d4d4d' if status else '#323233'
     def size(self,*args):
@@ -154,5 +161,5 @@ class Main(Tk):
             else: 
                 self.ActiveTab=self.Tabs[change-1 if change!=0 else change]
             self.opentab(self.ActiveTab)
-
-Main().mainloop()
+if __name__=='__main__':
+    Main().mainloop()

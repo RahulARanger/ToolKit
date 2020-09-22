@@ -26,7 +26,7 @@ class AnimatedGif(tk.Label):
 		self.start_time = time.time()  # Starting timer
 		self._animate()
 
-	def stop(self):
+	def Stop(self):
 		""" This stops the after loop that runs the animation, if we are using the after() approach """
 		self.stop = True
 
