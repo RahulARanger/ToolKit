@@ -1,0 +1,3 @@
+pip install youtube_dl
+
+pip install pafy

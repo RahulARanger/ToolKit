@@ -76,7 +76,7 @@ class GTBackend:
 class GT(Frame):
     def __init__(self,parent):
         super().__init__(parent)
-        self.config(height=300)
+        self.config()
         self.TFrame=Frame(self)
         self.TFrame['bg']='#84bbf8'
         self.TGif=AnimatedGif(self.TFrame,'Resources\Media\Translator.gif')
@@ -86,6 +86,8 @@ class GT(Frame):
         self.TFrame.pack(fill=X)
         self.TGif.pack(anchor='n')
         self.TGif.start()
+        for i in range(1000):
+            Button(self.TFrame,text=str(i)).pack()
 
 if __name__=='__main__':
     root=Tk()

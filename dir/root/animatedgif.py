@@ -6,7 +6,7 @@ class AnimatedGif(tk.Label):
 	Class to show animated GIF file in a label
 	Use start() method to begin animation, and set the stop flag to stop it
 	"""
-	def __init__(self, root, gif_file, delay=0.04,bg='#FFFFFF'):
+	def __init__(self, root, gif_file, delay=0.04,c_cursor='',bg='#FFFFFF'):
 		"""
 		:param root: tk.parent
 		:param gif_file: filename (and path) of animated gif
@@ -15,6 +15,7 @@ class AnimatedGif(tk.Label):
 		tk.Label.__init__(self, root)
 		self.root = root
 		self['bg']=bg
+		self.config(cursor=c_cursor)
 		self.gif_file = gif_file
 		self.delay = delay  # Animation delay - try low floats, like 0.04 (depends on the gif in question)
 		self.stop = False  # Thread exit request flag

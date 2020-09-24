@@ -30,9 +30,9 @@ class Installer(Tk):
         self.step=100/len(Packages().ModuleNames)
         self.height=300
         self.geometry('{}x{}+{}+{}'.format(360,300,int((self.winfo_screenwidth()-360)/2),int((self.winfo_screenheight()-300)/2)))
-        self.MFrame=Frame(self,background='#84bbf8')
+        self.MFrame=Frame(self,background='#84bbf8',cursor='coffee_mug')
         self.HiFrame=Frame(self.MFrame,background='#84bbf8')
-        self.Hi=AnimatedGif(self.HiFrame,'Resources\\Media\\welcoming.gif',0.05)
+        self.Hi=AnimatedGif(self.HiFrame,'Resources\\Media\\welcoming.gif',0.05,'heart')
         self.Hi.start()
         self.NFrame1=Frame(self.MFrame,background='#84bbf8')
         self.NFrame2=Frame(self.MFrame,background='#84bbf8')
@@ -49,7 +49,7 @@ class Installer(Tk):
         self.Tick1=AnimatedGif(self.NFrame1,'Resources\\Media\\tick2.gif')
         self.Tick2=AnimatedGif(self.NFrame3,'Resources\\Media\\tick2.gif')
         self.checking=Progressbar(self.NFrame1,orient=HORIZONTAL,length=250,mode='determinate')
-        self.installing=Progressbar(self.NFrame2,orient=HORIZONTAL,length=250,mode='indeterminate')
+        self.installing=Progressbar(self.NFrame2,orient=HORIZONTAL,length=250,mode='determinate')
         self.checking['value']=0
         self.setup1=None
         self.setup2=None
@@ -113,9 +113,11 @@ class Installer(Tk):
             print(self.PackageNames[i])
             try:
                 print('wht')
+                time.sleep(3)
                 subprocess.check_call([sys.executable,'-m','pip','install',package])
             except:
                 print('wht')
+                time.sleep(3)
                 os.system('pip install {}'.format(package))
     def setup_1(self):        
         if self.setup1 is None:
