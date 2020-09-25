@@ -14,8 +14,8 @@ except:
     from root.NetTest import *
 class Packages:
     def __init__(self):
-        self.ModuleNames=['pytube','googletrans','pyglet','PIL']
-        self.PackageNames={'pytube':'pytube3','pyglet':'pyglet','googletrans':'googletrans','PIL':'pillow'}
+        self.ModuleNames=['pytube','googletrans','pyglet','PIL','pygame']
+        self.PackageNames={'pytube':'pytube3','pyglet':'pyglet','googletrans':'googletrans','PIL':'pillow','pygame':'pygame'}
 class Installer(Tk):
     def __init__(self):
         super().__init__()

@@ -1,4 +1,6 @@
 from tkinter import *
+import time
+from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
 try:
@@ -15,72 +17,63 @@ except:
     from root.NetTest import *
 import time
 import webbrowser
-class EmptyFrame(Frame):
-    def __init__(self,parent):
-        super().__init__(parent)
-        self['bg']='#323233'
-        self.lb=Label(self,text='Default Label')
-        self.lb.pack()
-
-class Default(Frame):
-    def __init__(self,parent2,parent):
-        super().__init__(parent)
-        self['bg']='orange'
-        self.parent=parent
-        self.parent2=parent2
-        self.bt=Button(self,text='Translator',command=lambda: self.select(1))
-        self.bt2=Button(self,text='Calculator',command=lambda: self.select(2))
-        self.bt.pack()
-        self.bt2.pack()
-    def select(self,choice):
-        for i in self.winfo_children():
-            i.destroy()
-        if choice==1:
-            a=GT(self)
-            a.pack(expand=True,fill=BOTH)
-            self.parent2.ActiveTab.name.config(text='Translator')
-            self.parent2.attributes('-fullscreen',True)
-            self.parent2.attributes('-fullscreen',False)
-        elif choice==2:
-            a=Calc(self)
-            self.parent2.ActiveTab.name.config(text='Calculator')
-            a.pack(expand=True,fill=BOTH)
+def do_this():
+    style = ttk.Style()
+    style.theme_use('clam')
+    style.configure("Horizontal.TScrollbar", gripcount=0,
+                    background="#424242", darkcolor='#1e1e1e', lightcolor='#1e1e1e',arrowsize=18,
+                    troughcolor='#1e1e1e', bordercolor="#424242", arrowcolor="orange",relief=FLAT)
+    style.configure("Vertical.TScrollbar", gripcount=0,
+                            background="#424242", darkcolor='#1e1e1e', lightcolor='#1e1e1e',arrowsize=18,
+                            troughcolor='#1e1e1e', bordercolor="#424242", arrowcolor="orange",relief=FLAT)
 def Open(x):
 	new=2
 	url=x
 	webbrowser.open(url,new=new)
-class Tab:
-    def __init__(self,win,frame,parent):
-        self.frame=Frame(win,bg='#2d2d2d')
-        self.index=None
+class MenuFrame(Frame):
+    def __init__(self,parent,name,link=''):
+        super().__init__(parent)
+        self['bg']="#424242"
         self.textcolor=('#74878f','#f1f1ff')
-        self.backcolor=('#2d2d2d','#1e1e1e')
-        self.name=Label(self.frame,text='Main',bg=self.backcolor[0],fg=self.textcolor[0],height=2)
-        self.cross=Label(self.frame,text='✖',bg=self.backcolor[0],fg=self.textcolor[0])
-        self.TabFrame=Default(parent,frame)
-        self.arrange()
-    def arrange(self):
-        self.name.pack(side=LEFT)
-        self.cross.pack(side=RIGHT)
-    def getFrame(self):
-        return self.frame
-    def activate(self):
-        self.name['bg']=self.backcolor[1]
-        self.frame['bg']=self.backcolor[1]
-        self.cross['bg']=self.backcolor[1]
-        self.name['fg']=self.textcolor[1]
-        self.cross['fg']=self.textcolor[1]
-        self.TabFrame.pack(fill=BOTH,expand=True)
-    def deactivate(self):
-        self.name['bg']=self.backcolor[0]
-        self.frame['bg']=self.backcolor[0]
-        self.cross['bg']=self.backcolor[0]
-        self.name['fg']=self.textcolor[0]
-        self.cross['fg']=self.textcolor[0]
-        self.TabFrame.pack_forget()
-    def destruct(self):
-        self.frame.destroy()
-        self.TabFrame.destroy()
+        self.backcolor=("#424242",'#5a5a5c')
+        self.link=link
+        self.name=Label(self,text=name,fg=self.textcolor[0],bg=self.backcolor[0],height=2)
+        self.name.bind('<Enter>',lambda x:self.bthover(False))
+        self.name.bind('<Leave>',lambda x :self.bthover(True))
+        self.name.bind('<Button-1>',lambda x :self.bthover(None))
+        self.name.pack()
+    def bthover(self,status):
+        if status is None:
+            Open(self.link)
+        else:
+            if status:
+                self.config(bg=self.backcolor[0])
+                self.name.config(fg=self.textcolor[0],bg=self.backcolor[0])
+            else:
+                self.config(bg=self.backcolor[1])
+                self.name.config(fg=self.textcolor[1],bg=self.backcolor[1])
+        
+class MenuOptionFrame(Frame):
+    def __init__(self,parent,var):
+        super().__init__(parent)
+        self.options=var
+        self.options.set('Main')
+        self.textcolor=('#74878f','#f1f1ff')
+        self.backcolor=("#424242",'#5a5a5c')
+        self.select=OptionMenu(self,self.options,'Main','Calculator','Translator')
+        self.select.config(background=self.backcolor[0],fg=self.textcolor[0],relief=FLAT,activeforeground=self.textcolor[1],activebackground=self.backcolor[1],highlightthickness=0,indicatoron=0)
+        self.select['menu'].config(bg='#1e1e1e',activeforeground='#f1f1ff',fg=self.textcolor[0])
+        self.select['menu']['cursor']='hand2'
+        print(self.select.keys())
+        print(self.select['menu'].keys())
+        self.select.pack(fill=BOTH,expand=True,side=LEFT)
+        self.bind('<Enter>',lambda x:self.bthover(True))
+        self.bind('<Leave>',lambda x:self.bthover(False))
+    def bthover(self,status):
+        if status:
+            self.config(bg=self.backcolor[1])
+        else:
+            self.config(bg=self.backcolor[0])
 class Clock(Label):
     def __init__(self,parent):
         super().__init__(parent)
@@ -102,137 +95,132 @@ class Wifi(Label):
         super().__init__(parent)
         self.status=Label(parent,text='✔️',bg='#007acc',fg='#40FF19',font=('Times',12,'bold'))
         self.config(text='Connected:',bg='#007acc',fg='#f1f1ff',font=('helvetica',12,'bold'))
-        self.after(1000,self.check)
+        self.after(500,self.check)
     def check(self):
         if NetworkCheck().MTest():
             self.status.config(text='✔️',fg='#40FF19')
         else:
             self.status.config(text='❌ ',fg='#FF0000')
-        self.after(1000,self.check)
-
-class Main(Tk):
-    def __init__(self):
-        super().__init__()        
-        self.fullsize=False
-        self.title('ToolKit')
-        self.geometry('{}x{}+-5+-6'.format(self.winfo_screenwidth(),self.winfo_screenheight()))
-        self.bind('<F11>',self.size)
-        self.MFrame=Frame(self)
-        self.MFrame.config(bg='#323233')
-        self.textcolor='#74878f'
-        self.buttoncolor='#323233'
-        self.Tabs=[]
-        self.MBFrame=Frame(self.MFrame)
-        self.MBFrame.config(bg='#323233')
-        self.TFrame=Frame(self.MFrame,height=1)
-        self.TFrame.config(bg='#252526')
-        self.SFrame=Frame(self.MFrame)
-        self.SFrame.config(bg='#007acc')
-        self.AFrame=Frame(self.MFrame,bg='#252526')
-        self.MCanvas=Canvas(self.AFrame,bg='#252526')
-        self.New=Label(self.MBFrame,relief=FLAT,text='New',bg='#323233',fg=self.textcolor,font=('helvetica',12,'bold'))
-        self.About=Label(self.MBFrame,relief=FLAT,text='About',bg='#323233',fg=self.textcolor,font=('helvetica',12,'bold'))
-        self.Help=Label(self.MBFrame,relief=FLAT,text='Help',bg='#323233',fg=self.textcolor,font=('helvetica',12,'bold'))
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure("Horizontal.TScrollbar", gripcount=0,
-                background="#424242", darkcolor='#1e1e1e', lightcolor='#1e1e1e',arrowsize=18,
-                troughcolor='#1e1e1e', bordercolor="#424242", arrowcolor="orange",relief=FLAT)
-        style.configure("Vertical.TScrollbar", gripcount=0,
-                        background="#424242", darkcolor='#1e1e1e', lightcolor='#1e1e1e',arrowsize=18,
-                        troughcolor='#1e1e1e', bordercolor="#424242", arrowcolor="orange",relief=FLAT)
-        self.VBar=ttk.Scrollbar(self.AFrame,orient=VERTICAL,command=self.MCanvas.yview)
-        self.HBar=ttk.Scrollbar(self.AFrame,orient=HORIZONTAL,command=self.MCanvas.xview)
-        self.AcFrame=Frame(self.MCanvas,bg='#1e1e1e')
-        self.ActiveFrame=Frame(self.AcFrame)
-        self.AIFrame=EmptyFrame(self.ActiveFrame)
-        self.ActiveTab=None
-        self.add_events()
-    def add_events(self):
-        self.TimeNow=Clock(self.SFrame)
-        self.WifiCheck=Wifi(self.SFrame)
-        self.HBar.config(cursor='hand2')
-        self.VBar.config(cursor='hand2')
-        self.New.bind('<Enter>',lambda x:self.bthover_menu(self.New,True))
-        self.New.bind('<Button-1>',self.summonmain)
-        self.New.bind('<Leave>',lambda x:self.bthover_menu(self.New,False))
-        self.About.bind('<Enter>',lambda x:self.bthover_menu(self.About,True))
-        self.About.bind('<Button-1>',lambda x:self.bthover_menu(self.About,None,'https://github.com/RahulARanger/ToolKit'))
-        self.About.bind('<Leave>',lambda x:self.bthover_menu(self.About,False))
-        self.Help.bind('<Enter>',lambda x:self.bthover_menu(self.Help,True))
-        self.Help.bind('<Button-1>',lambda x:self.bthover_menu(self.Help,None,'https://github.com/RahulARanger/ToolKit/issues'))
-        self.Help.bind('<Leave>',lambda x:self.bthover_menu(self.Help,False))
+        self.after(15000,self.check)
+class Tab(Frame):
+    def __init__(self,parent):
+        super().__init__(parent)
+        self['bg']='#2d2d2d'
+        self.Name=Label(self,text='Main Window',bg='#1e1e1e',fg='#f1f1ff')
+        self.Name.pack(padx=10,ipadx=10,ipady=1)        
+class Default(Frame):
+    def __init__(self,parent):
+        super().__init__(parent)
+        self.VFrame=Frame(self,bg='#252526')
         self.arrange()
     def arrange(self):
-        self.MFrame.pack(expand=True,fill=BOTH)
-        self.MBFrame.pack(fill=X)
-        self.TFrame.pack(fill=X)
-        self.SFrame.pack(side=BOTTOM,fill=X)
-        self.AFrame.pack(fill=BOTH,expand=True)
+        self.VFrame.pack(fill=BOTH,expand=True)
+        for i in range(100):
+            Button(self.VFrame,text=str(i)).pack()
+class Version(Label):
+    def __init__(self,parent):
+        super().__init__(parent)
+        self.textcolor=('#74878f','#f1f1ff')
+        self.backcolor=("#424242",'#5a5a5c')
+        self.config(text='v1.0',fg=self.textcolor[0],bg=self.backcolor[0])
+        self.bind('<Enter>',lambda x:self.bthover(True))
+        self.bind('<Leave>',lambda x:self.bthover(False))
+    def bthover(self,status):
+        if status:
+            self.config(text='v1.0',fg=self.textcolor[1],bg=self.backcolor[1])
+        else:
+            self.config(text='v1.0',fg=self.textcolor[0],bg=self.backcolor[0])
+class Selector(Frame):
+    def __init__(self,parent,which_one):
+        super().__init__(parent)
+        self.MCanvas=Canvas(self,bg='#252526')
+        self.VBar=ttk.Scrollbar(self,orient=VERTICAL,command=self.MCanvas.yview)
+        self.HBar=ttk.Scrollbar(self,orient=HORIZONTAL,command=self.MCanvas.xview)
+        self.VFrame=Frame(self.MCanvas,bg='#252526')
+        self.whichone=which_one
+        self.arrange()
+    def orientScreen(self,event):
+        self.MCanvas.yview_scroll(int(-1*(event.delta/120)),'units')
+    def arrange(self):
+        self.HBar.config(cursor='hand2')
+        self.VBar.config(cursor='hand2')
         self.MCanvas.configure(yscrollcommand=self.VBar.set,xscrollcommand=self.HBar.set)
         self.MCanvas.bind('<Configure>',lambda e:self.MCanvas.configure(scrollregion=self.MCanvas.bbox('all')))
-        self.MCanvas.create_window((0,0),window=self.AcFrame,anchor='nw',width=1339)
-        self.ActiveFrame.pack(fill=BOTH,expand=True)
-        self.AIFrame.pack(fill=BOTH,expand=True)
+        self.MCanvas.bind_all('<MouseWheel>',self.orientScreen)
+        self.MCanvas.create_window((0,0),window=self.VFrame,anchor='nw',width=1339)
+        self.AcFrame=None
+        if self.whichone==0:
+            self.AcFrame=Default(self.VFrame)
+        elif self.whichone==1:
+            self.AcFrame=Calc(self.VFrame)
+        elif self.whichone==2:
+            self.AcFrame=GT(self.VFrame)
+        self.AcFrame.pack(fill=BOTH,expand=True)
         self.HBar.pack(side=BOTTOM,fill=X)
         self.VBar.pack(side=RIGHT,fill=Y)
         self.MCanvas.pack(fill=BOTH, expand=True)
-        self.New.pack(side=LEFT,anchor='nw',padx=3)
-        self.About.pack(side=LEFT,anchor='nw',padx=3)
-        self.Help.pack(side=LEFT,anchor='nw',padx=3)
+class MainWindow(Tk):
+    def __init__(self):
+        super().__init__()
+        do_this()
+        self.geometry('{}x{}+-5+-6'.format(self.winfo_screenwidth(),self.winfo_screenheight()))
+        self['bg']='#252526'
+        self.var=StringVar()
+        self.bind('<F11>',self.size)
+        self.MFrame=Frame(self,bg='#323233')
+        self.MeFrame=Frame(self.MFrame,bg="#424242")
+        self.TabFrame=Tab(self.MFrame)
+        self.ActiveFrame=None
+        self.SFrame=Frame(self.MFrame)
+        self.SFrame.config(bg='#007acc')
+        self.TimeNow=Clock(self.SFrame)
+        self.WifiCheck=Wifi(self.SFrame)
+        self.VersionInfo=Version(self.MeFrame)
+        self.select=MenuOptionFrame(self.MeFrame,self.var)
+        self.about=MenuFrame(self.MeFrame,'About','https://github.com/RahulARanger/ToolKit')
+        self.help=MenuFrame(self.MeFrame,'Help','https://github.com/RahulARanger/ToolKit/issues')
+        self.arrange()
+    def arrange(self):
+        self.MFrame.pack(fill=BOTH,expand=True)
+        self.MeFrame.pack(fill=X)
+        self.select.pack(side=LEFT,padx=3,ipadx=3)
+        self.about.pack(side=LEFT,padx=3,ipadx=3)
+        self.help.pack(side=LEFT,padx=3,ipadx=3)
+        self.VersionInfo.pack(side=RIGHT,ipadx=3)
+        self.TabFrame.pack(fill=X,pady=3)
+        self.SFrame.pack(side=BOTTOM,fill=X)
         self.TimeNow.pack(side=RIGHT)
         self.WifiCheck.status.pack(side=RIGHT)
         self.WifiCheck.pack(side=RIGHT)
-    def bthover_menu(self,bt,status,link=''):
-        if status is None:
-            print('Clicked')
-            Open(link)
-        else:
-            bt['bg']='#4d4d4d' if status else '#323233'
+        self.var.trace('w',self.selectTools_2)
+        self.whichone=0
+        self.var.set('Main')
+        self.selectTools(0,True)
     def size(self,*args):
         self.fullsize=not self.fullsize
         self.attributes('-fullscreen',self.fullsize)
-    def summonmain(self,*args):
-        if len(self.Tabs)==4:
-            messagebox.showwarning(title="Sorry, We are Currently Working On this issue", message='Opening More than 4 tabs freezes app!')
+    def selectTools_2(self,*args):
+        note=['Main','Calculator','Translator']
+        got=self.var.get()
+        if note.index(got)==self.whichone:
+            pass
         else:
-            if self.ActiveTab is None:self.AIFrame.pack_forget()
-            new=Tab(self.TFrame,self.ActiveFrame,self)
-            new.index=len(self.Tabs)
-            new.frame.pack(side=LEFT)
-            new.name.bind('<Button-1>',lambda e:self.shiftTab(new))
-            new.cross.bind('<Button-1>',lambda e:self.closeTab(new))
-            self.Tabs.append(new)
-            self.shiftTab(self.Tabs[-1])
-    def shiftTab(self,new):
-        print(len(self.Tabs))
-        if self.ActiveTab is None:
-            self.ActiveTab=new
-            self.ActiveTab.activate()
+            self.whichone=note.index(got)
+            self.TabFrame.Name.config(text=note[self.whichone])
+            self.ActiveFrame.destroy()
+            self.ActiveFrame=Selector(self.MFrame,self.whichone)
+            self.ActiveFrame.pack(expand=True,fill=BOTH)
+    def selectTools(self,whichone,special=False):
+        print(self.var.get())
+        if self.whichone==whichone and not special:
+            pass
         else:
-            self.ActiveTab.TabFrame.pack_forget()
-            self.ActiveTab.deactivate()
-            self.ActiveTab=new
-            self.ActiveTab.activate()
-    def closeTab(self,new):
-        current=new.index
-        if current==self.ActiveTab.index:
-            self.ActiveTab=None
-        print(current)
-        print(len(self.Tabs))
-        del self.Tabs[current]
-        new.destruct()
-        if len(self.Tabs)==0:
-            self.ActiveTab=None
-            a=EmptyFrame(self.ActiveFrame)
-            a.pack(expand=True,fill=BOTH)
-        else:
-            if self.ActiveTab is None:
-                if current==len(self.Tabs):current-=1
-                self.ActiveTab=self.Tabs[current]
-                self.ActiveTab.activate()
-        for i in range(len(self.Tabs)):
-            self.Tabs[i].index=i
-        print(len(self.Tabs))
+            if self.ActiveFrame is not None:self.ActiveFrame.destroy()
+            self.whichone=whichone
+            if self.whichone!=0:
+                pass
+            self.ActiveFrame=Selector(self.MFrame,whichone)
+            self.ActiveFrame.pack(expand=True,fill=BOTH)
 if __name__=='__main__':
-    Main().mainloop()
+    a=MainWindow()
+    a.mainloop()
