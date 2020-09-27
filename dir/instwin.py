@@ -3,19 +3,39 @@ import os
 from tkinter.ttk import Progressbar
 from tkinter import messagebox
 from tkinter import *
-import threading
-try:
-    from root.animatedgif import *
-except:    
-    from dir.root.animatedgif import *
+import sys
 try:
     from dir.root.NetTest import *
 except:
     from root.NetTest import *
+try:
+    import PIL.Image
+except:
+    root=Tk()
+    lb=Label(root,text='This Window will disappear after this process is over')
+    lb.pack()
+    try:
+        root.title('Wait untill this window disappers')
+        if NetworkCheck().MTest() is False:
+            a=messagebox.showerror('Need Internet Connection','It seems some modules are needed!!! So for next time try opening this with Internet connection.')
+            root.destroy()
+            sys.exit(0)
+        else:
+            a=messagebox.showinfo('Don\'t Worry happens only at once','Need an Important Module!!! Downloading those so please wait!!!')
+            subprocess.check_call([sys.executable,'-m','pip','install','Pillow'])
+    except:
+        os.system('pip install Pillow')
+    root.destroy()
+try:
+    from root.ImageViewer import *
+except:
+    from dir.root.ImageViewer import *
+import threading
+import time
 class Packages:
     def __init__(self):
-        self.ModuleNames=['pytube','googletrans','pyglet','PIL','pygame']
-        self.PackageNames={'pytube':'pytube3','pyglet':'pyglet','googletrans':'googletrans','PIL':'pillow','pygame':'pygame'}
+        self.ModuleNames=['pytube','googletrans','mutagen','pygame']
+        self.PackageNames={'pytube':'pytube3','mutagen':'mutagen','googletrans':'googletrans','pygame':'pygame'}
 class Installer(Tk):
     def __init__(self):
         super().__init__()
@@ -25,15 +45,14 @@ class Installer(Tk):
         self.PackageNames=Packages().PackageNames
         self.to_Install=[]
         self.resizable(0,0)
-        self.attributes('-disabled', True)
-        self.iconbitmap('Resources\Media\download.ico')
+        self.attributes('-disabled', True)        
         self.step=100/len(Packages().ModuleNames)
         self.height=300
         self.geometry('{}x{}+{}+{}'.format(360,300,int((self.winfo_screenwidth()-360)/2),int((self.winfo_screenheight()-300)/2)))
         self.MFrame=Frame(self,background='#84bbf8',cursor='coffee_mug')
         self.HiFrame=Frame(self.MFrame,background='#84bbf8')
-        self.Hi=AnimatedGif(self.HiFrame,'Resources\\Media\\welcoming.gif',0.05,'heart')
-        self.Hi.start()
+        self.HiPhotos=['Resources\Media\\hi\\hi{}.jpg'.format(i) for i in range(1,19)]
+        self.Hi=ImageAlbum(self.HiFrame,self.HiPhotos,360,300,50)
         self.NFrame1=Frame(self.MFrame,background='#84bbf8')
         self.NFrame2=Frame(self.MFrame,background='#84bbf8')
         self.NFrame3=Frame(self.MFrame,background='#84bbf8')
@@ -46,8 +65,9 @@ class Installer(Tk):
         self.Note4.bind('<Leave>',lambda x:self.bthover(False))
         self.Note4.bind('<Enter>',lambda x:self.bthover(True))
         self.Note4.bind('<Return>',lambda x:self.bthover(None))
-        self.Tick1=AnimatedGif(self.NFrame1,'Resources\\Media\\tick2.gif')
-        self.Tick2=AnimatedGif(self.NFrame3,'Resources\\Media\\tick2.gif')
+        self.ticks=['Resources\\Media\\tick\\tick{}.jpg'.format(i) for i in range(35)]
+        self.Tick1=ImageAlbum(self.NFrame1,self.ticks,50,20,50)
+        self.Tick2=ImageAlbum(self.NFrame3,self.ticks,50,20,50)
         self.checking=Progressbar(self.NFrame1,orient=HORIZONTAL,length=250,mode='determinate')
         self.installing=Progressbar(self.NFrame2,orient=HORIZONTAL,length=250,mode='determinate')
         self.checking['value']=0
@@ -60,7 +80,6 @@ class Installer(Tk):
         self.arrange()
     def register(self):
         self.completed=True   
-        self.Hi.Stop()
         self.destroy()
     def bthover(self,status):
         if status is None:
@@ -77,10 +96,9 @@ class Installer(Tk):
     def arrange(self):
         self.MFrame.pack(expand=True,fill=BOTH)
         self.HiFrame.pack(fill=X)
-        self.Hi.pack(side=LEFT,padx=3,pady=3,anchor='nw')
+        self.Hi.pack(padx=3,pady=3,anchor='n')
         self.NFrame1.pack(fill=X)          
-        self.after(1000,self.setup_1)               
-        
+        self.after(1000,self.setup_1)      
     def check_modules(self,package):
         statement='import '+package
         try:
@@ -138,7 +156,6 @@ class Installer(Tk):
         elif self.setup1 is True:
             self.checking.pack_forget()
             self.Tick1.pack(side=LEFT,padx=3,pady=3,anchor='nw')
-            self.Tick1.start()
             self.setup1=69
         elif self.setup2 is None:
             self.setup2=False
@@ -153,16 +170,9 @@ class Installer(Tk):
             if self.quick_check() is False:
                 if NetworkCheck().MTest() is False:
                     self.completed=False
-                    self.MFrame.destroy()
-                    self.balance()                    
-                    self.MFrame=Frame(self,bg='#84bbf8')
-                    self.sorry=AnimatedGif(self.MFrame,'Resources\Media\sorry.gif',0.03)
-                    self.MFrame.pack(expand=True,fill=BOTH)
-                    self.sorry.pack(side=LEFT,anchor='nw')
-                    self.sorry.start()
-                    self.a=messagebox.showinfo('Need Internet Connection','It seems some modules are needed!!! So for next time try opening this with Internet connection.')
-                    print(self.a)
-                    return None
+                    self.installing.stop()
+                    self.a=messagebox.showerror('Need Internet Connection','It seems some modules are needed!!! So for next time try opening this with Internet connection.')
+                    self.destroy()
                 if NetworkCheck().MTest() is True and not self.flag:
                     a=messagebox.showinfo('Don\'t Worry happens only at once','Need Some Modules!!! Downloading those so please wait!!!')
                     self.flag=True
@@ -180,7 +190,7 @@ class Installer(Tk):
             self.NFrame3.pack(fill=X)
             self.Note3.pack(side=LEFT,padx=3,pady=3,anchor='nw')
             self.Tick2.pack(side=LEFT,padx=3,pady=3,anchor='nw')
-            self.Tick2.start()
+            
             self.setup3=69
         elif self.setup4 is None:
             self.balance()            

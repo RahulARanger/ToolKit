@@ -4,6 +4,10 @@ from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
 try:
+    from root.ImageViewer import *
+except:
+    from dir.root.ImageViewer import *
+try:
     from GoogleTranslate import *
 except:
     from dir.GoogleTranslate import *
@@ -64,8 +68,6 @@ class MenuOptionFrame(Frame):
         self.select.config(background=self.backcolor[0],fg=self.textcolor[0],relief=FLAT,activeforeground=self.textcolor[1],activebackground=self.backcolor[1],highlightthickness=0,indicatoron=0)
         self.select['menu'].config(bg='#1e1e1e',activeforeground='#f1f1ff',fg=self.textcolor[0])
         self.select['menu']['cursor']='hand2'
-        print(self.select.keys())
-        print(self.select['menu'].keys())
         self.select.pack(fill=BOTH,expand=True,side=LEFT)
         self.bind('<Enter>',lambda x:self.bthover(True))
         self.bind('<Leave>',lambda x:self.bthover(False))
@@ -167,6 +169,7 @@ class MainWindow(Tk):
         self['bg']='#252526'
         self.var=StringVar()
         self.bind('<F11>',self.size)
+        self.state('zoomed')
         self.MFrame=Frame(self,bg='#323233')
         self.MeFrame=Frame(self.MFrame,bg="#424242")
         self.TabFrame=Tab(self.MFrame)

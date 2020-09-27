@@ -2,9 +2,9 @@ import googletrans
 import json
 from tkinter.ttk import Combobox
 try:
-    from root.animatedgif import * # When executed from this file
+    from root.ImageViewer import *
 except:
-    from dir.root.animatedgif import *
+    from dir.root.ImageViewer import *
 from tkinter import *
 class GTBackend:
     def __init__(self):

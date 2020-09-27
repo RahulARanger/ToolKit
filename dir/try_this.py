@@ -1,50 +1,58 @@
 from tkinter import *
-class MenuFrame(Frame):
-    def __init__(self,parent,name,link=''):
+from tkinter import ttk
+import json
+class PlayListFrame(Frame):
+    def __init__(self,parent,name='Hello'):
         super().__init__(parent)
-        self['bg']='#2d2d2d'
-        self.textcolor=('#74878f','#f1f1ff')
-        self.backcolor=('#2d2d2d','#474748')
-        self.link=link
-        self.name=Label(self,text=name,fg=self.textcolor[0],bg=self.backcolor[0],height=2)
-        self.name.bind('<Enter>',lambda x:self.bthover(False))
-        self.name.bind('<Leave>',lambda x :self.bthover(True))
-        self.name.pack()
-    def bthover(self,status):
-        if status is None:pass
-        else:
-            if status:
-                self.config(bg=self.backcolor[0])
-                self.name.config(fg=self.textcolor[0],bg=self.backcolor[0])
-            else:
-                self.config(bg=self.backcolor[1])
-                self.name.config(fg=self.textcolor[1],bg=self.backcolor[1])
+        self.Modify=Button(self,text='',cursor='pencil')
+        self.Delete=Button(self,text='',cursor='')
+        self.Name=Label(self,text=name)
+    
 
 
-        
-class MenuOptionFrame(Frame):
-    def __init__(self,parent,name):
+class PlayList(Toplevel):
+    def __init__(self,parent):
         super().__init__(parent)
-        self.options=StringVar()
-        self.options.set('Main')
-        self.textcolor=('#74878f','#f1f1ff')
-        self.backcolor=('#2d2d2d','#474748')
-        self.select=OptionMenu(self,self.options,'Main','Calculator','Translator')
-        self.select.config(background=self.backcolor[0],fg=self.textcolor[0],relief=FLAT,activeforeground=self.textcolor[1],activebackground=self.backcolor[1],highlightthickness=0,indicatoron=0)
-        self.select['menu'].config(bg='#1e1e1e',activeforeground='#f1f1ff',fg=self.textcolor[0])
-        self.select['menu']['cursor']='hand2'
-        print(self.select.keys())
-        print(self.select['menu'].keys())
-        self.select.pack(fill=BOTH,expand=True,side=LEFT)
-if __name__=="__main__":
-    root=Tk()
-    MFrame=Frame(root)
-    MFrame['bg']='#2d2d2d'
-    c=MenuOptionFrame(MFrame,'Select')
-    b=MenuFrame(MFrame,'About')
-    a=MenuFrame(MFrame,'Help')
-    c.pack(side=LEFT)
-    b.pack(side=LEFT)
-    a.pack(side=LEFT)
-    MFrame.pack(fill=X,expand=True)
-    root.mainloop()
+        self.BFrame=Frame(self)
+        self.BCanvas=Canvas(self.BFrame,bg='#EFDECD')
+        self.FFrame=Frame(self.BCanvas,bg='#EFDECD')
+        self.MFrame=Frame(self.FFrame,bg='#EFDECD')
+        self.geometry('400x400')
+        self.lst=[]
+        self.openplaylist()
+        self.PlayLists=PlayListFrame(self)
+        self.title('Choose Your PlayLists')
+        self.VBar=ttk.Scrollbar(self.BFrame,orient=VERTICAL,command=self.BCanvas.yview)
+        self.add=Button(self,text='+',command=self.createplaylist)
+        self.openthem()
+        self.arrange()
+    def arrange(self):
+        self.BCanvas.configure(yscrollcommand=self.VBar.set)
+        self.BCanvas.bind('<Configure>',lambda e:self.BCanvas.configure(scrollregion=self.BCanvas.bbox('all')))
+        self.BCanvas.create_window((0,0),window=self.FFrame,anchor='nw',width=400)
+        self.BCanvas.bind_all('<MouseWheel>',self.orientScreen)
+        self.BFrame.pack(fill=BOTH,expand=True)
+        self.BCanvas.pack(fill=BOTH,expand=True,side=LEFT)
+        self.VBar.pack(expand=True,fill=Y,side=RIGHT)
+        self.MFrame.pack(fill=BOTH,expand=True)
+    def openplaylist(self):
+        with open('dir\playlists.json','r') as playlistfile:
+            playlist=json.loads(playlistfile.read())
+            self.lst=playlist["Playlists"]
+            print(self.lst)
+    def orientScreen(self,event):
+        self.BCanvas.yview_scroll(int(-1*(event.delta/120)),'units')
+    def openthem(self):
+        pass
+    def createplaylist(self):
+        pass
+
+if __name__=='__main__':
+    a=Tk()
+    def openit():
+        b=PlayList(a)
+    bt=Button(a,text='Open',command=openit)
+    bt.pack()
+    
+    a.mainloop()
+    

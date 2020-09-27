@@ -4,9 +4,9 @@ import string
 from tkinter import font
 
 try:
-    from root.animatedgif import *
+    from root.ImageViewer import *
 except:
-    from dir.root.animatedgif import *
+    from dir.root.ImageViewer import *
 def Fill(variable,text,status=None):
     if status is None:variable.insert(INSERT,text)
     else:
@@ -125,7 +125,8 @@ class Calc(Frame):
         self.OFrame=Frame(self.CFrame,background='#635252')
         self.Row1=Frame(self.CFrame,bg='#a5de03')
         self.Row2=Frame(self.CFrame,bg='#a5de03')
-        self.Text=AnimatedGif(self,'Resources\Media\Cal.gif',0.01)
+        self.photos=['Resources\Media\\calc\\calc{}.jpg'.format(i) for i in range(1,20)]
+        self.Text=ImageAlbum(self,self.photos,560,500)        
         self.Row3=Frame(self.CFrame,bg='#a5de03')
         self.Row4=Frame(self.CFrame,bg='#a5de03')
         self.Row5=Frame(self.CFrame,bg='#a5de03')
@@ -152,8 +153,7 @@ class Calc(Frame):
         self.arrange()
     def arrange(self):
         self.OVar.trace('w',self.check)
-        self.Text.pack(padx=20,pady=20)
-        self.Text.start()
+        self.Text.pack(padx=20,pady=20)        
         self.CFrame.pack(padx=5,pady=5)
         self.CFrame.pack_propagate(0)
         self.OFrame.pack(padx=30,pady=40)
