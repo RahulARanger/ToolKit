@@ -2,11 +2,17 @@ from tkinter import *
 import tkinter.ttk as ttk
 import string
 from tkinter import font
-
+from tkinter import messagebox
 try:
     from root.ImageViewer import *
 except:
     from dir.root.ImageViewer import *
+class BackEnd:
+    def __init__(self,exp):
+        self.exp=exp
+    def result(self):
+        self.ans=eval(self.exp)
+        return self.ans
 def Fill(variable,text,status=None):
     if status is None:variable.insert(INSERT,text)
     else:
@@ -14,9 +20,37 @@ def Fill(variable,text,status=None):
             variable.delete(0,END)
         elif status is False:
             pass
+        elif status==420:
+            flag=True
+            if len(variable.get())==0:flag=False
+            for i in variable.get():
+                if i not in string.digits and i!='.':
+                    flag=False
+            if not flag:
+                x=messagebox.showerror('OMG!!!!!!!','Senpai, For rounding i need an answer i cannot do with expression')
+            else:
+                variable.set(int(eval(variable.get())))
         elif status==69:
-            pass
-
+            try:
+                b=variable.get()
+                ans=[]
+                for i in b:
+                    if i=='^':
+                        ans.append('**')
+                    else:
+                        ans.append(i)
+                b=''.join(ans)
+                eval(b)
+                a=BackEnd(b).result()
+                print(a)
+                a=str(a)
+                if len(a)>300:
+                    print(a,len(a))
+                    assert(False)
+                print(type(a))
+                variable.set(a)
+            except:
+                x=messagebox.showerror('OMG!!!!!!!','Senpai, This is just a simple Calculator')
 class NumButton(Frame):
     def __init__(self,parent,number,font,var,screen):
         super().__init__(parent)
@@ -79,7 +113,7 @@ class SymButton(Frame):
     def pressed(self,status,number):
         if status:
             self.Symbol.config(relief=SUNKEN)
-            if self.sym not in '⌫C=':
+            if self.sym not in '⌫C=R':
                 if self.sym in '➗':
                     Fill(self.screen,'/')
                 elif self.sym=='➕':
@@ -90,15 +124,19 @@ class SymButton(Frame):
                     Fill(self.screen,'*')
                 else:Fill(self.screen,number)
             else:
-                demo={'C':True,'⌫':False,'=':69}
-                if demo[self.sym]!=69:Fill(self.screen,self.sym,demo[self.sym])
+                demo={'C':True,'⌫':False,'=':69,'R':420}
+                if demo[self.sym]!=69 and demo[self.sym]!=420:Fill(self.screen,self.sym,demo[self.sym])
+                elif demo[self.sym]==420:
+                    Fill(self.var,self.sym,420)
                 else:self.just_call()
         else:self.Symbol.config(relief=RAISED)
     def just_call(self):
         # ? Only for the '=' Button
         if self.isthere:
+            print(type(self.var))
             print(self.var.get())
             Fill(self.var,self.sym,69)
+            self.screen.icursor(END)
     def disableIt(self):
         if self.isthere:
             self.Symbol.unbind('<Button-1>')        
@@ -135,7 +173,8 @@ class Calc(Frame):
         self.Plus=SymButton(self.Row3,'➕',self.OFont,self.OVar,self.OutputScreen)
         self.Minus=SymButton(self.Row4,'➖',self.OFont,self.OVar,self.OutputScreen)
         self.Multiply=SymButton(self.Row2,'✖️',self.OFont,self.OVar,self.OutputScreen)
-        self.Divide=SymButton(self.Row1,'➗',self.OFont,self.OVar,self.OutputScreen)        
+        self.Divide=SymButton(self.Row1,'➗',self.OFont,self.OVar,self.OutputScreen)
+        self.Round=SymButton(self.Row1,'R',self.OFont,self.OVar,self.OutputScreen)        
         self.LB=SymButton(self.Row4,'(',self.OFont,self.OVar,self.OutputScreen)
         self.RB=SymButton(self.Row4,')',self.OFont,self.OVar,self.OutputScreen)
         self.Power=SymButton(self.Row4,'^',self.OFont,self.OVar,self.OutputScreen)
@@ -145,6 +184,7 @@ class Calc(Frame):
         self.Back=SymButton(self.Row5,'⌫',self.OFont,self.OVar,self.OutputScreen)
         self.Zero=NumButton(self.Row5,'0',self.OFont,self.OVar,self.OutputScreen)
         self.Clear=SymButton(self.Row5,'C',self.OFont,self.OVar,self.OutputScreen)
+        self.Decimal=SymButton(self.Row5,'.',self.OFont,self.OVar,self.OutputScreen)
         self.Numbers=[NumButton(self.Row1,str(i),self.OFont,self.OVar,self.OutputScreen) for i in {7,8,9}]
         self.Numbers.extend([NumButton(self.Row2,str(i),self.OFont,self.OVar,self.OutputScreen) for i in {4,5,6}])
         self.Numbers.extend([NumButton(self.Row3,str(i),self.OFont,self.OVar,self.OutputScreen) for i in {3,2,1}])
@@ -167,19 +207,21 @@ class Calc(Frame):
         self.Row4.pack()  
         self.Row5.pack()        
         for i in range(len(self.Numbers)):
-            if i in [0,3,6]:self.Numbers[i].pack(side=LEFT,padx=28,pady=6)
-            else:self.Numbers[i].pack(side=LEFT,padx=20,pady=6)  
-        self.Power.pack(side=LEFT,padx=28,pady=6)
-        self.LB.pack(side=LEFT,padx=20,pady=6)
-        self.RB.pack(side=LEFT,padx=20,pady=6)
-        self.Divide.pack(side=LEFT,padx=20,pady=6)
-        self.Multiply.pack(side=LEFT,padx=20,pady=6)
-        self.Plus.pack(side=LEFT,padx=20,pady=6)
-        self.Minus.pack(side=LEFT,padx=20,pady=6)
-        self.Zero.pack(side=LEFT,padx=28,pady=6)
-        self.Equal.pack(side=LEFT,padx=20,pady=6)
-        self.Back.pack(side=LEFT,padx=20,pady=6)
-        self.Clear.pack(side=LEFT,padx=20,pady=6)
+            if i in [0,3,6]:self.Numbers[i].pack(side=LEFT)
+            else:self.Numbers[i].pack(side=LEFT)
+        self.Power.pack(side=LEFT)
+        self.LB.pack(side=LEFT)
+        self.RB.pack(side=LEFT)
+        self.Divide.pack(side=LEFT)
+        self.Round.pack(side=LEFT)
+        self.Multiply.pack(side=LEFT)
+        self.Plus.pack(side=LEFT)
+        self.Minus.pack(side=LEFT)
+        self.Zero.pack(side=LEFT)
+        self.Equal.pack(side=LEFT)
+        self.Back.pack(side=LEFT)
+        self.Clear.pack(side=LEFT)
+        self.Decimal.pack(side=LEFT)
         self.Error.pack(fill=X,expand=True)
         self.OutputScreen.focus_set()
         self.OutputScreen.bind('<Return>',lambda x: self.printResult(x))
@@ -227,8 +269,15 @@ class Calc(Frame):
     def filter(self,exp):
             ans=[]
             for letter in exp:
-                if letter in string.digits or letter in ['+','/','-','(',')','*','^']:
+                if letter in string.digits or letter in ['+','/','-','(',')','*','^','.']:
                     ans.append(letter)
+                elif letter=='r':
+                    self.OVar.set(self.OVar.get()[:-1])
+                    Fill(self.OVar,'R',420)
+                    return None
+                elif letter=='c':
+                    self.OutputScreen.delete(0,END)
+                    return None
                 else:
                     pass
             self.OVar.set(''.join(ans))

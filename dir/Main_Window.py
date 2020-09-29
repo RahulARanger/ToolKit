@@ -19,6 +19,10 @@ try:
     from dir.root.NetTest import *
 except:
     from root.NetTest import *
+try:
+    from dir.mediaplayer import *
+except:
+    from mediaplayer import *
 import time
 import webbrowser
 def do_this():
@@ -176,6 +180,7 @@ class MainWindow(Tk):
         self.ActiveFrame=None
         self.SFrame=Frame(self.MFrame)
         self.SFrame.config(bg='#007acc')
+        self.Mp3Player=MediaPlayer(self.SFrame)
         self.TimeNow=Clock(self.SFrame)
         self.WifiCheck=Wifi(self.SFrame)
         self.VersionInfo=Version(self.MeFrame)
@@ -192,6 +197,7 @@ class MainWindow(Tk):
         self.VersionInfo.pack(side=RIGHT,ipadx=3)
         self.TabFrame.pack(fill=X,pady=3)
         self.SFrame.pack(side=BOTTOM,fill=X)
+        self.Mp3Player.pack(side=LEFT)
         self.TimeNow.pack(side=RIGHT)
         self.WifiCheck.status.pack(side=RIGHT)
         self.WifiCheck.pack(side=RIGHT)
