@@ -29,16 +29,18 @@ class LabelButtons(Label):
         self.backcolor=('#007acc','#33BBFF')
         self.specialcolor='#FF5500'
         self.enable=False
+        self.w=200
+        self.h=200
+        self.type=None
         self.togglestatus=False
         self.config(bg=self.backcolor[0])
-        if self['text']=='    🔄️':
+        if self['text']=='Re':
             self.config(width=3)
+            self.after(800,self.toggle)
         self.config(fg=self.textcolor[0],font=('Helvtica',13,x),height=2)
         self.bind('<Enter>',lambda x:self.bthover(True))
         self.bind('<Leave>',lambda x:self.bthover(False))
-        self.bind('<Button-1>',lambda x:self.btaffect(False))        
-        if self['text']=='    🔄️':
-            self.after(1000,self.toggle)
+        self.bind('<Button-1>',lambda x:self.btaffect(False))                
     def toggle(self):
         if self.enable:
             if not self.togglestatus:
@@ -65,7 +67,7 @@ class MediaPlayer(Frame):
         pygame.mixer.music.get_endevent()
         self.config(bg='#007acc')
         self.play=LabelButtons(self,'  ▶ ')
-        self.replay=LabelButtons(self,'    🔄️')
+        self.replay=LabelButtons(self,'Re')
         self.playing=False 
         self.status=None
         self.checkpoint=None
@@ -112,7 +114,7 @@ class MediaPlayer(Frame):
             print(self.playing,self.started)
             if not self.playing:
                 print('a')
-                self.play.config(text='⏸️')
+                self.play.config(text=' | | ')
                 if self.uploaded:
                     # TODO : plays 
                     if not self.started:
@@ -145,7 +147,7 @@ class MediaPlayer(Frame):
                 self.showl.pack(side=LEFT,padx=3)
                 self.scale.pack(side=LEFT,padx=3)
                 self.showr.pack(side=LEFT,padx=3)
-                self.play.config(text='⏸️')
+                self.play.config(text=' | | ')
                 self.set('replay')
     def change_it(self,*ags):
         if self.uploaded:

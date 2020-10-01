@@ -1,23 +1,18 @@
-# -*- coding: utf8 -*-
-from tkinter import *
-from tkinter import messagebox
-import os
-import colorama
-import requests
-colorama.init()
-root = Tk()
-root.title('Test')
+class CustomText(tk.Text):
+    def __init__(self, *args, **kwargs):
+        """A text widget that report on internal widget commands"""
+        tk.Text.__init__(self, *args, **kwargs)
 
-def done():
-    print("test")
+        # create a proxy for the underlying widget
+        self._orig = self._w + "_orig"
+        self.tk.call("rename", self._w, self._orig)
+        self.tk.createcommand(self._w, self._proxy)
 
-def downscale():
-    root.geometry('{}x{}'.format(root.winfo_width()//2,root.winfo_height()//2))
+    def _proxy(self, command, *args):
+        cmd = (self._orig, command) + args
+        result = self.tk.call(cmd)
 
-downscale = Button(root, text='Can you see the done button?', command=downscale)
-downscale.grid(row=1, column=1)
+        if command in ("insert", "delete", "replace"):
+            self.event_generate("<<TextModified>>")
 
-b = Button(root, text='Done')
-b.grid(row=50, column=50)
-
-root.mainloop()
+        return result

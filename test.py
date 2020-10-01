@@ -1,21 +1,10 @@
-import tkinter as tk
-from tkinter import ttk
+from tkinter import *
 
-root = tk.Tk()
-buttons = [None] * 7
+a=Tk()
+def check():
+    print(x.get('1.0',END))
+x=Text(a)
+b=Button(a,text='Check',commandse)
+x.pack()
 
-
-def del_button():
-    for i in range(5, 7):
-        buttons[i].destroy()
-
-
-for i in range(7):
-    buttons[i] = ttk.Button(root, text=f"{i}")
-    buttons[i].grid(column=i, row=0, sticky=tk.E)
-    root.columnconfigure(i, weight=1)
-
-button_del = ttk.Button(root, text='Delete', command=del_button)
-button_del.grid(column=0, row=1)
-
-root.mainloop()
+a.mainloop()
