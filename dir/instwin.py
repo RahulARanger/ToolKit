@@ -44,6 +44,7 @@ class Installer(Tk):
         # ! Imp. (Package Names)
         self.PackageNames=Packages().PackageNames
         self.to_Install=[]
+        self.title('Setting things up !!!, Senpai')
         self.resizable(0,0)
         self.attributes('-disabled', True)        
         self.step=100/len(Packages().ModuleNames)

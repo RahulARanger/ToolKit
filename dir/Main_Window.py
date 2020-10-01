@@ -153,7 +153,7 @@ class Selector(Frame):
         self.MCanvas.configure(yscrollcommand=self.VBar.set,xscrollcommand=self.HBar.set)
         self.MCanvas.bind('<Configure>',lambda e:self.MCanvas.configure(scrollregion=self.MCanvas.bbox('all')))
         self.MCanvas.bind_all('<MouseWheel>',self.orientScreen)
-        self.MCanvas.create_window((0,0),window=self.VFrame,anchor='nw',width=1339)
+        self.MCanvas.create_window((0,0),window=self.VFrame,anchor='nw',width=1350)
         self.AcFrame=None
         if self.whichone==0:
             self.AcFrame=Default(self.VFrame)

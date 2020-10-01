@@ -114,22 +114,21 @@ class MediaPlayer(Frame):
                 print('a')
                 self.play.config(text='⏸️')
                 if self.uploaded:
-                    # TODO : playes 
-                        if not self.started:
-                            pygame.mixer.music.play(0)
-                            self.started=True
-                        else:
-                            pygame.mixer.music.unpause()
+                    # TODO : plays 
+                    if not self.started:
+                        pygame.mixer.music.play(0)
+                        self.started=True
+                    else:
+                        pygame.mixer.music.unpause()
             else:
                 # TODO: pauses it
-
                 self.play.config(text='  ▶ ',justify=RIGHT)
                 if self.uploaded and self.playing:
                         pygame.mixer.music.pause()
             if self.started:self.playing=not(self.playing)
         else:
             if self.uploaded:  
-                # TODO: replayes
+                # TODO: replays
                 self.replay.enable=False
                 self.started,self.playing=False,False
                 MUSIC_END = pygame.USEREVENT+1

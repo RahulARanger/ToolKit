@@ -1,0 +1,15 @@
+{
+    "Playlists": [
+        "Default",
+        "Hello"
+    ],
+    "Default": [
+        "Resources\\Media\\Centimeter.mp3",
+        "Resources\\Media\\Kokuhaku bungee jump.mp3"
+    ],
+    "Hello": [
+        "a",
+        "b",
+        "c"
+    ]
+}

@@ -1,5 +1,4 @@
 from dir.instwin import *
-from dir.Main_Window import *
 while True:
     print('The Following Messages in these Prompt are Just Log Messages!!! Just Ignore them')
     PageZero=Installer()
