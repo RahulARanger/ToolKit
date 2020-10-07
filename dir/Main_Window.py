@@ -4,6 +4,10 @@ from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
 try:
+    from Settings import *
+except:
+    from dir.Settings import *
+try:
     from root.ImageViewer import *
 except:
     from dir.root.ImageViewer import *
@@ -89,13 +93,23 @@ class Clock(Label):
         self.parent=parent
         self.Hours=IntVar()
         self.WTime=StringVar()
+        self.backcolor=('#007acc','#33BBFF')
         self.config(textvariable=self.WTime,bg='#007acc',fg='#f1f1ff',font=('helvetica',12,'bold'))
+        self.bind('<Enter>',lambda x:self.bthover(True))
+        self.bind('<Leave>',lambda x:self.bthover(False))
         self.after(1000,self.set_time)
     def set_time(self):
         if self.flag:self.WTime.set(time.strftime('%H:%M:%S'))        
         else:self.WTime.set(time.strftime('%H:%M %S'))        
         self.flag=not(self.flag)
         self.after(1000,self.set_time)
+    def bthover(self,status):
+        if status is True:
+            self.config(bg=self.backcolor[1])
+            self.config(relief=GROOVE)
+        else:
+            self.config(bg=self.backcolor[0])
+            self.config(relief=FLAT)
 class Wifi(Label):
     def __init__(self,parent):
         super().__init__(parent)
@@ -112,7 +126,7 @@ class Tab(Frame):
     def __init__(self,parent):
         super().__init__(parent)
         self['bg']='#2d2d2d'
-        self.Name=Label(self,text='Main Window',bg='#1e1e1e',fg='#f1f1ff')
+        self.Name=Label(self,text='Main',bg='#1e1e1e',fg='#f1f1ff')
         self.Name.pack(padx=10,ipadx=10,ipady=1)        
 class Default(Frame):
     def __init__(self,parent):
@@ -156,7 +170,7 @@ class Selector(Frame):
         self.MCanvas.create_window((0,0),window=self.VFrame,anchor='nw',width=1350)
         self.AcFrame=None
         if self.whichone==0:
-            self.AcFrame=Default(self.VFrame)
+            self.AcFrame=Settings(self.VFrame)
         elif self.whichone==1:
             self.AcFrame=Calc(self.VFrame)
         elif self.whichone==2:
@@ -198,9 +212,9 @@ class MainWindow(Tk):
         self.TabFrame.pack(fill=X,pady=3)
         self.SFrame.pack(side=BOTTOM,fill=X)
         self.Mp3Player.pack(side=LEFT)
-        self.TimeNow.pack(side=RIGHT)
-        self.WifiCheck.status.pack(side=RIGHT)
-        self.WifiCheck.pack(side=RIGHT)
+        self.TimeNow.pack(side=RIGHT,fill=Y)
+        self.WifiCheck.status.pack(side=RIGHT,fill=Y)
+        self.WifiCheck.pack(side=RIGHT,fill=Y)
         self.var.trace('w',self.selectTools_2)
         self.whichone=0
         self.var.set('Main')

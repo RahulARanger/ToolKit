@@ -42,12 +42,9 @@ def Fill(variable,text,status=None):
                 b=''.join(ans)
                 eval(b)
                 a=BackEnd(b).result()
-                print(a)
                 a=str(a)
                 if len(a)>300:
-                    print(a,len(a))
                     assert(False)
-                print(type(a))
                 variable.set(a)
             except:
                 x=messagebox.showerror('OMG!!!!!!!','Senpai, This is just a simple Calculator')
@@ -87,8 +84,6 @@ class MStack:
         store=self.lst[0]
         del self.lst[0]
         return store
-    def see(self):
-        print(self.lst)
 
 class SymButton(Frame):
     def __init__(self,parent,sym,font,var,screen):
@@ -133,8 +128,6 @@ class SymButton(Frame):
     def just_call(self):
         # ? Only for the '=' Button
         if self.isthere:
-            print(type(self.var))
-            print(self.var.get())
             Fill(self.var,self.sym,69)
             self.screen.icursor(END)
     def disableIt(self):
@@ -264,7 +257,6 @@ class Calc(Frame):
                 self.OutputScreen.unbind('<Return>')
                 self.is_there=True
     def printResult(self,e):
-        print(self.OVar.get())
         self.Equal.just_call()
     def filter(self,exp):
             ans=[]

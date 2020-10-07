@@ -99,7 +99,9 @@ class Installer(Tk):
         self.HiFrame.pack(fill=X)
         self.Hi.pack(padx=3,pady=3,anchor='n')
         self.NFrame1.pack(fill=X)          
-        self.after(1000,self.setup_1)      
+        try:
+            self.after(1000,self.setup_1)  
+        except:pass
     def check_modules(self,package):
         statement='import '+package
         try:
@@ -201,7 +203,8 @@ class Installer(Tk):
         else:
             print('Hello')
             return None
-        self.after(1000,self.setup_1)   
+        try:self.after(1000,self.setup_1)   
+        except:pass
     def balance(self,minus=None):
         if minus is None:
             self.height+=35

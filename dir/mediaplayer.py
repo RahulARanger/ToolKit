@@ -5,6 +5,10 @@ import os
 import re
 from mutagen.mp3 import MP3
 from tkinter import filedialog
+try:
+    from root.Dialogs import *    
+except:
+    from dir.root.Dialogs import *
 pygame.init()
 pygame.mixer.init()
 class AudioB:
@@ -61,12 +65,21 @@ class LabelButtons(Label):
         if status is True:
             self.config(relief=FLAT)
 
+class Display(Label):
+    def __init__(self,parent,title):
+        super().__init__(parent)
+        self.title=title
+        self.config(text=title)
+        self.config(bg='#007acc')
+        self.config(fg='#f1f1ff')
+    
 class MediaPlayer(Frame):
     def __init__(self,parent):
         super().__init__(parent)
         pygame.mixer.music.get_endevent()
         self.config(bg='#007acc')
         self.play=LabelButtons(self,'  ▶ ')
+        self.parent=parent
         self.replay=LabelButtons(self,'Re')
         self.playing=False 
         self.status=None
@@ -100,6 +113,7 @@ class MediaPlayer(Frame):
             self.showl.destroy()
             self.showr.destroy()
             self.scale.destroy()
+            self.titleshow.destroy()
     def set(self,for_):
         if for_=='replay':
             self.playing=True
@@ -110,8 +124,7 @@ class MediaPlayer(Frame):
         self.choice.pack(side=LEFT)
         self.Import.pack(side=LEFT,ipadx=4)
     def flip(self,status):
-        if status:
-            print(self.playing,self.started)
+        if status:            
             if not self.playing:
                 print('a')
                 self.play.config(text=' | | ')
@@ -141,6 +154,8 @@ class MediaPlayer(Frame):
                 temp=AudioB(self.file)
                 self.totallength=temp.length
                 self.reset('end')
+                self.title=(re.findall(r'([^/]+).mp3',self.file)[0])
+                self.titleshow=Display(self,self.title)
                 self.showl=Label(self,text='{}:{}'.format(0,0),bg='#007acc',fg='white')
                 self.showr=Label(self,text='{}:{}'.format(temp.minutes,temp.seconds),bg='#007acc',fg='white')            
                 self.scale=ttk.Scale(self,orient=HORIZONTAL,from_=0,to_=int(self.totallength),variable=self.barstatus,command=self.change_it)
@@ -148,11 +163,12 @@ class MediaPlayer(Frame):
                 self.scale.pack(side=LEFT,padx=3)
                 self.showr.pack(side=LEFT,padx=3)
                 self.play.config(text=' | | ')
+                self.titleshow.pack(side=LEFT,padx=(20,))
                 self.set('replay')
     def change_it(self,*ags):
         if self.uploaded:
             self.pause=True
-    def note(self):
+    def note(self):        
         if self.uploaded is True and not self.pause:
             timee=pygame.mixer.music.get_pos()
             if self.checkpoint is not None:
@@ -186,7 +202,8 @@ class MediaPlayer(Frame):
         if self.status is None:
             self.status=self.selected.get()
             if self.status=='Single File':self.Import.bind('<Button-1>',lambda x:self.single_player())
-            else:self.Import.bind('<Button-1>',lambda x:self.playlist())
+            elif self.status=='PlayList':self.Import.bind('<Button-1>',lambda x:self.playlist())
+            else:pass
         else:
             if self.status!=self.selected.get():
                 try:
@@ -198,18 +215,19 @@ class MediaPlayer(Frame):
             if self.selected.get()=='Single File':
                 try:
                     self.Import.unbind('<Button-1>')
+                    del self.playlists
                 except:pass
                 self.Import.bind('<Button-1>',lambda x:self.single_player())
                 if self.status is None:self.single_player()
                 self.status='Single File'
-            else:
+            elif self.selected.get()=='PlayList':
                 self.Import.unbind('<Button-1>')
                 self.status='PlayList'
                 self.Import.bind('<Button-1>',lambda x:self.playlist())
-    def playlist(self):
-        pass
-    def single_player(self):
-        
+            else:pass
+    def playlist(self):        
+        a=FutureUpdate(self)
+    def single_player(self):        
         file=filedialog.askopenfilename(title='Open the Audio File',initialdir=os.getcwd(),filetypes=(('Audio Files','.mp3'),))
         if len(file)==0:
             pass
@@ -225,8 +243,10 @@ class MediaPlayer(Frame):
                 self.scale.destroy()
                 self.showl.destroy()
                 self.showr.destroy()
+                self.titleshow.destroy()
             except:pass
             self.title=(re.findall(r'([^/]+).mp3',self.file)[0])
+            self.titleshow=Display(self,self.title)
             temp=AudioB(self.file)
             print('changed')
             self.totallength=temp.length
@@ -237,6 +257,7 @@ class MediaPlayer(Frame):
             self.showl.pack(side=LEFT,padx=3)
             self.scale.pack(side=LEFT,padx=3)
             self.showr.pack(side=LEFT,padx=3)
+            self.titleshow.pack(side=LEFT,padx=(20,))
 if __name__=='__main__':
     a=Tk()
     b=MediaPlayer(a)
