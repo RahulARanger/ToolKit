@@ -16,12 +16,27 @@
 
 > * version 1.0 has the basic setup for the toolkit we have the audio player, calc. ,Translator. 
 
+<h2><u> Tools Available:</u></h2>
 
-<h2><u>Quick Tricks</u></h2>
-
-> * We have used certain number of external Modules. So at starting if you want to speed up the process of installation, you can manually type this commands  
- ***Modules Used***: pytube3, googletrans, pyglet, pillow
- 
+><h2><u>Calculator</u></h2>
+> It's a Simple Calculator that can do following operations:<br>
+>
+> * Addition
+> * Subtraction 
+> * Multiplication 
+> * Division 
+> * Power
+> * Can use Brackets
+> * Rounding
+>
+><hr>
+><h2><u>Translator</u></h2>
+>It's uses Google Translator API and can translate the text from any language to any other language.
+>
+><hr>
+><h2><u> Audio Player </h2></u>
+>Audio player that can support .mp3 files. Playlist feature to be added soon.
+><br>
 
 **Currently We are working on Completing the Project**
 

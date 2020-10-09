@@ -121,22 +121,13 @@ class Wifi(Label):
             self.status.config(text='✔️',fg='#40FF19')
         else:
             self.status.config(text='❌ ',fg='#FF0000')
-        self.after(15000,self.check)
+        self.after(6000,self.check)
 class Tab(Frame):
     def __init__(self,parent):
         super().__init__(parent)
         self['bg']='#2d2d2d'
         self.Name=Label(self,text='Main',bg='#1e1e1e',fg='#f1f1ff')
         self.Name.pack(padx=10,ipadx=10,ipady=1)        
-class Default(Frame):
-    def __init__(self,parent):
-        super().__init__(parent)
-        self.VFrame=Frame(self,bg='#252526')
-        self.arrange()
-    def arrange(self):
-        self.VFrame.pack(fill=BOTH,expand=True)
-        for i in range(100):
-            Button(self.VFrame,text=str(i)).pack()
 class Version(Label):
     def __init__(self,parent):
         super().__init__(parent)
@@ -175,10 +166,12 @@ class Selector(Frame):
             self.AcFrame=Calc(self.VFrame)
         elif self.whichone==2:
             self.AcFrame=GT(self.VFrame)
+            print(self.AcFrame.failed)
         self.AcFrame.pack(fill=BOTH,expand=True)
         self.HBar.pack(side=BOTTOM,fill=X)
         self.VBar.pack(side=RIGHT,fill=Y)
         self.MCanvas.pack(fill=BOTH, expand=True)
+
 class MainWindow(Tk):
     def __init__(self):
         super().__init__()

@@ -68,11 +68,29 @@ class LabelButtons(Label):
 class Display(Label):
     def __init__(self,parent,title):
         super().__init__(parent)
-        self.title=title
+        self.title=title+'   '
+        self.note=len(self.title)
+        self.checkpoint=0
         self.config(text=title)
         self.config(bg='#007acc')
         self.config(fg='#f1f1ff')
-    
+        self.after(600,self.slide)
+    def slide(self):
+        end=self.checkpoint+10
+        if self.note>10:
+            if end>=self.note:
+                left=self.title[self.checkpoint:]
+                limit=end-self.note
+                right=self.title[:limit+1]
+                self.checkpoint=limit+1
+            else:
+                left=self.title[self.checkpoint:end]
+                right=''
+                self.checkpoint=end
+            self.config(text=left+right)
+        else:
+            self.config(text=self.title)
+        self.after(1000,self.slide)
 class MediaPlayer(Frame):
     def __init__(self,parent):
         super().__init__(parent)
@@ -83,6 +101,7 @@ class MediaPlayer(Frame):
         self.replay=LabelButtons(self,'Re')
         self.playing=False 
         self.status=None
+        self.failed=False
         self.checkpoint=None
         self.modifier=None
         self.options=['Single File','PlayList']

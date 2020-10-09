@@ -3,10 +3,15 @@ import tkinter.ttk as ttk
 import string
 from tkinter import font
 from tkinter import messagebox
+import json
 try:
     from root.ImageViewer import *
 except:
     from dir.root.ImageViewer import *
+try:
+    from root.Dialogs import *
+except:
+    from dir.root.Dialogs import *
 class BackEnd:
     def __init__(self,exp):
         self.exp=exp
@@ -148,6 +153,10 @@ class Calc(Frame):
     def __init__(self,parent):
         super().__init__(parent)
         self['bg']='#1e1e1e'
+        self.tut=None
+        self.file='dir\\root\\settings.json'  
+        self.checktut()
+        self.failed=False
         self.OFont=font.Font(family='verdana',size=20,weight='bold')
         self.OVar=StringVar()
         self.is_there=False
@@ -184,6 +193,8 @@ class Calc(Frame):
         self.Error=Label(self.OFrame,text='',relief=GROOVE)
         self.ErrorFont=font.Font(family='Century Gothic',size=10)
         self.arrange()
+        if self.tut:
+            self.tutorial()
     def arrange(self):
         self.OVar.trace('w',self.check)
         self.Text.pack(padx=20,pady=20)        
@@ -218,6 +229,15 @@ class Calc(Frame):
         self.Error.pack(fill=X,expand=True)
         self.OutputScreen.focus_set()
         self.OutputScreen.bind('<Return>',lambda x: self.printResult(x))
+    def checktut(self):
+        c=dict()
+        with open(self.file,'r') as hand:
+            c=json.loads(hand.read())
+        self.tut=True if c['Tuts']['Calculator'] else False
+        print(self.tut)        
+    def tutorial(self):
+        photos=['Resources\\Instructions\\Calculator\\#{}.jpeg'.format(i) for i in range(1,4)]
+        a=Instructions(self,photos)
     def backspace(self,e):
         b=self.OutputScreen.index(INSERT)
         a=b-1

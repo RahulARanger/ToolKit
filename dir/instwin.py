@@ -4,6 +4,7 @@ from tkinter.ttk import Progressbar
 from tkinter import messagebox
 from tkinter import *
 import sys
+import json
 try:
     from dir.root.NetTest import *
 except:
@@ -45,6 +46,7 @@ class Installer(Tk):
         self.PackageNames=Packages().PackageNames
         self.to_Install=[]
         self.title('Setting things up !!!, Senpai')
+        self.file='dir\\root\\settings.json'    
         self.resizable(0,0)
         self.attributes('-disabled', True)        
         self.step=100/len(Packages().ModuleNames)
@@ -80,6 +82,11 @@ class Installer(Tk):
         self.completed=False
         self.arrange()
     def register(self):
+        with open(self.file,'r') as hand:
+            container=json.loads(hand.read())
+        container['Times']+=1
+        with open(self.file,'w') as hand:
+            hand.write(json.dumps(container,indent=4))
         self.completed=True   
         self.destroy()
     def bthover(self,status):

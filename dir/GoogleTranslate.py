@@ -21,62 +21,50 @@ class GTBackend:
     def __init__(self):
         self.lines=['']
         self.from_,self.to_=None,None
+        self.detect=None
+        self.translator=googletrans.Translator(service_urls=['translate.google.com','translate.google.co.kr',])
         self.c_from,self.c_to=None,None
         self.origin,self.translated,self.pronunciation=str(),str(),str()
         self.Languages=[] # has the list of the Languages
         self.LanCodes=None # has the language codes
         self.collect()
+        self.FromLanguages=self.Languages[:]
+        self.ToLanguages=self.Languages[:]
+        self.trace=googletrans.LANGUAGES
+        self.ToLanguages.remove('Detect Language')
     def collect(self):
         with open('dir\\root\\languages.json','r') as hand:
             self.LanCodes=json.loads(hand.read())
             for i in self.LanCodes['Languages']:
                 self.Languages.append(i.title())    
-            self.LanCodes=self.LanCodes['Languages']
-    def get_Input(self,file_import=None,text=None):
-        if file_import is not None:
-            try:
-                hand=open(file_import,'r')
-                text=hand.read()
-                hand.close()
-            except:
-                # ? For GUI use a dialog box here
-                print('Selected File is Not Supported For now..')
-                return False
-        self.lines=text.split('\n')
+            self.LanCodes=self.LanCodes['Languages']  
+    def Detect(self,text):
+        self.detect=False
+        results=self.translator.detect(text)        
+        detected=results.lang
+        ans=self.trace[detected]
+        conf=results.confidence
+        return detected,ans
     def translation(self,text,from_='english',to_='japanese'):
         if len(text)==0:return '',''
         from_=from_.lower()
         to_=to_.lower()
         fromcode=self.LanCodes[from_]
-        tocode=self.LanCodes[to_]
-        translator=googletrans.Translator()
-        result=translator.translate(text,src=fromcode,dest=tocode)        
-        try:pronunciation=result.pronunciation
-        except:pronunciation=text
-        return result.text,pronunciation
-    def export(self):
-        # TODO: Script inside this method is used to design the output text file
-        # ? use save as filedialog to save the exported file
-        # * Raw Modules\Google Translate API\test2.txt
-        filename=input('Enter the File Name: ')
-        hand=open(filename,'wb')
-        hand.write('{} Text: \n'.format(self.from_).encode())
-        check=len('{} Text:'.format(self.from_))
-        hand.write('{}\n\n'.format('═'*check).encode())
-        hand.write(self.origin.encode())
-        hand.write('\n'.encode())
-        hand.write('Translated to: {} \n'.format(self.to_).encode())
-        check=len('Translated to: {}'.format(self.to_))
-        hand.write('{}\n\n'.format('═'*check).encode())
-        hand.write(self.translated.encode())
-        hand.write('\n'.encode())
-        
-        hand.write('Pronunciation for the {} text is: \n'.format(self.to_).encode())
-        check=len('Pronunciation for the {} text is:'.format(self.to_))
-        hand.write('{}\n\n'.format('═'*check).encode())
-        hand.write(self.pronunciation.encode())
-        hand.write('\n'.encode())
-        hand.close()
+        tocode=self.LanCodes[to_]            
+        name=None
+        try:
+            if fromcode=='special':
+                fromcode,name=self.Detect(text)
+            else:
+                fromcode,name=self.Detect(text)
+            result=self.translator.translate(text,src=fromcode,dest=tocode)        
+        except:
+            return None
+        try:
+            pronunciation=result.pronunciation
+        except:
+            pronunciation=text
+        return result.text,pronunciation,name    
 class SearchBox(Frame):
     def __init__(self,parent,lst,var):
         super().__init__(parent)
@@ -147,6 +135,7 @@ class InputBox(scrolledtext.ScrolledText):
         self.config(autoseparators=True,maxundo=-1) # ? for unlocking the undo power
         self.config(borderwidth=6) # ? design matters
         self.config(wrap=WORD)
+        self.bind('<Control-Z>',lambda x:self.redoit())        
         self.bind('<FocusIn>',self.change)
         self.bind('<FocusOut>',self.revert)        
         self.special=special  
@@ -155,6 +144,10 @@ class InputBox(scrolledtext.ScrolledText):
             self.config(width=45,height=10)
             self.config(font= ('consolas', '16'))
         self.arrange()
+    def redoit(self):
+        try:
+            self.edit_redo()
+        except:pass
     def change(self,*args):
         self.config(relief=RAISED)
     def revert(self,*args):
@@ -189,59 +182,97 @@ class SpecialButton(Label):
         else:
             self.config(relief=RIDGE)
             self.config(bg=self.backcolor[0],fg=self.textcolor[0])        
+class GIFButton(ImageAlbum):
+    def __init__(self,parent,photos):        
+        super().__init__(parent,photos,200,200,100)
+        self.backcolor=('#80D4FF','orange')
+        self.config(bg=self.backcolor[0])
+        self.bind('<Enter>',lambda x:self.bthover(True))
+        self.bind('<Leave>',lambda x:self.bthover(False))
+        self.bind('<Button-1>',lambda x:self.btpressed(True))
+        self.bind('<ButtonRelease-1>',lambda x:self.btpressed(False))
+    def bthover(self,status):
+        if status:
+            self.config(bg=self.backcolor[1])
+            self.config(relief=RAISED)
+        else:
+            self.config(bg=self.backcolor[0])
+            self.config(relief=FLAT)
+    def btpressed(self,status):
+        if status:
+            self.config(relief=RAISED)
+            Open('https://translate.google.co.in/')            
+        else:
+            self.config(relief=FLAT)
 class GT(Frame):
     def __init__(self,parent):
         super().__init__(parent)
-        self.config(bg='#E6FFFB')
-        self.IFrame=Frame(self,bg='#E6FFFB')
-        self.SeFrame=Frame(self,bg='#E6FFFB')
-        self.FromLabel=HoverLabel(self.IFrame,'From Language: ')
-        self.ToLabel=HoverLabel(self.IFrame,'To Language: ')     
-        self.IIFrame=Frame(self,bg='#E6FFFB')
-        self.photos=['Resources\Media\Translator\Translator{}.jpg'.format(i) for i in range(22)]
-        self.title=ImageAlbum(self,self.photos,500,500,100,'#E6FFFB')
-        self.StatusFrame=Frame(self,bg='orange')        
-        self.TranslateThem=SpecialButton(self.IIFrame)
-        self.fs=StringVar()
-        self.ts=StringVar()        
-        self.fs.set('English')
-        self.ts.set('Japanese')
-        self.From=InputBox(self.IIFrame)
-        self.To=InputBox(self.IIFrame,True)
-        self.TBack=GTBackend()
-        self.Languages=self.TBack.Languages        
+        self.config(bg='#80D4FF')
+        self.MainFrame=Frame(self,bg='#80D4FF')
+        self.TitleFrame=Frame(self.MainFrame,bg='#80D4FF')
+        self.photos=['Resources\Media\Translator\Translator{}.jpg'.format(i) for i in range(20)]
+        self.title=ImageAlbum(self.TitleFrame,self.photos,500,500,150,'#80D4FF')
+        self.ContainFrame=Frame(self.MainFrame,bg='#E6FFFB')        
+        self.SearchFrame=Frame(self.ContainFrame,bg='#80D4FF')
+        self.GTBack=GTBackend()
         self.checker=NetworkCheck()
-        self.FromBox=SearchBox(self.SeFrame,self.Languages,self.fs)
-        self.ToBox=SearchBox(self.SeFrame,self.Languages,self.ts)
-        self.FromText=None
-        self.arrange()        
-        self.From.focus_set() 
-        self.after(3000,self.check)       
-    def arrange(self):
-        self.title.pack()
-        self.IFrame.pack(fill=X,expand=True)
-        self.FromLabel.pack(side=LEFT,padx=30)
-        self.ToLabel.pack(side=RIGHT,padx=(0,460))
-        self.SeFrame.pack(fill=X,expand=True,pady=10)
-        self.FromBox.pack(side=LEFT,padx=60)
-        self.ToBox.pack(side=RIGHT,padx=(0,420))
-        self.IIFrame.pack(expand=True,fill=X)
-        self.From.pack(side=LEFT,padx=30,pady=30)
-        self.TranslateThem.pack(side=LEFT,padx=(3,0))
-        self.To.pack(side=RIGHT,padx=30,pady=30)  
-        self.TranslateThem.bind('<Button-1>',self.do_it)    
-    def do_it(self,*ags):
+        self.DisplayFrame=Frame(self.ContainFrame,bg='#80D4FF')
+        self.fs=StringVar()
+        self.failed=False
+        self.ts=StringVar()        
+        self.fs.set('Detect Language')
+        self.ts.set('Japanese')
+        self.FromLabel=HoverLabel(self.SearchFrame,'From Language: ')
+        self.ToLabel=HoverLabel(self.SearchFrame,'To Language: ')     
+        self.FromBox=SearchBox(self.SearchFrame,self.GTBack.FromLanguages,self.fs)
+        self.ToBox=SearchBox(self.SearchFrame,self.GTBack.ToLanguages,self.ts)
+        self.From=InputBox(self.DisplayFrame)
+        self.TranslateButt=SpecialButton(self.DisplayFrame)
+        self.To=InputBox(self.DisplayFrame,True)
+        self.photos2=['Resources\Media\Translator-Chan\TranslatorChan{}.jpg'.format(i) for i in range(11)]
+        self.MoreFrame=Frame(self,bg='#80D4FF')
+        self.TranslatorChan=GIFButton(self.MoreFrame,self.photos2)
+        self.TranslateButt.bind('<Button-1>',self.TranslateThem)
+        self.arrange()   
+        self.after(600,self.checknet)           
+    def TranslateThem(self,*args):
         text=self.From.get_it()        
-        translated,pronunciation=self.TBack.translation(text,self.fs.get(),self.ts.get())
+        try:translated,pronunciation,setto=self.GTBack.translation(text,self.fs.get(),self.ts.get())
+        except:return None
+        if translated==False:
+            return None
         self.To.remove_text()
+        self.fs.set(setto.title())
         self.To.enter_text(translated)
         self.To.enter_text('\n\n'+pronunciation)
-    def check(self):
+    def arrange(self):        
+        self.MainFrame.pack(fill=X,expand=True)
+        self.TitleFrame.pack(fill=X,expand=True)
+        self.MoreFrame.pack(fill=X,expand=True)
+        self.title.pack(pady=30)
+        self.ContainFrame.pack(fill=X,expand=True)
+        self.SearchFrame.pack(fill=X,expand=True)
+        self.DisplayFrame.pack(fill=X,expand=True)
+        self.FromLabel.pack(side=LEFT,expand=True)
+        self.FromBox.pack(side=LEFT,padx=(100,),pady=3)
+        self.ToBox.pack(side=RIGHT,padx=(100,),pady=3)
+        self.ToLabel.pack(side=RIGHT,expand=True)
+        self.From.pack(side=LEFT,expand=True)
+        self.TranslateButt.pack(side=LEFT,expand=True)
+        self.To.pack(side=RIGHT,expand=True)
+        self.TranslatorChan.pack(side=RIGHT,padx=(0,50),pady=6)
+    def checknet(self):
         if self.checker.MTest() is False:
-            print('Not Connected')
-        self.after(3000,self.check)
+            self.failed=True
+            self.pack_forget()
+        else:
+            if self.failed:
+                self.pack(fill=BOTH,expand=True)
+                self.failed=False
+        self.after(600,self.checknet)
 if __name__=='__main__':
     root=Tk()
     a=GT(root)
     a.pack(fill=BOTH,expand=True)
     root.mainloop()
+

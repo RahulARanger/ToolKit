@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import font
+from tkinter import messagebox
+import json
 try:
     from root.ImageViewer import *
 except:
@@ -11,7 +13,7 @@ except:
 class ChooseButton(Label):
     def __init__(self,p,var):
         super().__init__(p)
-        self.var=var
+        self.var=var        
         self.Ifont=font.Font(family="Times", size="12", weight="bold",slant="roman")
         self.textcolor=('#74878f','#f1f1ff')
         self.backcolor=("#424242",'#5a5a5c')
@@ -27,22 +29,24 @@ class ChooseButton(Label):
             self.config(bg=self.backcolor[1],fg=self.textcolor[1])
         else:
             self.config(bg=self.backcolor[0],fg=self.textcolor[0])
-
+    def manual(self,status):
+        self.config(text=' On ' if status else ' Off  ')
+        self.var.set(1 if status else 0)
     def btpressed(self,status):
         if status:
             self.var.set(not(self.var.get()))
             self.config(text=' On ' if self.var.get()==1 else ' Off  ')
             if self.var.get()==1:
-                a=Check(self)
+                a=messagebox.showinfo('Done!!!','Now you can check the help box after opening the tool')
         else:
             pass
-
-
 class Settings(Frame):
     def __init__(self,parent):
-        super().__init__(parent) 
+        super().__init__(parent)
+        self.file='dir\\root\\settings.json'        
         self['bg']='#252526'   
-        self.textcolor=('#74878f','#f1f1ff')    
+        self.failed=False
+        self.textcolor=('#74878f','#f1f1ff')
         self.sfont=font.Font(family="Lucida Grande", size=12)
         self.sfontl=font.Font(family="Lucida Grande", size=21)
         self.Ifont=font.Font(family="Times", size="12", weight="bold",slant="italic")
@@ -65,26 +69,21 @@ class Settings(Frame):
         self.TSFrame.bind('<Leave>',lambda x:self.hover(False,self.TSFrame))
         self.cvar=BooleanVar()
         self.mvar=BooleanVar()
-        self.tvar=BooleanVar()
-        self.cvar.set('True')
-        self.mvar.set('True')
-        self.tvar.set('True')
-        self.Cti=Label(self.CSFrame,text='⚫ Tutorial : ',fg=self.textcolor[1],bg='#252526',font=self.Ifont)
-        self.Mti=Label(self.MSFrame,text='⚫ Tutorial : ',fg=self.textcolor[1],bg='#252526',font=self.Ifont)
-        self.Tti=Label(self.TSFrame,text='⚫ Tutorial : ',fg=self.textcolor[1],bg='#252526',font=self.Ifont)
+        self.tvar=BooleanVar()              
+        self.mvar.trace('w',lambda x,y,z:self.modifylst('Audio Player',self.mvar.get()))
+        self.cvar.trace('w',lambda x,y,z:self.modifylst('Calculator',self.cvar.get()))
+        self.tvar.trace('w',lambda x,y,z:self.modifylst('Translator',self.tvar.get()))        
+        self.Cti=Label(self.CSFrame,text='⚫ Help Box : ',fg=self.textcolor[1],bg='#252526',font=self.Ifont)
+        self.Mti=Label(self.MSFrame,text='⚫ Help Box : ',fg=self.textcolor[1],bg='#252526',font=self.Ifont)
+        self.Tti=Label(self.TSFrame,text='⚫ Help Box : ',fg=self.textcolor[1],bg='#252526',font=self.Ifont)
         self.Ctut=ChooseButton(self.CSFrame,self.cvar)
         self.Mtut=ChooseButton(self.MSFrame,self.mvar)
         self.Ttut=ChooseButton(self.TSFrame,self.tvar)
+        self.updatelst()  
+        self.Reset=Button(self.SFrame,text='Reset',bg=self.Ctut.backcolor[0],fg=self.textcolor[0],activebackground=self.Ctut.backcolor[0],relief=FLAT,activeforeground=self.textcolor[1],command=self.reset_it)
+        self.Reset.bind('<Enter>',lambda x:self.bthover(True))
+        self.Reset.bind('<Leave>',lambda x:self.bthover(False))
         self.arrange()
-    def hover(self,status,obj):
-        if status:
-            obj.config(font=self.sfontl)
-            obj['fg']=self.textcolor[1]
-            self.SFrame.config(relief=RIDGE)
-        else:
-            obj.config(font=self.sfont)
-            obj['fg']=self.textcolor[0]
-            self.SFrame.config(relief=RAISED)       
     def arrange(self):
         self.SFrame.pack(fill=X)
         self.TFrame.pack(fill=X)
@@ -97,6 +96,50 @@ class Settings(Frame):
         self.Ctut.pack(side=LEFT)
         self.Mtut.pack(side=LEFT)
         self.Ttut.pack(side=LEFT)
+        self.Reset.pack(side=RIGHT,pady=20,padx=(0,30))
+    def reset_it(self):
+        a=messagebox.askyesno('Reset! Are you Sure','Once done, all the previous settings will be erased')
+        if a:
+            with open(self.file,'r') as hand:
+                self.container=json.loads(hand.read())
+            for i in self.container['Tuts']:
+                self.container['Tuts'][i]=True
+            with open(self.file,'w') as hand:
+                hand.write(json.dumps(self.container,indent=4))      
+            self.updatelst()
+    def bthover(self,status):
+        if status:
+            self.Reset.config(fg=self.textcolor[1],bg=self.Ctut.backcolor[1])
+        else:
+            self.Reset.config(fg=self.textcolor[0],bg=self.Ctut.backcolor[0])
+    def updatelst(self):
+        with open(self.file,'r') as hand:
+            self.container=json.loads(hand.read())
+        print('here')
+        if self.container['Times']==1:
+            self.cvar.set('True')
+            self.mvar.set('True')
+            self.tvar.set('True')            
+        else:
+            self.cvar.set('True' if self.container['Tuts']['Calculator'] else 'False')
+            self.mvar.set('True' if self.container['Tuts']['Audio Player'] else 'False')
+            self.tvar.set('True' if self.container['Tuts']['Translator'] else 'False')    
+        self.Ctut.manual(True if self.cvar.get()==1 else False)
+        self.Mtut.manual(True if self.mvar.get()==1 else False)
+        self.Ttut.manual(True if self.tvar.get()==1 else False)
+    def modifylst(self,text,value):        
+        self.container['Tuts'][text]=True if value else False
+        with open(self.file,'w') as hand:
+            hand.write(json.dumps(self.container,indent=4))
+    def hover(self,status,obj):
+        if status:
+            obj.config(font=self.sfontl)
+            obj['fg']=self.textcolor[1]
+            self.SFrame.config(relief=RIDGE)
+        else:
+            obj.config(font=self.sfont)
+            obj['fg']=self.textcolor[0]
+            self.SFrame.config(relief=RAISED)   
 if __name__=='__main__':
     a=Tk()
     b=Settings(a)
