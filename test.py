@@ -1,17 +1,12 @@
 from tkinter import *
-class testing(Frame):
-    def __init__(self,parent):
-        super().__init__(parent)
-        self.exit=Button(self,text='Exit',command=self.destroy)
-        self.exit.pack()
-class test(Tk):
-    def __init__(self):
-        super().__init__()
-        self.test1=testing(self)
-        self.test1.pack()
-        self.after(100,self.check)    
-    def check(self):
-        print(self.test1.winfo_exists())
-        self.after(100,self.check)    
-test().mainloop()
-
+root=Tk()
+lf = LabelFrame(root, text="Selected Value", width=100, height=80)
+lf.place(x=20, y=600, anchor="w")
+tx = Text(lf, wrap=WORD, padx=5, height=10, width=50)
+tx.insert(INSERT, final_value)
+tx.config(state=DISABLED)
+scroll = Scrollbar(lf, orient=VERTICAL, command=tx.yview)
+scroll.pack(side=RIGHT, fill=Y)
+tx.configure(yscrollcommand=scroll.set)
+tx.pack()
+root.mainloop()

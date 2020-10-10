@@ -6,6 +6,14 @@ try:
     from root.ImageViewer import *
 except:
     from dir.root.ImageViewer import *
+try:
+    from root.ToolTip import *
+except:
+    from dir.root.ToolTip import *
+try:
+    from root.Dialogs import *
+except:
+    from dir.root.Dialogs import *
 from tkinter import *
 from tkinter import *
 try:
@@ -182,41 +190,19 @@ class SpecialButton(Label):
         else:
             self.config(relief=RIDGE)
             self.config(bg=self.backcolor[0],fg=self.textcolor[0])        
-class GIFButton(ImageAlbum):
-    def __init__(self,parent,photos):        
-        super().__init__(parent,photos,200,200,100)
-        self.backcolor=('#80D4FF','orange')
-        self.config(bg=self.backcolor[0])
-        self.bind('<Enter>',lambda x:self.bthover(True))
-        self.bind('<Leave>',lambda x:self.bthover(False))
-        self.bind('<Button-1>',lambda x:self.btpressed(True))
-        self.bind('<ButtonRelease-1>',lambda x:self.btpressed(False))
-    def bthover(self,status):
-        if status:
-            self.config(bg=self.backcolor[1])
-            self.config(relief=RAISED)
-        else:
-            self.config(bg=self.backcolor[0])
-            self.config(relief=FLAT)
-    def btpressed(self,status):
-        if status:
-            self.config(relief=RAISED)
-            Open('https://translate.google.co.in/')            
-        else:
-            self.config(relief=FLAT)
 class GT(Frame):
     def __init__(self,parent):
         super().__init__(parent)
         self.config(bg='#80D4FF')
-        self.MainFrame=Frame(self,bg='#80D4FF')
-        self.TitleFrame=Frame(self.MainFrame,bg='#80D4FF')
+        self.TitleFrame=Frame(self,bg='#80D4FF')
         self.photos=['Resources\Media\Translator\Translator{}.jpg'.format(i) for i in range(20)]
         self.title=ImageAlbum(self.TitleFrame,self.photos,500,500,150,'#80D4FF')
-        self.ContainFrame=Frame(self.MainFrame,bg='#E6FFFB')        
+        self.ContainFrame=Frame(self,bg='#E6FFFB')        
         self.SearchFrame=Frame(self.ContainFrame,bg='#80D4FF')
         self.GTBack=GTBackend()
         self.checker=NetworkCheck()
         self.DisplayFrame=Frame(self.ContainFrame,bg='#80D4FF')
+        self.MoreFrame=Frame(self,bg='#80D4FF')
         self.fs=StringVar()
         self.failed=False
         self.ts=StringVar()        
@@ -230,8 +216,11 @@ class GT(Frame):
         self.TranslateButt=SpecialButton(self.DisplayFrame)
         self.To=InputBox(self.DisplayFrame,True)
         self.photos2=['Resources\Media\Translator-Chan\TranslatorChan{}.jpg'.format(i) for i in range(11)]
-        self.MoreFrame=Frame(self,bg='#80D4FF')
-        self.TranslatorChan=GIFButton(self.MoreFrame,self.photos2)
+        
+        self.TranslatorChan=ButtonAlbum(self.MoreFrame,self.photos2,300,300,'#80D4FF')
+        self.TranslatorChan.bind('<ButtonRelease-1>',lambda x:Open('https://translate.google.co.in/'))
+        try:Title=ToolTip(self.TranslatorChan,'More Features')
+        except:pass
         self.TranslateButt.bind('<Button-1>',self.TranslateThem)
         self.arrange()   
         self.after(600,self.checknet)           
@@ -246,11 +235,10 @@ class GT(Frame):
         self.To.enter_text(translated)
         self.To.enter_text('\n\n'+pronunciation)
     def arrange(self):        
-        self.MainFrame.pack(fill=X,expand=True)
         self.TitleFrame.pack(fill=X,expand=True)
-        self.MoreFrame.pack(fill=X,expand=True)
         self.title.pack(pady=30)
         self.ContainFrame.pack(fill=X,expand=True)
+        self.MoreFrame.pack(fill=X,expand=True)
         self.SearchFrame.pack(fill=X,expand=True)
         self.DisplayFrame.pack(fill=X,expand=True)
         self.FromLabel.pack(side=LEFT,expand=True)
@@ -263,10 +251,12 @@ class GT(Frame):
         self.TranslatorChan.pack(side=RIGHT,padx=(0,50),pady=6)
     def checknet(self):
         if self.checker.MTest() is False:
+            if self.failed is False:a=NIC(self)
             self.failed=True
             self.pack_forget()
         else:
             if self.failed:
+                print('check')
                 self.pack(fill=BOTH,expand=True)
                 self.failed=False
         self.after(600,self.checknet)
@@ -275,4 +265,3 @@ if __name__=='__main__':
     a=GT(root)
     a.pack(fill=BOTH,expand=True)
     root.mainloop()
-

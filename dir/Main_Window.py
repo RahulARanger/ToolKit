@@ -165,13 +165,11 @@ class Selector(Frame):
         elif self.whichone==1:
             self.AcFrame=Calc(self.VFrame)
         elif self.whichone==2:
-            self.AcFrame=GT(self.VFrame)
-            print(self.AcFrame.failed)
+            self.AcFrame=GT(self.VFrame)                    
         self.AcFrame.pack(fill=BOTH,expand=True)
         self.HBar.pack(side=BOTTOM,fill=X)
         self.VBar.pack(side=RIGHT,fill=Y)
         self.MCanvas.pack(fill=BOTH, expand=True)
-
 class MainWindow(Tk):
     def __init__(self):
         super().__init__()
@@ -226,8 +224,7 @@ class MainWindow(Tk):
             self.ActiveFrame.destroy()
             self.ActiveFrame=Selector(self.MFrame,self.whichone)
             self.ActiveFrame.pack(expand=True,fill=BOTH)
-    def selectTools(self,whichone,special=False):
-        print(self.var.get())
+    def selectTools(self,whichone,special=False):        
         if self.whichone==whichone and not special:
             pass
         else:
