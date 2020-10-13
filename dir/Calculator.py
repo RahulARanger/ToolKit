@@ -78,18 +78,6 @@ class NumButton(Frame):
         else:
             self.Number.config(relief=RAISED)
 
-class MStack:
-    def __init__(self):
-        self.lst=[]
-    def append(self,letter):
-        if len(self.lst)>5:
-            self.pop()
-        self.lst.append(letter)
-    def pop(self):
-        store=self.lst[0]
-        del self.lst[0]
-        return store
-
 class SymButton(Frame):
     def __init__(self,parent,sym,font,var,screen):
         super().__init__(parent)

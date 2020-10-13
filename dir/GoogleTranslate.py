@@ -1,6 +1,6 @@
 import googletrans
 import json
-from tkinter.ttk import Combobox
+from tkinter import font
 import tkinter.scrolledtext as scrolledtext
 try:
     from root.ImageViewer import *
@@ -20,11 +20,10 @@ try:
     from dir.root.NetTest import *
 except:
     from root.NetTest import *
-import webbrowser
-def Open(x):
-	new=2
-	url=x
-	webbrowser.open(url,new=new)
+try:
+    from dir.root.OpenLink import *
+except:
+    from root.OpenLink import *
 class GTBackend:
     def __init__(self):
         self.lines=['']
@@ -65,11 +64,12 @@ class GTBackend:
                 fromcode,name=self.Detect(text)
             else:
                 fromcode,name=self.Detect(text)
-            result=self.translator.translate(text,src=fromcode,dest=tocode)        
+            result=self.translator.translate(text,src=fromcode,dest=tocode)    
         except:
             return None
         try:
             pronunciation=result.pronunciation
+            if type(pronunciation)!=str:pronunciation=''
         except:
             pronunciation=text
         return result.text,pronunciation,name    
@@ -96,7 +96,6 @@ class SearchBox(Frame):
         self.focus_force()
     def appear(self,*arrgfs):
         self.HBar.pack(fill=Y,side=RIGHT)
-        print('Hello')
         self.lstbox.pack(side=LEFT,padx=(1,0))
     def track(self,*args):
         text=self.var.get()
@@ -161,10 +160,28 @@ class InputBox(scrolledtext.ScrolledText):
     def revert(self,*args):
         self.config(relief=SUNKEN)
     def arrange(self):
-        pass
-    def enter_text(self,text):
+        self._orig = self._w + "_orig"
+        self.tk.call("rename", self._w, self._orig)
+        self.tk.createcommand(self._w, self._proxy)
+    def _proxy(self, command, *args):
+        cmd = (self._orig, command) + args
+        try:
+            result = self.tk.call(cmd)
+        except:
+            result=None
+        if command in ("insert", "delete", "replace"):
+            self.event_generate("<<TextModified>>")
+        return result
+    def enter_text(self,text,status):
         self.config(state=NORMAL)
+        self.markindex=self.index(CURRENT)
         self.insert(END,text)
+        if status:
+            pass
+        else:
+            self.tag_add('Pronunciation',self.markindex,END)
+            self.tag_configure('Pronunciation',foreground='orange')
+            self.markindex=None
         self.config(state=DISABLED)
     def get_it(self):
         return self.get('1.0',END)[:-1]
@@ -189,14 +206,76 @@ class SpecialButton(Label):
             self.config(relief=GROOVE)       
         else:
             self.config(relief=RIDGE)
-            self.config(bg=self.backcolor[0],fg=self.textcolor[0])        
+            self.config(bg=self.backcolor[0],fg=self.textcolor[0])    
+class Status(Text):
+    def __init__(self,parent):
+        super().__init__(parent)
+        self.config(bg='#006655')
+        self.config(relief=RAISED,state=DISABLED)
+        self.config(width=70,height=11)   
+        self.typed=0
+        self.TitleFont=("Times", "24", "bold italic") 
+        self.NormalFont=("Verdana 10 bold")
+        self.translated=0
+        self.config(state=NORMAL)
+        self.CurrentLog='''        
+            Current Log
+        
+    Number of Characters Typed: {}
+
+    Translated: {}
+
+    Number of Characters in the Translation: {}
+        '''.format(self.typed,'NO',self.translated)  
+        self.insert(END,self.CurrentLog)  
+        self.tag_add('title','2.0 linestart','2.0 lineend')
+        self.tag_add('Line1','4.0 linestart','4.0 lineend')
+        self.tag_add('Line2','6.0 linestart','6.0 lineend')
+        self.tag_add('Line3','8.0 linestart','8.0 lineend')
+        self.tag_configure('title',foreground='white',font=self.TitleFont)
+        self.tag_configure('Line1',foreground='#FFE6CC',font=self.NormalFont)
+        self.tag_configure('Line2',foreground='#FFE6CC',font=self.NormalFont)
+        self.tag_configure('Line3',foreground='#FFE6CC',font=self.NormalFont)
+        self.config(state=DISABLED)
+    def enter_text(self,text,status,frm='',to=''):
+        if frm!='':
+            update='( '+frm+' ➜ '+to+' )'
+        else:update=''
+        self.config(state=NORMAL)
+        if status:
+            self.typed=len(text)
+        else:
+            self.translated=len(text)
+        self.CurrentLog='''        
+            Log {}
+        
+    Number of Characters Typed: {}
+
+    Translated: {}
+
+    Number of Characters in the Translation: {}
+        '''.format(update,self.typed,'NO' if status else 'YES',self.translated)    
+        self.delete('1.0',END)
+        self.insert(END,self.CurrentLog)
+        self.tag_add('title','2.0 linestart','2.0 lineend')
+        self.tag_add('Line1','4.0 linestart','4.0 lineend')
+        self.tag_add('Line2','6.0 linestart','6.0 lineend')
+        self.tag_add('Line3','8.0 linestart','8.0 lineend')
+        self.tag_configure('title',foreground='white',font=self.TitleFont)
+        self.tag_configure('Line1',foreground='#FFE6CC',font=self.NormalFont)
+        self.tag_configure('Line2',foreground='#FFE6CC',font=self.NormalFont)
+        self.tag_configure('Line3',foreground='#FFE6CC',font=self.NormalFont)
+        self.config(state=DISABLED)    
+    def save(self):
+        # ! create a function that saves the logs into a log file
+        pass
 class GT(Frame):
     def __init__(self,parent):
         super().__init__(parent)
         self.config(bg='#80D4FF')
         self.TitleFrame=Frame(self,bg='#80D4FF')
         self.photos=['Resources\Media\Translator\Translator{}.jpg'.format(i) for i in range(20)]
-        self.title=ImageAlbum(self.TitleFrame,self.photos,500,500,150,'#80D4FF')
+        self.title=ImageAlbum(self.TitleFrame,self.photos,500,500,100,'#80D4FF')
         self.ContainFrame=Frame(self,bg='#E6FFFB')        
         self.SearchFrame=Frame(self.ContainFrame,bg='#80D4FF')
         self.GTBack=GTBackend()
@@ -215,25 +294,31 @@ class GT(Frame):
         self.From=InputBox(self.DisplayFrame)
         self.TranslateButt=SpecialButton(self.DisplayFrame)
         self.To=InputBox(self.DisplayFrame,True)
-        self.photos2=['Resources\Media\Translator-Chan\TranslatorChan{}.jpg'.format(i) for i in range(11)]
-        
+        self.photos2=['Resources\Media\Translator-Chan\TranslatorChan{}.jpg'.format(i) for i in range(11)]                
+        self.StatusBar=Status(self.MoreFrame)
         self.TranslatorChan=ButtonAlbum(self.MoreFrame,self.photos2,300,300,'#80D4FF')
         self.TranslatorChan.bind('<ButtonRelease-1>',lambda x:Open('https://translate.google.co.in/'))
-        try:Title=ToolTip(self.TranslatorChan,'More Features')
-        except:pass
-        self.TranslateButt.bind('<Button-1>',self.TranslateThem)
+        self.From.bind("<<TextModified>>", lambda x:self.StatusBar.enter_text(self.From.get_it(),True))
+        try:Title=ToolTip(self.TranslatorChan,'Click to view parent Tool')
+        except:
+            self.TranslatorChan.bind('<Enter>',lambda x:self.TranslatorChan.config(relief=RAISED,borderwidth=6))
+            self.TranslatorChan.bind('<Leave>',lambda x:self.TranslatorChan.config(relief=FLAT,borderwidth=0))
+        self.TranslateButt.bind('<ButtonRelease-1>',self.TranslateThem)
         self.arrange()   
         self.after(600,self.checknet)           
     def TranslateThem(self,*args):
         text=self.From.get_it()        
-        try:translated,pronunciation,setto=self.GTBack.translation(text,self.fs.get(),self.ts.get())
+        try:translated,pronounciation,setto=self.GTBack.translation(text,self.fs.get(),self.ts.get())
         except:return None
         if translated==False:
             return None
+        # TODO: need to add the waiting or translating thing here
+        self.after(500)
         self.To.remove_text()
         self.fs.set(setto.title())
-        self.To.enter_text(translated)
-        self.To.enter_text('\n\n'+pronunciation)
+        self.To.enter_text(translated,True)
+        self.StatusBar.enter_text(translated,False,self.fs.get(),self.ts.get())
+        self.To.enter_text('\n\n'+pronounciation,False)
     def arrange(self):        
         self.TitleFrame.pack(fill=X,expand=True)
         self.title.pack(pady=30)
@@ -249,6 +334,7 @@ class GT(Frame):
         self.TranslateButt.pack(side=LEFT,expand=True)
         self.To.pack(side=RIGHT,expand=True)
         self.TranslatorChan.pack(side=RIGHT,padx=(0,50),pady=6)
+        self.StatusBar.pack(side=LEFT,padx=(30,0),pady=6)
     def checknet(self):
         if self.checker.MTest() is False:
             if self.failed is False:a=NIC(self)
@@ -256,7 +342,6 @@ class GT(Frame):
             self.pack_forget()
         else:
             if self.failed:
-                print('check')
                 self.pack(fill=BOTH,expand=True)
                 self.failed=False
         self.after(600,self.checknet)

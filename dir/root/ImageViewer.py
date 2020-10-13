@@ -27,15 +27,8 @@ class ButtonAlbum(Label):
         self.photos=[self.resize(i) for i in range(len(self.photos))]        
         self.photos=[PIL.ImageTk.PhotoImage(i) for i in self.photos]
         self.index=0
-        self.change()
-        self.bind('<Button-1>',lambda x:self.change())
-        self.bind('<Enter>',lambda x:self.hover(True))
-        self.bind('<Leave>',lambda x:self.hover(False))
-    def hover(self,status):
-        if status:
-            self.config(relief=RIDGE)
-        else:
-            self.config(relief=FLAT)
+        self.bind('<Button-1>',lambda x:self.change())    
+        self.change()    
     def resize(self,index):
         r1=self.photos[index].size[0]/self.w
         r2=self.photos[index].size[1]/self.h
@@ -47,8 +40,7 @@ class ButtonAlbum(Label):
         if self.index==len(self.photos):
             self.index=0
         self.config(image=self.photos[self.index])
-        self.index+=1
-        
+        self.index+=1        
 class ImageAlbum(Label):
     def __init__(self,parent,photos,w,h,delay=100,bag='#1e1e1e'):
         super().__init__(parent)

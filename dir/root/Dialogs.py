@@ -44,18 +44,19 @@ class Instructions(Common):
     def __init__(self,parent,photos):
         super().__init__(parent)
         self.config(bg='orange')        
-        self.focus_set()
+        self.grab_set()
         self.resizable(0,0)        
         self.Contain=Frame(self,bg='#FF8000')       
         self.index=0
         self.Notify=Label(self.Contain,bg='orange',borderwidth=6,relief=FLAT)
         self.entered=False
         self.photos=photos
+        self.focus_set()
         self.Notify.config(text='{} of {}'.format(1,len(self.photos)))
         self.collections=[ImageLabel(self,self.photos[i],500,500) for i in range(len(self.photos))]   
         self.collections[0].pack(side=TOP)
         self.Contain.pack(side=BOTTOM,fill=X)        
-        self.Notify.pack(side=RIGHT,fill=Y)
+        self.Notify.pack(side=RIGHT,fill=BOTH)
         self.bind('<Left>',lambda x:self.change(False))     
         self.bind('<Right>',lambda x:self.change(True))
     def change(self,next):        

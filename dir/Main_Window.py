@@ -27,8 +27,14 @@ try:
     from dir.mediaplayer import *
 except:
     from mediaplayer import *
+try:
+    from dir.root.OpenLink import *
+except:
+    from root.OpenLink import *
 import time
-import webbrowser
+import pygame
+hoversound='Resources\Media\\button.wav'
+pygame.mixer.init()
 def do_this():
     style = ttk.Style()
     style.theme_use('clam')
@@ -38,10 +44,6 @@ def do_this():
     style.configure("Vertical.TScrollbar", gripcount=0,
                             background="#424242", darkcolor='#1e1e1e', lightcolor='#1e1e1e',arrowsize=18,
                             troughcolor='#1e1e1e', bordercolor="#424242", arrowcolor="orange",relief=FLAT)
-def Open(x):
-	new=2
-	url=x
-	webbrowser.open(url,new=new)
 class MenuFrame(Frame):
     def __init__(self,parent,name,link=''):
         super().__init__(parent)
@@ -62,6 +64,8 @@ class MenuFrame(Frame):
                 self.config(bg=self.backcolor[0])
                 self.name.config(fg=self.textcolor[0],bg=self.backcolor[0])
             else:
+                global hoversound
+                pygame.mixer.Sound(hoversound).play()
                 self.config(bg=self.backcolor[1])
                 self.name.config(fg=self.textcolor[1],bg=self.backcolor[1])
         
@@ -81,6 +85,8 @@ class MenuOptionFrame(Frame):
         self.bind('<Leave>',lambda x:self.bthover(False))
     def bthover(self,status):
         if status:
+            global hoversound
+            pygame.mixer.Sound(hoversound).play()
             self.config(bg=self.backcolor[1])
         else:
             self.config(bg=self.backcolor[0])
@@ -138,6 +144,8 @@ class Version(Label):
         self.bind('<Leave>',lambda x:self.bthover(False))
     def bthover(self,status):
         if status:
+            global hoversound
+            pygame.mixer.Sound(hoversound).play()
             self.config(text='v1.0',fg=self.textcolor[1],bg=self.backcolor[1])
         else:
             self.config(text='v1.0',fg=self.textcolor[0],bg=self.backcolor[0])
@@ -149,6 +157,7 @@ class Selector(Frame):
         self.HBar=ttk.Scrollbar(self,orient=HORIZONTAL,command=self.MCanvas.xview)
         self.VFrame=Frame(self.MCanvas,bg='#252526')
         self.whichone=which_one
+        self.switchsound='Resources\Media\switch.wav'
         self.arrange()
     def orientScreen(self,event):
         self.MCanvas.yview_scroll(int(-1*(event.delta/120)),'units')
@@ -160,6 +169,8 @@ class Selector(Frame):
         self.MCanvas.bind_all('<MouseWheel>',self.orientScreen)
         self.MCanvas.create_window((0,0),window=self.VFrame,anchor='nw',width=1350)
         self.AcFrame=None
+        a=pygame.mixer.Sound(self.switchsound)
+        a.play()
         if self.whichone==0:
             self.AcFrame=Settings(self.VFrame)
         elif self.whichone==1:

@@ -69,29 +69,23 @@ class LabelButtons(Label):
 class Display(Label):
     def __init__(self,parent,title):
         super().__init__(parent)
-        self.title=title+'   '
+        self.title=title+'      '
         self.note=len(self.title)
-        self.checkpoint=0
+        self.checkpoint=[i for i in self.title[:11]]
+        self.pos=len(self.checkpoint)
         self.config(text=title)
         self.config(bg='#007acc')
         self.config(fg='#f1f1ff')
         self.after(600,self.slide)
     def slide(self):
-        end=self.checkpoint+10
-        if self.note>10:
-            if end>=self.note:
-                left=self.title[self.checkpoint:]
-                limit=end-self.note
-                right=self.title[:limit+1]
-                self.checkpoint=limit+1
-            else:
-                left=self.title[self.checkpoint:end]
-                right=''
-                self.checkpoint=end
-            self.config(text=left+right)
-        else:
-            self.config(text=self.title)
-        self.after(1000,self.slide)
+        if len(self.title)>10:
+            self.config(text=''.join(self.checkpoint))
+            del self.checkpoint[0]
+            if self.pos==len(self.title):self.pos=0
+            self.checkpoint.append(self.title[self.pos])
+            self.pos+=1
+            self.after(1000,self.slide)
+        else:self.config(text=' '.join(self.checkpoint))
 class MediaPlayer(Frame):
     def __init__(self,parent):
         super().__init__(parent)
@@ -134,6 +128,7 @@ class MediaPlayer(Frame):
             self.showr.destroy()
             self.scale.destroy()
             self.titleshow.destroy()
+            self.replay.enable=False
     def set(self,for_):
         if for_=='replay':
             self.playing=True
@@ -221,7 +216,8 @@ class MediaPlayer(Frame):
     def go_for_it(self,*args):
         if self.status is None:
             self.status=self.selected.get()
-            if self.status=='Single File':self.Import.bind('<Button-1>',lambda x:self.single_player())
+            if self.status=='Single File':
+                self.Import.bind('<Button-1>',lambda x:self.single_player())
             elif self.status=='PlayList':self.Import.bind('<Button-1>',lambda x:self.playlist())
             else:pass
         else:
@@ -264,9 +260,11 @@ class MediaPlayer(Frame):
                 self.showl.destroy()
                 self.showr.destroy()
                 self.titleshow.destroy()
+                self.replay.enable=False
             except:pass
             self.title=(re.findall(r'([^/]+).mp3',self.file)[0])
             self.titleshow=Display(self,self.title)
+            self.replay.enable=True
             temp=AudioB(self.file)
             print('changed')
             self.totallength=temp.length
@@ -278,6 +276,7 @@ class MediaPlayer(Frame):
             self.scale.pack(side=LEFT,padx=3)
             self.showr.pack(side=LEFT,padx=3)
             self.titleshow.pack(side=LEFT,padx=(20,))
+            self.replay.enable=True
 if __name__=='__main__':
     a=Tk()
     b=MediaPlayer(a)
