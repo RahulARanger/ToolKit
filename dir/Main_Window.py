@@ -31,6 +31,10 @@ try:
     from dir.root.OpenLink import *
 except:
     from root.OpenLink import *
+try:
+    from dir.YtDownloader import *
+except:
+    from YtDownloader import*
 import time
 import pygame
 hoversound='Resources\Media\\button.wav'
@@ -76,7 +80,7 @@ class MenuOptionFrame(Frame):
         self.options.set('Main')
         self.textcolor=('#74878f','#f1f1ff')
         self.backcolor=("#424242",'#5a5a5c')
-        self.select=OptionMenu(self,self.options,'Main','Calculator','Translator')
+        self.select=OptionMenu(self,self.options,'Main','Calculator','Translator','Youtube Downloader')
         self.select.config(background=self.backcolor[0],fg=self.textcolor[0],relief=FLAT,activeforeground=self.textcolor[1],activebackground=self.backcolor[1],highlightthickness=0,indicatoron=0)
         self.select['menu'].config(bg='#1e1e1e',activeforeground='#f1f1ff',fg=self.textcolor[0])
         self.select['menu']['cursor']='hand2'
@@ -144,8 +148,6 @@ class Version(Label):
         self.bind('<Leave>',lambda x:self.bthover(False))
     def bthover(self,status):
         if status:
-            global hoversound
-            pygame.mixer.Sound(hoversound).play()
             self.config(text='v1.0',fg=self.textcolor[1],bg=self.backcolor[1])
         else:
             self.config(text='v1.0',fg=self.textcolor[0],bg=self.backcolor[0])
@@ -171,12 +173,16 @@ class Selector(Frame):
         self.AcFrame=None
         a=pygame.mixer.Sound(self.switchsound)
         a.play()
+        
         if self.whichone==0:
             self.AcFrame=Settings(self.VFrame)
         elif self.whichone==1:
             self.AcFrame=Calc(self.VFrame)
         elif self.whichone==2:
-            self.AcFrame=GT(self.VFrame)                    
+            self.AcFrame=GT(self.VFrame)   
+        elif self.whichone==3:
+            print('Entered')
+            self.AcFrame=YT(self.VFrame)
         self.AcFrame.pack(fill=BOTH,expand=True)
         self.HBar.pack(side=BOTTOM,fill=X)
         self.VBar.pack(side=RIGHT,fill=Y)
@@ -225,7 +231,7 @@ class MainWindow(Tk):
         self.fullsize=not self.fullsize
         self.attributes('-fullscreen',self.fullsize)
     def selectTools_2(self,*args):
-        note=['Main','Calculator','Translator']
+        note=['Main','Calculator','Translator','Youtube Downloader']
         got=self.var.get()
         if note.index(got)==self.whichone:
             pass

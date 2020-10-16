@@ -102,6 +102,7 @@ class Settings(Frame):
         if a:
             with open(self.file,'r') as hand:
                 self.container=json.loads(hand.read())
+            self.container['Times']=1
             for i in self.container['Tuts']:
                 self.container['Tuts'][i]=True
             with open(self.file,'w') as hand:

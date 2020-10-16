@@ -20,22 +20,16 @@ class SpecialLabel(Label):
         self.config(textvariable=self.var)
         self.toggle=False
         self.note=''
-        self.switch=True
         self.after(300,self.change)
     def change(self):
-        if not self.switch:
-            self.var.set('Failed >_< No Internet connection!!!')
+        text='Installing {}'.format(self.note)
+        if self.toggle:
+            text+='.../...'
         else:
-            text='Installing {}'.format(self.note)
-            if self.toggle:
-                text+='.../...'
-            else:
-                text+='...\...'
-            self.var.set(text)
-            self.toggle=not(self.toggle)
+            text+='...\...'
+        self.var.set(text)
+        self.toggle=not(self.toggle)
         self.after(300,self.change)
-    def specialcase(self):
-        self.switch=False
 class preInstall(Tk):
     def __init__(self):
         super().__init__()
@@ -127,19 +121,18 @@ class Installer(Tk):
             self.MFrame=Frame(self,background='#84bbf8',cursor='coffee_mug')
             self.HiFrame=Frame(self.MFrame,background='#84bbf8')
             self.HiPhotos=['Resources\Media\\hi\\hi{}.jpg'.format(i) for i in range(1,19)]
-            self.Hi=ImageAlbum(self.HiFrame,self.HiPhotos,360,300,50)            
+            self.Hi=ImageAlbum(self.HiFrame,self.HiPhotos,360,300,50)
+            #self.installing=Progressbar(self.NFrame2,orient=HORIZONTAL,length=250,mode='indeterminate')
             self.InstallerFrame=Frame(self.MFrame,background='#84bbf8')
             self.installing=Progressbar(self.InstallerFrame,orient=HORIZONTAL,length=250,mode='indeterminate')
             self.announce=SpecialLabel(self.InstallerFrame)
             self.flag=False
             self.completed=False
-            self.noNet=None
             self.arrange()
             self.check_it=threading.Thread(target=self.checknet)
             self.check_it.start()
             self.do_it=threading.Thread(target=self.install)
             self.do_it.start()
-            
     def checkFirst(self):
         flag=True
         for i in self.ModuleNames:
@@ -154,13 +147,9 @@ class Installer(Tk):
             if self.completed is True:
                 break
             if NetworkCheck().MTest() is False:
-                self.noNet=False
                 a=messagebox.showerror('>_< Need Internet Connection','It seems some modules are needed!!! So for next time try opening this with Internet connection.')
-                self.announce.specialcase()
-                self.installing.destroy()
+                self.destroy()
                 sys.exit(0)
-            else:
-                self.noNet=True
     def register(self):
         with open(self.file,'r') as hand:
             container=json.loads(hand.read())
@@ -182,36 +171,23 @@ class Installer(Tk):
         self.installing.pack()
         self.announce.pack(side=BOTTOM)
         self.installing.start()
-    def exit_from_here(self):
-        self.completed=False
-        self.destroy()
     def install(self):
-        while True:
-            if self.noNet is not None:break
-        if self.noNet is False:
-            sys.exit(0)
-            
         for i in self.toInstall:
             self.announce.note=self.PackageNames[i]
             try:
                 subprocess.check_call([sys.executable,'-m','pip','install',self.PackageNames[i]])
             except:
                 os.system('pip install {}'.format(self.PackageNames[i]))
-        try:
-            self.installing.stop()
-            self.InstallerFrame.destroy()
-            self.New=Frame(self.MFrame,bg=self.backcolor[0])
-            self.New.pack()
-            self.newannounce=Label(self.New,text='Completed',font=('Comic Sans MS', 12, 'bold italic'),fg='#f1f1ff',bg='#5a5a5c')
-            self.done=Button(self.New,text=' Continue ',command=self.register,relief=FLAT,fg=self.textcolor[0],bg=self.backcolor[0])
-            self.done.bind('<Enter>',lambda x:self.bthover(True))
-            self.done.bind('<Leave>',lambda x:self.bthover(False))
-            self.New.pack(pady=10,fill=BOTH)
-            self.newannounce.pack(fill=BOTH)
-            self.done.pack(side=RIGHT,fill=X)
-        except:
-            print('hello',self.noNet,threading.active_count())
-            sys.exit(0)
+        self.InstallerFrame.destroy()
+        self.New=Frame(self.MFrame,bg=self.backcolor[0])
+        self.New.pack()
+        self.newannounce=Label(self.New,text='Completed',font=('Comic Sans MS', 12, 'bold italic'),fg='#f1f1ff',bg='#5a5a5c')
+        self.done=Button(self.New,text=' Continue ',command=self.register,relief=FLAT,fg=self.textcolor[0],bg=self.backcolor[0])
+        self.done.bind('<Enter>',lambda x:self.bthover(True))
+        self.done.bind('<Leave>',lambda x:self.bthover(False))
+        self.New.pack(pady=10,fill=BOTH)
+        self.newannounce.pack(fill=BOTH)
+        self.done.pack(side=RIGHT,fill=BOTH)
 if __name__=='__main__':
     a=Installer()
     a.mainloop()    

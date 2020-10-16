@@ -137,7 +137,6 @@ class InputBox(scrolledtext.ScrolledText):
         super().__init__(parent)
         if not special: self.config(font= ('consolas', '15'))
         self.config(width=50,height=10)        
-        self.config(relief=SUNKEN)
         self.config(undo=True)
         self.config(autoseparators=True,maxundo=-1) # ? for unlocking the undo power
         self.config(borderwidth=6) # ? design matters
@@ -147,7 +146,8 @@ class InputBox(scrolledtext.ScrolledText):
         self.bind('<FocusOut>',self.revert)        
         self.special=special  
         if self.special:                        
-            self.config(state=DISABLED)       
+            self.config(state=DISABLED)  
+            self.config(relief=RAISED)     
             self.config(width=45,height=10)
             self.config(font= ('consolas', '16'))
         self.arrange()
@@ -214,7 +214,8 @@ class Status(Text):
         self.config(relief=RAISED,state=DISABLED)
         self.config(width=70,height=11)   
         self.typed=0
-        self.TitleFont=("Times", "24", "bold italic") 
+        self.TitleFont=("Times", "24", "bold italic",True) 
+        self.TitleFont=font.Font(family='Times',size='24',underline=True,weight='bold',slant='italic')
         self.NormalFont=("Verdana 10 bold")
         self.translated=0
         self.config(state=NORMAL)
@@ -273,9 +274,6 @@ class GT(Frame):
     def __init__(self,parent):
         super().__init__(parent)
         self.config(bg='#80D4FF')
-        self.TitleFrame=Frame(self,bg='#80D4FF')
-        self.photos=['Resources\Media\Translator\Translator{}.jpg'.format(i) for i in range(20)]
-        self.title=ImageAlbum(self.TitleFrame,self.photos,500,500,100,'#80D4FF')
         self.ContainFrame=Frame(self,bg='#E6FFFB')        
         self.SearchFrame=Frame(self.ContainFrame,bg='#80D4FF')
         self.GTBack=GTBackend()
@@ -305,7 +303,7 @@ class GT(Frame):
             self.TranslatorChan.bind('<Leave>',lambda x:self.TranslatorChan.config(relief=FLAT,borderwidth=0))
         self.TranslateButt.bind('<ButtonRelease-1>',self.TranslateThem)
         self.arrange()   
-        self.after(600,self.checknet)           
+        self.after(3000,self.checknet)           
     def TranslateThem(self,*args):
         text=self.From.get_it()        
         try:translated,pronounciation,setto=self.GTBack.translation(text,self.fs.get(),self.ts.get())
@@ -320,8 +318,6 @@ class GT(Frame):
         self.StatusBar.enter_text(translated,False,self.fs.get(),self.ts.get())
         self.To.enter_text('\n\n'+pronounciation,False)
     def arrange(self):        
-        self.TitleFrame.pack(fill=X,expand=True)
-        self.title.pack(pady=30)
         self.ContainFrame.pack(fill=X,expand=True)
         self.MoreFrame.pack(fill=X,expand=True)
         self.SearchFrame.pack(fill=X,expand=True)
@@ -344,7 +340,7 @@ class GT(Frame):
             if self.failed:
                 self.pack(fill=BOTH,expand=True)
                 self.failed=False
-        self.after(600,self.checknet)
+        self.after(3000,self.checknet)
 if __name__=='__main__':
     root=Tk()
     a=GT(root)
