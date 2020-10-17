@@ -54,10 +54,12 @@ def Fill(variable,text,status=None):
             except:
                 x=messagebox.showerror('OMG!!!!!!!','Senpai, This is just a simple Calculator')
 class NumButton(Frame):
-    def __init__(self,parent,number,font,var,screen):
+    def __init__(self,parent,number,font,var,screen,status):
         super().__init__(parent)
         self.OFont=font
+        self.status=status
         self.var=var
+        self.number=number
         self.screen=screen
         self.Number=Label(self,text=number,width=4,height=2,cursor='hand2')
         self.config(bg='#a5de03')
@@ -69,8 +71,12 @@ class NumButton(Frame):
         self.Number.bind('<Button-1>',lambda x:self.pressed(True,number))
         self.Number.bind('<ButtonRelease-1>',lambda x:self.pressed(False,number))
     def hover(self,status):
-        if status:self.Number['bg'],self.Number['fg']='#f78419','black'
-        else:self.Number['fg'],self.Number['bg']='black','#77ba1c'
+        if status:
+            self.status.set('On Number '+str(self.number))
+            self.Number['bg'],self.Number['fg']='#f78419','black'
+        else:
+            self.status.set('ZzZzZzzZzzZZzzZZ')
+            self.Number['fg'],self.Number['bg']='black','#77ba1c'
     def pressed(self,status,number):
         if status:
             Fill(self.screen,number)
@@ -79,12 +85,14 @@ class NumButton(Frame):
             self.Number.config(relief=RAISED)
 
 class SymButton(Frame):
-    def __init__(self,parent,sym,font,var,screen):
+    def __init__(self,parent,sym,font,var,screen,status):
         super().__init__(parent)
         self.OFont=font
         self.screen=screen
         self.var=var
         self.sym=sym
+        self.status=status
+        self.function={'➕':'Addition','C':'Clear','✖️':'Product','➗':'Divide','➖':'Subtract','R':'Rounding','⌫':'BackSpace','=':'Math Time','.':'Decimal Point','(':'Left Bracs',')':'Right Bracs','^':'Power'}
         self.config(bg='#a5de03')
         self.Symbol=Label(self,text=sym,width=4,height=2,cursor='hand2')
         self.Symbol.config(relief=RAISED)
@@ -96,8 +104,12 @@ class SymButton(Frame):
         self.Symbol.bind('<Button-1>',lambda x:self.pressed(True,sym))        
         self.Symbol.bind('<ButtonRelease-1>',lambda x:self.pressed(False,sym))        
     def hover(self,status):
-        if status:self.Symbol['bg'],self.Symbol['fg']='#f78419','black'
-        else:self.Symbol['bg'],self.Symbol['fg']='#d5d6d6','black'
+        if status:
+            self.Symbol['bg'],self.Symbol['fg']='#f78419','black'
+            self.status.set(self.function[self.sym])
+        else:
+            self.Symbol['bg'],self.Symbol['fg']='#d5d6d6','black'
+            self.status.set('ZzZzZzzZzzZZzzZZ')
     def pressed(self,status,number):
         if status:
             self.Symbol.config(relief=SUNKEN)
@@ -147,37 +159,40 @@ class Calc(Frame):
         self.failed=False
         self.OFont=font.Font(family='verdana',size=20,weight='bold')
         self.OVar=StringVar()
+        self.status=StringVar()
+        self.status.set('Welcome to Our Calculator!!! Cykla Bylat')
         self.is_there=False
         self.is_therebar=False
-        self.CFrame=Frame(self,background='#a5de03',highlightbackground='#9e3501',highlightthickness=6,width=560,height=640)        
+        self.CFrame=Frame(self,background='#a5de03',highlightbackground='#9e3501',highlightthickness=6,width=560,height=580)        
         self.OFrame=Frame(self.CFrame,background='#635252')
         self.Row1=Frame(self.CFrame,bg='#a5de03')
         self.Row2=Frame(self.CFrame,bg='#a5de03')
-        self.photos=['Resources\Media\\calc\\calc{}.jpg'.format(i) for i in range(1,20)]
-        self.Text=ImageAlbum(self,self.photos,560,500)        
+                
         self.Row3=Frame(self.CFrame,bg='#a5de03')
         self.Row4=Frame(self.CFrame,bg='#a5de03')
         self.Row5=Frame(self.CFrame,bg='#a5de03')
+        self.StatusFrame=Frame(self.CFrame,bg='#a5de03')
+        self.checkinglabel=Label(self.StatusFrame,textvariable=self.status, justify=LEFT,background="#ffffe0", relief=SOLID, borderwidth=1,font=("Comic Sans MS", "10", "normal"))
         self.OutputFrame=Frame(self.OFrame,bg='#E6F2FF',height=23)
         self.OutputScreen=Entry(self.OutputFrame,bg='#E6F2FF',justify=RIGHT,width=69,textvariable=self.OVar,cursor='xterm',insertwidth=6,insertbackground='orange')        
-        self.Plus=SymButton(self.Row3,'➕',self.OFont,self.OVar,self.OutputScreen)
-        self.Minus=SymButton(self.Row4,'➖',self.OFont,self.OVar,self.OutputScreen)
-        self.Multiply=SymButton(self.Row2,'✖️',self.OFont,self.OVar,self.OutputScreen)
-        self.Divide=SymButton(self.Row1,'➗',self.OFont,self.OVar,self.OutputScreen)
-        self.Round=SymButton(self.Row1,'R',self.OFont,self.OVar,self.OutputScreen)        
-        self.LB=SymButton(self.Row4,'(',self.OFont,self.OVar,self.OutputScreen)
-        self.RB=SymButton(self.Row4,')',self.OFont,self.OVar,self.OutputScreen)
-        self.Power=SymButton(self.Row4,'^',self.OFont,self.OVar,self.OutputScreen)
+        self.Plus=SymButton(self.Row3,'➕',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Minus=SymButton(self.Row4,'➖',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Multiply=SymButton(self.Row2,'✖️',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Divide=SymButton(self.Row1,'➗',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Round=SymButton(self.Row1,'R',self.OFont,self.OVar,self.OutputScreen,self.status)        
+        self.LB=SymButton(self.Row4,'(',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.RB=SymButton(self.Row4,')',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Power=SymButton(self.Row4,'^',self.OFont,self.OVar,self.OutputScreen,self.status)
         self.HBar=ttk.Scrollbar(self.OFrame,orient=HORIZONTAL,command=self.OutputScreen.xview)
         self.OutputScreen.config(font=self.OFont)
-        self.Equal=SymButton(self.Row5,'=',self.OFont,self.OVar,self.OutputScreen)
-        self.Back=SymButton(self.Row5,'⌫',self.OFont,self.OVar,self.OutputScreen)
-        self.Zero=NumButton(self.Row5,'0',self.OFont,self.OVar,self.OutputScreen)
-        self.Clear=SymButton(self.Row5,'C',self.OFont,self.OVar,self.OutputScreen)
-        self.Decimal=SymButton(self.Row5,'.',self.OFont,self.OVar,self.OutputScreen)
-        self.Numbers=[NumButton(self.Row1,str(i),self.OFont,self.OVar,self.OutputScreen) for i in {7,8,9}]
-        self.Numbers.extend([NumButton(self.Row2,str(i),self.OFont,self.OVar,self.OutputScreen) for i in {4,5,6}])
-        self.Numbers.extend([NumButton(self.Row3,str(i),self.OFont,self.OVar,self.OutputScreen) for i in {3,2,1}])
+        self.Equal=SymButton(self.Row5,'=',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Back=SymButton(self.Row5,'⌫',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Zero=NumButton(self.Row5,'0',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Clear=SymButton(self.Row5,'C',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Decimal=SymButton(self.Row5,'.',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Numbers=[NumButton(self.Row1,str(i),self.OFont,self.OVar,self.OutputScreen,self.status) for i in {7,8,9}]
+        self.Numbers.extend([NumButton(self.Row2,str(i),self.OFont,self.OVar,self.OutputScreen,self.status) for i in {4,5,6}])
+        self.Numbers.extend([NumButton(self.Row3,str(i),self.OFont,self.OVar,self.OutputScreen,self.status) for i in {3,2,1}])
         self.Error=Label(self.OFrame,text='',relief=GROOVE)
         self.ErrorFont=font.Font(family='Century Gothic',size=10)
         self.arrange()
@@ -185,7 +200,6 @@ class Calc(Frame):
             self.tutorial()
     def arrange(self):
         self.OVar.trace('w',self.check)
-        self.Text.pack(padx=20,pady=20)        
         self.CFrame.pack(padx=5,pady=5)
         self.CFrame.pack_propagate(0)
         self.OFrame.pack(padx=30,pady=40)
@@ -198,6 +212,8 @@ class Calc(Frame):
         self.Row3.pack()   
         self.Row4.pack()  
         self.Row5.pack()        
+        self.StatusFrame.pack(fill=X,side=BOTTOM)
+        self.checkinglabel.pack(side=LEFT)
         for i in range(len(self.Numbers)):
             if i in [0,3,6]:self.Numbers[i].pack(side=LEFT)
             else:self.Numbers[i].pack(side=LEFT)
@@ -222,7 +238,10 @@ class Calc(Frame):
         with open(self.file,'r') as hand:
             c=json.loads(hand.read())
         self.tut=True if c['Tuts']['Calculator'] else False
-        print(self.tut)        
+        if self.tut:
+            c['Tuts']['Calculator']=False
+            with open(self.file,'w') as hand:
+                hand.write(json.dumps(c,indent=4))
     def tutorial(self):
         photos=['Resources\\Instructions\\Calculator\\#{}.jpeg'.format(i) for i in range(1,4)]
         a=Instructions(self,photos)

@@ -1,0 +1,9 @@
+{
+    "Times": 3,
+    "Tuts": {
+        "Calculator": false,
+        "Translator": true,
+        "Audio Player": true
+    }
+}
+
