@@ -6,11 +6,14 @@ from tkinter import *
 import sys
 import json
 import threading
-import time
 try:
     from dir.root.NetTest import *
 except:
     from root.NetTest import *
+try:
+    from dir.root.LogFiles import *
+except:
+    from root.LogFiles import *
 class SpecialLabel(Label):
     def __init__(self,parent):
         super().__init__(parent)
@@ -24,6 +27,7 @@ class SpecialLabel(Label):
         self.after(300,self.change)
     def change(self):
         if not self.switch:
+            started.critical('Failed >_< No Internet connection!!!')
             self.var.set('Failed >_< No Internet connection!!!')
         else:
             text='Installing {}'.format(self.note)
@@ -73,6 +77,7 @@ class preInstall(Tk):
         self.config(bg=self.colors[self.index])
         self.index+=1
         if NetworkCheck().MTest() is False:
+            started.critical('Failed >_< No Internet connection!!!')
             a=messagebox.showerror('>_< Need Internet Connection','It seems some modules are needed!!! So for next time try opening this with Internet connection.')
             self.destroy()
             sys.exit(0)
@@ -91,14 +96,17 @@ class preInstall(Tk):
         return flag
     def install(self):
         for i in self.toInstall:
+            started.debug('Installing {}'.format(i))
             self.current.note=self.V[i]
             try:
                 subprocess.check_call([sys.executable,'-m','pip','install',self.V[i]])
             except:
                 os.system('pip install {}'.format(self.V[i]))
+            started.info('Installed {}'.format(i))
         self.current.destroy()
         self.Info.config(text='Completed UwU')
         self.done.pack(expand=True)
+        started.info('PreInstallation is Completed')
 preInstall().mainloop()
 try:
     from root.ImageViewer import *
@@ -155,6 +163,7 @@ class Installer(Tk):
                 break
             if NetworkCheck().MTest() is False:
                 self.noNet=False
+                started.critical('>_< Need Internet Connection')
                 a=messagebox.showerror('>_< Need Internet Connection','It seems some modules are needed!!! So for next time try opening this with Internet connection.')
                 self.announce.specialcase()
                 self.installing.destroy()
@@ -193,10 +202,12 @@ class Installer(Tk):
             
         for i in self.toInstall:
             self.announce.note=self.PackageNames[i]
+            started.debug('Installing {}'.format(i))
             try:
                 subprocess.check_call([sys.executable,'-m','pip','install',self.PackageNames[i]])
             except:
                 os.system('pip install {}'.format(self.PackageNames[i]))
+            started.info('Installed {}'.format(i))
         try:
             self.installing.stop()
             self.InstallerFrame.destroy()

@@ -10,6 +10,10 @@ try:
     from root.Dialogs import *    
 except:
     from dir.root.Dialogs import *
+try:
+    from dir.root.LogFiles import *
+except:
+    from root.LogFiles import *
 class ChooseButton(Label):
     def __init__(self,p,var):
         super().__init__(p)
@@ -47,8 +51,8 @@ class Settings(Frame):
         self['bg']='#252526'   
         self.failed=False
         self.textcolor=('#74878f','#f1f1ff')
-        self.sfont=font.Font(family="Lucida Grande", size=12)
-        self.sfontl=font.Font(family="Lucida Grande", size=21)
+        self.sfont=font.Font(family="Lucida Grande", size=14)
+        self.sfontl=font.Font(family="Lucida Grande", size=16)
         self.Ifont=font.Font(family="Times", size="12", weight="bold",slant="italic")
         self.TFrame=LabelFrame(self,text='Tools',bg='#252526',padx=10,pady=10,fg='#f1f1ff',font=self.sfont)
         self.SFrame=LabelFrame(self,text='Settings ⚙️',bg='#252526',fg=self.textcolor[0],padx=10,pady=10)
@@ -81,8 +85,11 @@ class Settings(Frame):
         self.Ttut=ChooseButton(self.TSFrame,self.tvar)
         self.updatelst()  
         self.Reset=Button(self.SFrame,text='Reset',bg=self.Ctut.backcolor[0],fg=self.textcolor[0],activebackground=self.Ctut.backcolor[0],relief=FLAT,activeforeground=self.textcolor[1],command=self.reset_it)
-        self.Reset.bind('<Enter>',lambda x:self.bthover(True))
-        self.Reset.bind('<Leave>',lambda x:self.bthover(False))
+        self.Log=Button(self.SFrame,text='Show Logs',bg=self.Ctut.backcolor[0],fg=self.textcolor[0],activebackground=self.Ctut.backcolor[0],relief=FLAT,activeforeground=self.textcolor[1],command=lambda :ShowLogs(self,'Resources\Logs\Opening.log'))
+        self.Reset.bind('<Enter>',lambda x:self.bthover(True,self.Reset))
+        self.Reset.bind('<Leave>',lambda x:self.bthover(False,self.Reset))
+        self.Log.bind('<Enter>',lambda x:self.bthover(True,self.Log))
+        self.Log.bind('<Leave>',lambda x:self.bthover(False,self.Log))
         self.arrange()
     def arrange(self):
         self.SFrame.pack(fill=X)
@@ -97,8 +104,9 @@ class Settings(Frame):
         self.Mtut.pack(side=LEFT)
         self.Ttut.pack(side=LEFT)
         self.Reset.pack(side=RIGHT,pady=20,padx=(0,30))
+        self.Log.pack(side=RIGHT,pady=20,padx=(0,30))
     def reset_it(self):
-        a=messagebox.askyesno('Reset! Are you Sure','Once done, all the previous settings will be erased')
+        a=messagebox.askyesno('Reset! Are you Sure','Once done, all the previous settings will be erased',icon='warning')
         if a:
             with open(self.file,'r') as hand:
                 self.container=json.loads(hand.read())
@@ -108,11 +116,11 @@ class Settings(Frame):
             with open(self.file,'w') as hand:
                 hand.write(json.dumps(self.container,indent=4))      
             self.updatelst()
-    def bthover(self,status):
+    def bthover(self,status,w):
         if status:
-            self.Reset.config(fg=self.textcolor[1],bg=self.Ctut.backcolor[1])
+            w.config(fg=self.textcolor[1],bg=self.Ctut.backcolor[1])
         else:
-            self.Reset.config(fg=self.textcolor[0],bg=self.Ctut.backcolor[0])
+            w.config(fg=self.textcolor[0],bg=self.Ctut.backcolor[0])
     def updatelst(self):
         with open(self.file,'r') as hand:
             self.container=json.loads(hand.read())

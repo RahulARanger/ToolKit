@@ -12,6 +12,10 @@ try:
     from root.Dialogs import *
 except:
     from dir.root.Dialogs import *
+try:
+    from dir.root.LogFiles import *
+except:
+    from root.LogFiles import *
 class BackEnd:
     def __init__(self,exp):
         self.exp=exp
@@ -34,7 +38,11 @@ def Fill(variable,text,status=None):
             if not flag:
                 x=messagebox.showerror('OMG!!!!!!!','Senpai, For rounding i need an answer i cannot do with expression')
             else:
-                variable.set(int(eval(variable.get())))
+                expression=variable.get()
+                result=int(eval(expression))
+                print(expression,result)
+                calculator.info(str(expression)+str(result))
+                variable.set(result)
         elif status==69:
             try:
                 b=variable.get()
@@ -48,6 +56,10 @@ def Fill(variable,text,status=None):
                 eval(b)
                 a=BackEnd(b).result()
                 a=str(a)
+                expression=variable.get()
+                result=int(eval(expression))
+                print(expression,result)
+                calculator.info(str(expression)+str(result))
                 if len(a)>300:
                     assert(False)
                 variable.set(a)
@@ -166,8 +178,7 @@ class Calc(Frame):
         self.CFrame=Frame(self,background='#a5de03',highlightbackground='#9e3501',highlightthickness=6,width=560,height=580)        
         self.OFrame=Frame(self.CFrame,background='#635252')
         self.Row1=Frame(self.CFrame,bg='#a5de03')
-        self.Row2=Frame(self.CFrame,bg='#a5de03')
-                
+        self.Row2=Frame(self.CFrame,bg='#a5de03')                
         self.Row3=Frame(self.CFrame,bg='#a5de03')
         self.Row4=Frame(self.CFrame,bg='#a5de03')
         self.Row5=Frame(self.CFrame,bg='#a5de03')

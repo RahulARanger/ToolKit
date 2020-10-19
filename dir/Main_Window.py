@@ -2,6 +2,7 @@ from tkinter import *
 import time
 from tkinter import *
 import tkinter.ttk as ttk
+
 from tkinter import messagebox
 try:
     from Settings import *
@@ -62,6 +63,7 @@ class MenuFrame(Frame):
         self.name.pack()
     def bthover(self,status):
         if status is None:
+            started.info('Opened Browser, pressed {}'.format(self.name['text']))
             Open(self.link)
         else:
             if status:
@@ -71,8 +73,7 @@ class MenuFrame(Frame):
                 global hoversound
                 pygame.mixer.Sound(hoversound).play()
                 self.config(bg=self.backcolor[1])
-                self.name.config(fg=self.textcolor[1],bg=self.backcolor[1])
-        
+                self.name.config(fg=self.textcolor[1],bg=self.backcolor[1])        
 class MenuOptionFrame(Frame):
     def __init__(self,parent,var):
         super().__init__(parent)
@@ -128,8 +129,12 @@ class Wifi(Label):
         self.after(500,self.check)
     def check(self):
         if NetworkCheck().MTest():
+            if self.status['text']=='❌ ':
+                started.debug('Internet is Back')
             self.status.config(text='✔️',fg='#40FF19')
         else:
+            if self.status['text']=='✔️':
+                started.warning('Internet Connection is Lost')
             self.status.config(text='❌ ',fg='#FF0000')
         self.after(6000,self.check)
 class Tab(Frame):
@@ -172,17 +177,23 @@ class Selector(Frame):
         self.MCanvas.create_window((0,0),window=self.VFrame,anchor='nw',width=1350)
         self.AcFrame=None
         a=pygame.mixer.Sound(self.switchsound)
-        a.play()
-        
+        a.play()        
         if self.whichone==0:
+            started.info('Opened Main Tab')
             self.AcFrame=Settings(self.VFrame)
+            started.info('Closed Main Tab')
         elif self.whichone==1:
+            started.info('Opened Calculator Tab')
             self.AcFrame=Calc(self.VFrame)
+            started.info('Closed Calculator Tab')
         elif self.whichone==2:
+            started.info('Opened Translator Tab')
             self.AcFrame=GT(self.VFrame)   
+            started.info('Closed Translator Tab')
         elif self.whichone==3:
-            print('Entered')
+            started.info('Opened Yt Downloader Tab')
             self.AcFrame=YT(self.VFrame)
+            started.info('Closed YT Downloader Tab')
         self.AcFrame.pack(fill=BOTH,expand=True)
         self.HBar.pack(side=BOTTOM,fill=X)
         self.VBar.pack(side=RIGHT,fill=Y)
@@ -210,6 +221,10 @@ class MainWindow(Tk):
         self.about=MenuFrame(self.MeFrame,'About','https://github.com/RahulARanger/ToolKit')
         self.help=MenuFrame(self.MeFrame,'Help','https://github.com/RahulARanger/ToolKit/issues')
         self.arrange()
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+    def on_closing(self):
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.destroy()
     def arrange(self):
         self.MFrame.pack(fill=BOTH,expand=True)
         self.MeFrame.pack(fill=X)
