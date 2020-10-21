@@ -118,8 +118,8 @@ class Installer(Tk):
         # ! Imp (Module Names)
         self.textcolor=('#74878f','#f1f1ff')
         self.backcolor=("#424242",'#5a5a5c')
-        self.ModuleNames=['googletrans','mutagen']
-        self.PackageNames={'mutagen':'mutagen','googletrans':'googletrans'}
+        self.ModuleNames=['googletrans','mutagen','pytube']
+        self.PackageNames={'mutagen':'mutagen','googletrans':'googletrans','pytube':'pytube3'}
         self.file='dir\\root\\settings.json' 
         self.toInstall=[]
         if self.checkFirst():
@@ -146,8 +146,7 @@ class Installer(Tk):
             self.check_it=threading.Thread(target=self.checknet)
             self.check_it.start()
             self.do_it=threading.Thread(target=self.install)
-            self.do_it.start()
-            
+            self.do_it.start()            
     def checkFirst(self):
         flag=True
         for i in self.ModuleNames:

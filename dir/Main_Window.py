@@ -38,6 +38,7 @@ except:
     from YtDownloader import*
 import time
 import pygame
+STATUS=None
 hoversound='Resources\Media\\button.wav'
 pygame.mixer.init()
 def do_this():
@@ -67,11 +68,13 @@ class MenuFrame(Frame):
             Open(self.link)
         else:
             if status:
+                STATUS.set('ZzZzZzzZzzZZzzZZ')
                 self.config(bg=self.backcolor[0])
                 self.name.config(fg=self.textcolor[0],bg=self.backcolor[0])
             else:
                 global hoversound
                 pygame.mixer.Sound(hoversound).play()
+                STATUS.set('Redirects to {}'.format(self.link))
                 self.config(bg=self.backcolor[1])
                 self.name.config(fg=self.textcolor[1],bg=self.backcolor[1])        
 class MenuOptionFrame(Frame):
@@ -92,8 +95,10 @@ class MenuOptionFrame(Frame):
         if status:
             global hoversound
             pygame.mixer.Sound(hoversound).play()
+            STATUS.set('Select the Tool')
             self.config(bg=self.backcolor[1])
         else:
+            STATUS.set('ZzZzZzzZzzZZzzZZ')
             self.config(bg=self.backcolor[0])
 class Clock(Label):
     def __init__(self,parent):
@@ -117,15 +122,19 @@ class Clock(Label):
     def bthover(self,status):
         if status is True:
             self.config(bg=self.backcolor[1])
+            STATUS.set('Current Date and Time')
             self.config(relief=GROOVE)
         else:
             self.config(bg=self.backcolor[0])
+            STATUS.set('ZzZzZzzZzzZZzzZZ')
             self.config(relief=FLAT)
 class Wifi(Label):
     def __init__(self,parent):
         super().__init__(parent)
         self.status=Label(parent,text='✔️',bg='#007acc',fg='#40FF19',font=('Times',12,'bold'))
         self.config(text='Connected:',bg='#007acc',fg='#f1f1ff',font=('helvetica',12,'bold'))
+        self.bind('<Enter>',lambda x:self.hover(True))
+        self.bind('<Leave>',lambda x:self.hover(False))
         self.after(500,self.check)
     def check(self):
         if NetworkCheck().MTest():
@@ -137,12 +146,22 @@ class Wifi(Label):
                 started.warning('Internet Connection is Lost')
             self.status.config(text='❌ ',fg='#FF0000')
         self.after(6000,self.check)
+    def hover(self,status):
+        if status:
+            STATUS.set('Not Connected' if self.status['text']=='❌ ' else 'Connected')
+        else:
+            STATUS.set('ZzZzZzzZzzZZzzZZ')
 class Tab(Frame):
     def __init__(self,parent):
         super().__init__(parent)
+        global STATUS
         self['bg']='#2d2d2d'
-        self.Name=Label(self,text='Main',bg='#1e1e1e',fg='#f1f1ff')
-        self.Name.pack(padx=10,ipadx=10,ipady=1)        
+        self.Name=Label(self,text='Main',bg='#1e1e1e',fg='#f1f1ff',font=("Comic Sans MS", "10", "normal"))
+        STATUS=StringVar()
+        STATUS.set('')
+        self.checkinglabel=Label(self,textvariable=STATUS, justify=LEFT,background="#ffffe0", relief=SOLID,font=("Comic Sans MS", "10", "normal"),borderwidth=2)
+        self.Name.pack(ipadx=10,ipady=1,side=LEFT,anchor=N)        
+        self.checkinglabel.pack(anchor=NE)
 class Version(Label):
     def __init__(self,parent):
         super().__init__(parent)
@@ -192,7 +211,7 @@ class Selector(Frame):
             started.info('Closed Translator Tab')
         elif self.whichone==3:
             started.info('Opened Yt Downloader Tab')
-            self.AcFrame=YT(self.VFrame)
+            self.AcFrame=YT(self.VFrame,STATUS)
             started.info('Closed YT Downloader Tab')
         self.AcFrame.pack(fill=BOTH,expand=True)
         self.HBar.pack(side=BOTTOM,fill=X)
