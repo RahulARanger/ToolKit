@@ -2,9 +2,10 @@ from tkinter import *
 import PIL.ImageTk
 import PIL.Image
 class ImageLabel(Label):
-    def __init__(self,parent,img,w,h):
+    def __init__(self,parent,img,w,h,color=None):
         super().__init__(parent)
         self.img=img
+        if color is None:self.config(bg=color)
         self.w,self.h=w,h
         self.img=PIL.Image.open(self.img)
         self.resize()

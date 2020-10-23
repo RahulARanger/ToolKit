@@ -1,44 +1,116 @@
-21/10/2020 02:22:42 PM INFO Opened Main Tab
-21/10/2020 02:22:43 PM INFO Closed Main Tab
-21/10/2020 02:23:10 PM INFO Opened Main Tab
-21/10/2020 02:23:10 PM INFO Closed Main Tab
-21/10/2020 02:23:46 PM INFO Opened Main Tab
-21/10/2020 02:23:46 PM INFO Closed Main Tab
-21/10/2020 02:24:46 PM INFO Opened Main Tab
-21/10/2020 02:24:46 PM INFO Closed Main Tab
-21/10/2020 02:24:57 PM INFO Opened Calculator Tab
-21/10/2020 02:24:58 PM INFO Closed Calculator Tab
-21/10/2020 02:25:03 PM INFO Opened Translator Tab
-21/10/2020 02:25:04 PM INFO Closed Translator Tab
-21/10/2020 02:25:06 PM INFO Opened Yt Downloader Tab
-21/10/2020 02:25:08 PM INFO Closed YT Downloader Tab
-21/10/2020 04:10:59 PM DEBUG App was Opened
-21/10/2020 04:11:03 PM INFO Opened Main Window
-21/10/2020 04:11:03 PM INFO Opened Main Tab
-21/10/2020 04:11:04 PM INFO Closed Main Tab
-21/10/2020 04:12:22 PM INFO Opened Translator Tab
-21/10/2020 04:12:25 PM INFO Closed Translator Tab
-21/10/2020 04:12:27 PM INFO Opened Yt Downloader Tab
-21/10/2020 04:12:29 PM INFO Closed YT Downloader Tab
-21/10/2020 04:13:46 PM DEBUG Exited the App
-21/10/2020 04:17:03 PM DEBUG App was Opened
-21/10/2020 04:17:06 PM INFO Opened Main Window
-21/10/2020 04:17:07 PM INFO Opened Main Tab
-21/10/2020 04:17:08 PM INFO Closed Main Tab
-21/10/2020 04:17:14 PM INFO Opened Yt Downloader Tab
-21/10/2020 04:17:17 PM INFO Closed YT Downloader Tab
-21/10/2020 04:17:40 PM INFO Opened Main Tab
-21/10/2020 04:17:40 PM INFO Closed Main Tab
-21/10/2020 04:17:43 PM INFO Opened Calculator Tab
-21/10/2020 04:17:44 PM INFO Closed Calculator Tab
-21/10/2020 04:17:57 PM INFO Opened Translator Tab
-21/10/2020 04:17:59 PM INFO Closed Translator Tab
-21/10/2020 04:18:04 PM INFO Opened Yt Downloader Tab
-21/10/2020 04:18:07 PM INFO Closed YT Downloader Tab
-21/10/2020 04:18:13 PM INFO Opened Calculator Tab
-21/10/2020 04:18:13 PM INFO Closed Calculator Tab
-21/10/2020 04:18:21 PM INFO Opened Translator Tab
-21/10/2020 04:18:24 PM INFO Closed Translator Tab
-21/10/2020 04:18:28 PM INFO Opened Yt Downloader Tab
-21/10/2020 04:18:31 PM INFO Closed YT Downloader Tab
-21/10/2020 04:18:50 PM DEBUG Exited the App
+22/10/2020 09:59:43 PM INFO Opened Yt Downloader Tab
+22/10/2020 09:59:46 PM INFO Closed YT Downloader Tab
+22/10/2020 10:02:34 PM DEBUG Exited the App
+23/10/2020 08:54:00 AM DEBUG App was Opened
+23/10/2020 08:54:13 AM INFO Opened Main Window
+23/10/2020 08:54:19 AM INFO Opened Main Tab
+23/10/2020 08:54:19 AM INFO Closed Main Tab
+23/10/2020 08:55:12 AM INFO Opened Yt Downloader Tab
+23/10/2020 08:55:19 AM INFO Closed YT Downloader Tab
+23/10/2020 09:06:03 AM DEBUG Exited the App
+23/10/2020 09:12:10 AM DEBUG App was Opened
+23/10/2020 09:12:13 AM INFO Opened Main Window
+23/10/2020 09:12:15 AM INFO Opened Main Tab
+23/10/2020 09:12:15 AM INFO Closed Main Tab
+23/10/2020 09:13:49 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:13:52 AM INFO Closed YT Downloader Tab
+23/10/2020 09:14:31 AM DEBUG Exited the App
+23/10/2020 09:14:48 AM DEBUG App was Opened
+23/10/2020 09:14:50 AM INFO Opened Main Window
+23/10/2020 09:14:51 AM INFO Opened Main Tab
+23/10/2020 09:14:51 AM INFO Closed Main Tab
+23/10/2020 09:15:26 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:15:31 AM INFO Closed YT Downloader Tab
+23/10/2020 09:16:03 AM DEBUG Exited the App
+23/10/2020 09:18:30 AM DEBUG App was Opened
+23/10/2020 09:18:33 AM INFO Opened Main Window
+23/10/2020 09:18:33 AM INFO Opened Main Tab
+23/10/2020 09:18:34 AM INFO Closed Main Tab
+23/10/2020 09:18:36 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:18:41 AM INFO Closed YT Downloader Tab
+23/10/2020 09:19:59 AM DEBUG Exited the App
+23/10/2020 09:22:22 AM DEBUG App was Opened
+23/10/2020 09:22:24 AM INFO Opened Main Window
+23/10/2020 09:22:25 AM INFO Opened Main Tab
+23/10/2020 09:22:25 AM INFO Closed Main Tab
+23/10/2020 09:22:30 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:22:32 AM INFO Closed YT Downloader Tab
+23/10/2020 09:24:58 AM DEBUG Exited the App
+23/10/2020 09:25:12 AM INFO Opened Main Tab
+23/10/2020 09:25:12 AM INFO Closed Main Tab
+23/10/2020 09:25:30 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:25:33 AM INFO Closed YT Downloader Tab
+23/10/2020 09:28:03 AM DEBUG App was Opened
+23/10/2020 09:28:06 AM INFO Opened Main Window
+23/10/2020 09:28:06 AM INFO Opened Main Tab
+23/10/2020 09:28:07 AM INFO Closed Main Tab
+23/10/2020 09:28:34 AM INFO Opened Calculator Tab
+23/10/2020 09:28:35 AM INFO Closed Calculator Tab
+23/10/2020 09:28:55 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:28:59 AM INFO Closed YT Downloader Tab
+23/10/2020 09:32:19 AM DEBUG Exited the App
+23/10/2020 09:32:58 AM INFO Opened Main Tab
+23/10/2020 09:32:59 AM INFO Closed Main Tab
+23/10/2020 09:33:14 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:33:19 AM INFO Closed YT Downloader Tab
+23/10/2020 09:35:06 AM INFO Opened Main Tab
+23/10/2020 09:35:06 AM INFO Closed Main Tab
+23/10/2020 09:35:10 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:35:12 AM INFO Closed YT Downloader Tab
+23/10/2020 09:36:53 AM INFO Opened Main Tab
+23/10/2020 09:36:53 AM INFO Closed Main Tab
+23/10/2020 09:36:59 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:37:04 AM INFO Closed YT Downloader Tab
+23/10/2020 09:38:33 AM INFO Opened Main Tab
+23/10/2020 09:38:33 AM INFO Closed Main Tab
+23/10/2020 09:42:35 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:42:38 AM INFO Closed YT Downloader Tab
+23/10/2020 09:45:44 AM DEBUG App was Opened
+23/10/2020 09:45:46 AM INFO Opened Main Window
+23/10/2020 09:45:47 AM INFO Opened Main Tab
+23/10/2020 09:45:47 AM INFO Closed Main Tab
+23/10/2020 09:47:35 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:47:40 AM INFO Closed YT Downloader Tab
+23/10/2020 09:49:05 AM DEBUG Exited the App
+23/10/2020 09:51:36 AM DEBUG App was Opened
+23/10/2020 09:51:40 AM INFO Opened Main Window
+23/10/2020 09:51:41 AM INFO Opened Main Tab
+23/10/2020 09:51:41 AM INFO Closed Main Tab
+23/10/2020 09:51:57 AM INFO Opened Translator Tab
+23/10/2020 09:51:58 AM INFO Closed Translator Tab
+23/10/2020 09:51:59 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:52:01 AM INFO Closed YT Downloader Tab
+23/10/2020 09:55:02 AM DEBUG Exited the App
+23/10/2020 09:55:27 AM DEBUG App was Opened
+23/10/2020 09:55:29 AM INFO Opened Main Window
+23/10/2020 09:55:29 AM INFO Opened Main Tab
+23/10/2020 09:55:29 AM INFO Closed Main Tab
+23/10/2020 09:55:50 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:55:52 AM INFO Closed YT Downloader Tab
+23/10/2020 09:56:13 AM DEBUG Exited the App
+23/10/2020 09:56:58 AM DEBUG App was Opened
+23/10/2020 09:57:01 AM INFO Opened Main Window
+23/10/2020 09:57:02 AM INFO Opened Main Tab
+23/10/2020 09:57:02 AM INFO Closed Main Tab
+23/10/2020 09:57:06 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:57:08 AM INFO Closed YT Downloader Tab
+23/10/2020 09:57:27 AM DEBUG Exited the App
+23/10/2020 09:57:32 AM DEBUG App was Opened
+23/10/2020 09:57:36 AM INFO Opened Main Window
+23/10/2020 09:57:37 AM INFO Opened Main Tab
+23/10/2020 09:57:37 AM INFO Closed Main Tab
+23/10/2020 09:58:04 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:58:11 AM INFO Closed YT Downloader Tab
+23/10/2020 09:58:48 AM DEBUG Exited the App
+23/10/2020 09:59:09 AM INFO Opened Main Tab
+23/10/2020 09:59:09 AM INFO Closed Main Tab
+23/10/2020 09:59:28 AM INFO Opened Yt Downloader Tab
+23/10/2020 09:59:31 AM INFO Closed YT Downloader Tab
+23/10/2020 10:02:51 AM INFO Opened Main Tab
+23/10/2020 10:02:51 AM INFO Closed Main Tab
+23/10/2020 10:03:42 AM INFO Opened Main Tab
+23/10/2020 10:03:42 AM INFO Closed Main Tab
+23/10/2020 10:04:59 AM INFO Opened Main Tab
+23/10/2020 10:04:59 AM INFO Closed Main Tab
+23/10/2020 10:05:21 AM INFO Opened Yt Downloader Tab
+23/10/2020 10:05:23 AM INFO Closed YT Downloader Tab

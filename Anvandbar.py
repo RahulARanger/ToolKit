@@ -5,7 +5,11 @@ def createPreFiles():
     if os.path.exists('Resources/Logs'):
         pass
     else:
-        os.mkdir('Resources/Logs')        
+        os.mkdir('Resources/Logs')  
+    if os.path.exists('temp'):
+            pass
+    else:
+        os.mkdir('temp')
 createPreFiles()
 from dir.root.LogFiles import *
 from dir.instwin import *

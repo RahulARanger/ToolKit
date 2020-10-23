@@ -15,9 +15,10 @@ try:
 except:
     from root.LogFiles import *
 class ChooseButton(Label):
-    def __init__(self,p,var):
+    def __init__(self,p,var,var2):
         super().__init__(p)
         self.var=var        
+        self.status=var2
         self.Ifont=font.Font(family="Times", size="12", weight="bold",slant="roman")
         self.textcolor=('#74878f','#f1f1ff')
         self.backcolor=("#424242",'#5a5a5c')
@@ -31,8 +32,10 @@ class ChooseButton(Label):
     def hover(self,status):
         if status:
             self.config(bg=self.backcolor[1],fg=self.textcolor[1])
+            self.status.set('Off?' if self['text']==' On ' else ' On? ')
         else:
             self.config(bg=self.backcolor[0],fg=self.textcolor[0])
+            self.status.set('ZzZzZzzZzzZZzzZZ')
     def manual(self,status):
         self.config(text=' On ' if status else ' Off  ')
         self.var.set(1 if status else 0)
@@ -45,11 +48,12 @@ class ChooseButton(Label):
         else:
             pass
 class Settings(Frame):
-    def __init__(self,parent):
+    def __init__(self,parent,var):
         super().__init__(parent)
         self.file='dir\\root\\settings.json'        
         self['bg']='#252526'   
         self.failed=False
+        self.status=var
         self.textcolor=('#74878f','#f1f1ff')
         self.sfont=font.Font(family="Lucida Grande", size=14)
         self.sfontl=font.Font(family="Lucida Grande", size=16)
@@ -80,9 +84,9 @@ class Settings(Frame):
         self.Cti=Label(self.CSFrame,text='⚫ Help Box : ',fg=self.textcolor[1],bg='#252526',font=self.Ifont)
         self.Mti=Label(self.MSFrame,text='⚫ Help Box : ',fg=self.textcolor[1],bg='#252526',font=self.Ifont)
         self.Tti=Label(self.TSFrame,text='⚫ Help Box : ',fg=self.textcolor[1],bg='#252526',font=self.Ifont)
-        self.Ctut=ChooseButton(self.CSFrame,self.cvar)
-        self.Mtut=ChooseButton(self.MSFrame,self.mvar)
-        self.Ttut=ChooseButton(self.TSFrame,self.tvar)
+        self.Ctut=ChooseButton(self.CSFrame,self.cvar,self.status)
+        self.Mtut=ChooseButton(self.MSFrame,self.mvar,self.status)
+        self.Ttut=ChooseButton(self.TSFrame,self.tvar,self.status)
         self.updatelst()  
         self.Reset=Button(self.SFrame,text='Reset',bg=self.Ctut.backcolor[0],fg=self.textcolor[0],activebackground=self.Ctut.backcolor[0],relief=FLAT,activeforeground=self.textcolor[1],command=self.reset_it)
         self.Log=Button(self.SFrame,text='Show Logs',bg=self.Ctut.backcolor[0],fg=self.textcolor[0],activebackground=self.Ctut.backcolor[0],relief=FLAT,activeforeground=self.textcolor[1],command=lambda :ShowLogs(self,'Resources\Logs\Opening.log'))
@@ -119,8 +123,10 @@ class Settings(Frame):
     def bthover(self,status,w):
         if status:
             w.config(fg=self.textcolor[1],bg=self.Ctut.backcolor[1])
+            self.status.set(w['text'])
         else:
             w.config(fg=self.textcolor[0],bg=self.Ctut.backcolor[0])
+            self.status.set('ZzZzZzzZzzZZzzZZ')
     def updatelst(self):
         with open(self.file,'r') as hand:
             self.container=json.loads(hand.read())
@@ -145,10 +151,12 @@ class Settings(Frame):
             obj.config(font=self.sfontl)
             obj['fg']=self.textcolor[1]
             self.SFrame.config(relief=RIDGE)
+            self.status.set(obj['text'])
         else:
             obj.config(font=self.sfont)
             obj['fg']=self.textcolor[0]
             self.SFrame.config(relief=RAISED)   
+            self.status.set('ZzZzZzzZzzZZzzZZ')
 if __name__=='__main__':
     a=Tk()
     b=Settings(a)

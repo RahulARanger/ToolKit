@@ -2,7 +2,6 @@ from tkinter import *
 import time
 from tkinter import *
 import tkinter.ttk as ttk
-
 from tkinter import messagebox
 try:
     from Settings import *
@@ -173,8 +172,10 @@ class Version(Label):
     def bthover(self,status):
         if status:
             self.config(text='v1.0',fg=self.textcolor[1],bg=self.backcolor[1])
+            STATUS.set('Current Version is {}'.format(self['text']))
         else:
             self.config(text='v1.0',fg=self.textcolor[0],bg=self.backcolor[0])
+            STATUS.set('ZzzzZZZzZZZZzZZZZZz')
 class Selector(Frame):
     def __init__(self,parent,which_one):
         super().__init__(parent)
@@ -199,7 +200,7 @@ class Selector(Frame):
         a.play()        
         if self.whichone==0:
             started.info('Opened Main Tab')
-            self.AcFrame=Settings(self.VFrame)
+            self.AcFrame=Settings(self.VFrame,STATUS)
             started.info('Closed Main Tab')
         elif self.whichone==1:
             started.info('Opened Calculator Tab')
@@ -213,7 +214,7 @@ class Selector(Frame):
             started.info('Opened Yt Downloader Tab')
             self.AcFrame=YT(self.VFrame,STATUS)
             started.info('Closed YT Downloader Tab')
-        self.AcFrame.pack(fill=BOTH,expand=True)
+        self.AcFrame.pack(expand=True,fill=BOTH)
         self.HBar.pack(side=BOTTOM,fill=X)
         self.VBar.pack(side=RIGHT,fill=Y)
         self.MCanvas.pack(fill=BOTH, expand=True)
@@ -253,6 +254,7 @@ class MainWindow(Tk):
         self.VersionInfo.pack(side=RIGHT,ipadx=3)
         self.TabFrame.pack(fill=X,pady=3)
         self.SFrame.pack(side=BOTTOM,fill=X)
+        self.fullsize=False
         self.Mp3Player.pack(side=LEFT)
         self.TimeNow.pack(side=RIGHT,fill=Y)
         self.WifiCheck.status.pack(side=RIGHT,fill=Y)
