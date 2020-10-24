@@ -1,6 +1,7 @@
 import googletrans
 import json
 from tkinter import font
+import threading
 import tkinter.scrolledtext as scrolledtext
 try:
     from root.ImageViewer import *
@@ -24,6 +25,10 @@ try:
     from dir.root.OpenLink import *
 except:
     from root.OpenLink import *
+try:
+    from dir.root.LogFiles import *
+except:
+    from root.LogFiles import *
 class GTBackend:
     def __init__(self):
         self.lines=['']
@@ -78,7 +83,7 @@ class SearchBox(Frame):
         super().__init__(parent)
         self.lst=lst
         self.var=var
-        self.config(bg='#E6FFFB')
+        self.config(bg='#80D4FF')
         self.var.trace('w',self.track)
         self.Search=Entry(self,text='',textvariable=self.var,width=20,font=('Arial',10),bg='#E6FFFB')
         self.Search.config(highlightthickness=3,highlightcolor='#3399FF',highlightbackground='#003333')
@@ -192,21 +197,21 @@ class InputBox(scrolledtext.ScrolledText):
 class SpecialButton(Label):
     def __init__(self,parent):
         super().__init__(parent)
-        self.backcolor=('orange','skyblue')
+        self.backcolor=('orange','yellow')
         self.textcolor=('white','black')
         self.config(text='Translate')
         self.config(width=10,height=2)
-        self.config(relief=RIDGE)
-        self.config(bg=self.backcolor[0],fg=self.textcolor[0])        
+        self.config(relief=FLAT)
+        self.config(bg=self.backcolor[0],fg=self.textcolor[0],font=('Comic Sans MS', 12))        
         self.bind('<Enter>',lambda c:self.bthover(True))
         self.bind('<Leave>',lambda c:self.bthover(False))
     def bthover(self,status):
         if status is True:
             self.config(bg=self.backcolor[1],fg=self.textcolor[1]) 
-            self.config(relief=GROOVE)       
+            self.config(relief=RAISED)     
         else:
-            self.config(relief=RIDGE)
-            self.config(bg=self.backcolor[0],fg=self.textcolor[0])    
+            self.config(relief=FLAT)  
+            self.config(bg=self.backcolor[0],fg=self.textcolor[0])           
 class Status(Text):
     def __init__(self,parent):
         super().__init__(parent)
@@ -271,10 +276,11 @@ class Status(Text):
         # ! create a function that saves the logs into a log file
         pass
 class GT(Frame):
-    def __init__(self,parent):
+    def __init__(self,parent,status):
         super().__init__(parent)
         self.config(bg='#80D4FF')
-        self.ContainFrame=Frame(self,bg='#E6FFFB')        
+        self.status=status
+        self.ContainFrame=Frame(self,bg='#80D4FF')        
         self.SearchFrame=Frame(self.ContainFrame,bg='#80D4FF')
         self.GTBack=GTBackend()
         self.checker=NetworkCheck()
@@ -289,7 +295,9 @@ class GT(Frame):
         self.ToLabel=HoverLabel(self.SearchFrame,'To Language: ')     
         self.FromBox=SearchBox(self.SearchFrame,self.GTBack.FromLanguages,self.fs)
         self.ToBox=SearchBox(self.SearchFrame,self.GTBack.ToLanguages,self.ts)
+        self.bind('<Button-1>',lambda cx:self.cleanit())
         self.From=InputBox(self.DisplayFrame)
+        self.toggle=False
         self.TranslateButt=SpecialButton(self.DisplayFrame)
         self.To=InputBox(self.DisplayFrame,True)
         self.photos2=['Resources\Media\Translator-Chan\TranslatorChan{}.jpg'.format(i) for i in range(11)]                
@@ -303,8 +311,16 @@ class GT(Frame):
             self.TranslatorChan.bind('<Leave>',lambda x:self.TranslatorChan.config(relief=FLAT,borderwidth=0))
         self.TranslateButt.bind('<ButtonRelease-1>',self.TranslateThem)
         self.arrange()   
-        self.after(3000,self.checknet)           
-    def TranslateThem(self,*args):
+        self.after(3000,self.checknet)  
+    def cleanit(self):
+        print('He')
+        try:
+            self.FromBox.lstbox.pack_forget()
+        except:pass
+        try:
+            self.ToBox.lstbox.pack_forget()
+        except:pass
+    def TranslatorThread(self):
         text=self.From.get_it()        
         try:translated,pronounciation,setto=self.GTBack.translation(text,self.fs.get(),self.ts.get())
         except:return None
@@ -317,32 +333,50 @@ class GT(Frame):
         self.To.enter_text(translated,True)
         self.StatusBar.enter_text(translated,False,self.fs.get(),self.ts.get())
         self.To.enter_text('\n\n'+pronounciation,False)
+        self.stop=True
+        self.status.set('ZzZzZzzZzzZZzzZZ')
+    def TranslateThem(self,*args):
+        self.after(100)
+        if True:
+            self.stop=False
+            self.after(10,self.StartTranslating)
+            omega=threading.Thread(target=self.TranslatorThread)
+            omega.start()
+    def StartTranslating(self):
+        if self.stop:return
+        if self.toggle:self.status.set('Translating.../...')
+        else:self.status.set('Translating...\...')
+        self.toggle=not(self.toggle)
+        self.after(600,self.StartTranslating)
     def arrange(self):        
-        self.ContainFrame.pack(fill=X,expand=True)
-        self.MoreFrame.pack(fill=X,expand=True)
+        self.ContainFrame.pack(fill=X,expand=True,ipady=20)
+        self.MoreFrame.pack(fill=X,expand=True,ipady=10)
         self.SearchFrame.pack(fill=X,expand=True)
         self.DisplayFrame.pack(fill=X,expand=True)
-        self.FromLabel.pack(side=LEFT,expand=True)
-        self.FromBox.pack(side=LEFT,padx=(100,),pady=3)
+        self.FromLabel.pack(side=LEFT,expand=True,ipady=10,padx=(0,30))
+        self.FromBox.pack(side=LEFT,pady=3)
         self.ToBox.pack(side=RIGHT,padx=(100,),pady=3)
-        self.ToLabel.pack(side=RIGHT,expand=True)
+        self.ToLabel.pack(side=RIGHT,expand=True,ipady=10,padx=(270,0))
         self.From.pack(side=LEFT,expand=True)
         self.TranslateButt.pack(side=LEFT,expand=True)
         self.To.pack(side=RIGHT,expand=True)
         self.TranslatorChan.pack(side=RIGHT,padx=(0,50),pady=6)
-        self.StatusBar.pack(side=LEFT,padx=(30,0),pady=6)
+        self.StatusBar.pack(side=LEFT,padx=(30,0),pady=6,ipady=10)
     def checknet(self):
         if self.checker.MTest() is False:
-            if self.failed is False:a=NIC(self)
+            if self.failed is False:
+                started.error('Failed to Open due to Network Issues')
+                a=NIC(self)
             self.failed=True
             self.pack_forget()
         else:
             if self.failed:
                 self.pack(fill=BOTH,expand=True)
                 self.failed=False
-        self.after(3000,self.checknet)
+                started.warning('Regained Net Access')
+        self.after(3000,self.checknet)  
 if __name__=='__main__':
     root=Tk()
-    a=GT(root)
+    a=GT(root,StringVar())
     a.pack(fill=BOTH,expand=True)
     root.mainloop()

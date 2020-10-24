@@ -49,6 +49,7 @@ def do_this():
     style.configure("Vertical.TScrollbar", gripcount=0,
                             background="#424242", darkcolor='#1e1e1e', lightcolor='#1e1e1e',arrowsize=18,
                             troughcolor='#1e1e1e', bordercolor="#424242", arrowcolor="orange",relief=FLAT)
+
 class MenuFrame(Frame):
     def __init__(self,parent,name,link=''):
         super().__init__(parent)
@@ -208,7 +209,7 @@ class Selector(Frame):
             started.info('Closed Calculator Tab')
         elif self.whichone==2:
             started.info('Opened Translator Tab')
-            self.AcFrame=GT(self.VFrame)   
+            self.AcFrame=GT(self.VFrame,STATUS)   
             started.info('Closed Translator Tab')
         elif self.whichone==3:
             started.info('Opened Yt Downloader Tab')

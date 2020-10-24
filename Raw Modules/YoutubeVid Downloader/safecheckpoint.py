@@ -5,7 +5,7 @@ import urllib
 import pytube
 import re
 import os
-
+import sys
 bytes_to_mb=lambda x:(x/(10**6))
 
 # ! adjustment line (important)
@@ -86,14 +86,15 @@ class YT(YTBackend):
 if __name__=='__main__':
     link=input('Enter the link: ')
     a=YT(link)
-    print(a.check())
+    if a.check() is False:sys.exit(0)
+
     # TODO: we can use this videos as the details below the video preview tab
     print(a.Title) # ? returns the title of the video as the string
     #* print(a.Desc) # ? returns the string type of the description of youtube
     #* print(a.Rating) # ? returns the rating of the video in decimal (out of 5)
     # * print(a.Views) # ? returns the number of views of the video
     # * print(a.Length) # ? returns the length of the video in minutes
-    a.preview() # ? downloades the thumbnail of the video as the self.title.extension in temp folder
+     # ? downloades the thumbnail of the video as the self.title.extension in temp folder
     a.choices()
     #a.choices('videos')
     #a.choices('audio')

@@ -54,6 +54,7 @@ class ShowLogs(Toplevel):
         self.file=file
         self.config(bg='#252526')
         self.focus_set()
+        self.grab_set()
         self.textcolor=('#74878f','#f1f1ff')
         self.backcolor=("#424242",'#5a5a5c')
         self.resizable(0,0)
