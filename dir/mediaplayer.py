@@ -4,6 +4,7 @@ import pygame
 import os
 import re
 from mutagen.mp3 import MP3
+from tkinter import messagebox
 from tkinter import filedialog
 try:
     from root.Dialogs import *    
@@ -217,7 +218,11 @@ class MediaPlayer(Frame):
         if self.status is None:
             self.status=self.selected.get()
             if self.status=='Single File':
-                self.Import.bind('<Button-1>',lambda x:self.single_player())
+                try:
+                    self.Import.bind('<Button-1>',lambda x:self.single_player())
+                except:
+                    self.status=None
+                    messagebox.showerror('Note!!','Try to Open Media Player After closing Yt Downloader for safety measures!')
             elif self.status=='PlayList':self.Import.bind('<Button-1>',lambda x:self.playlist())
             else:pass
         else:

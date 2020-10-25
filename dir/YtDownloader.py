@@ -192,7 +192,7 @@ class DisplayBox(Frame):
             current=[]
             if type=='audio': 
                 if allowaudio:  
-                    exe='mp3' if str(i.subtype)=='mp4' else str(i.subtype)
+                    exe=str(i.subtype)
                     current=[str(i.itag),str(type),exe,str(Converter.sizething(i.filesize)),str(i.abr),i.filesize]
                     if i.abr is None or i.abr=="None": 
                         print(i)
@@ -762,7 +762,7 @@ class YT(Frame):
     def checknet(self):
         if self.checker.MTest() is False:
             if self.failed is False:
-                started.error('Failed to Open due to Network Issues')
+                started.error('Lost Network')
                 a=NIC(self)
             self.failed=True
             self.pack_forget()
