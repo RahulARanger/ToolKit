@@ -1,10 +1,13 @@
 from tkinter import *
 import re
 from tkinter import messagebox
+from tkinter import filedialog
 from tkinter import font
 import pytube
 import threading 
 import time
+import os
+import pygame
 import tkinter.ttk as ttk
 try:
     from dir.root.__pre__ import *
@@ -30,12 +33,18 @@ try:
     from dir.root.LogFiles import *
 except:
     from root.LogFiles import *
+try:
+    from dir.root.LogFiles import *
+except:
+    from root.LogFiles import *
 import tkinter.scrolledtext as scrolledtext
 pytube.__main__.apply_descrambler = apply_descrambler
 YTOBJ=None
 STATUSE=None
 THUMBNAIL=None
-
+STOPTIME='Resources\Media\\stoptime.ogg'
+STARTTIME='Resources\Media\\resumetime.ogg'
+pygame.mixer.init()
 class Converter:
     @staticmethod
     def timething(gtime):
@@ -60,32 +69,164 @@ class Converter:
         mb=kb//1000
         ans='{} {}'.format(mb if mb!=0 else kb,'Mb' if mb!=0 else 'Kb')
         return ans
+    @staticmethod
+    def sortBits(l):
+        regex=r'[0-9]+'
+        ans=int(re.findall(regex,l)[0])
+        return ans
+class StreamDownloader(Toplevel):
+    def __init__(self,p):
+        super().__init__(p)
+        self.finished=False
+        self.title('Downloader')
+        self.MFrame=Frame(self,bg='orange')
+        self.ActionStatus=IntVar()
+        self.cancelled=False
+        self.pause=False
+        self.canclose=False
+        self.resizable(0,0)
+        self.protocol("WM_DELETE_WINDOW", self.closing)
+        self.StatusFrame=Frame(self.MFrame,bg='#4DA6FF',borderwidth=3,relief=GROOVE)
+        self.Cancel=Button(self.StatusFrame,text='Cancel',relief=FLAT,command=self.cancelit,bg='#6AFF4D')
+        self.Action=Button(self.StatusFrame,text='Pause',relief=FLAT,bg='#6AFF4D',command=self.pauseit)
+        self.Cancel.bind('<Enter>',lambda x:self.Cancel.config(bg='#40FF19'))
+        self.Cancel.bind('<Leave>',lambda x:self.Cancel.config(bg='#6AFF4D'))
+        self.Action.bind('<Enter>',lambda x:self.Action.config(bg='#40FF19'))
+        self.Action.bind('<Leave>',lambda x:self.Action.config(bg='#6AFF4D'))
+        self.ProgressArea=Frame(self.MFrame,bg='#FF5500',relief=RIDGE,borderwidth=3)
+        self.Lb=Label(self.ProgressArea,text='Progress: ',borderwidth=3,bg='#FF5500',fg='#004D4D',height=2,font=("Times", 15, "bold"))
+        self.arrange()
+    def pauseit(self):
+        if self.pause:
+            self.Action.config(text='Pause')
+            self.pause=False
+        else:
+            self.Action.config(text='Resume')
+            self.pause=True
+    def closing(self):
+        if self.canclose:
+            self.destroy()
+    def cancelit(self):
+        truth=messagebox.askyesno('Cancel?','Cancel the download?',parent=self)
+        if truth:
+            self.pause=False
+            self.cancelled=True
+            self.canclose=True
+    def arrange(self):
+        self.MFrame.pack(fill=BOTH)
+        self.ProgressArea.pack(side=TOP)
+        self.Lb.pack(side=LEFT,padx=6)
+        self.StatusFrame.pack(side=BOTTOM,fill=X)
+        self.Cancel.pack(side=RIGHT)
+        self.Action.pack(side=LEFT)
+    def download(self):
+        while True:
+            try:
+                with open(self.location,'wb') as hand:
+                    streams=pytube.request.stream(self.stream.url)
+                    downloaded=0
+                    percent='Downloaded {}% {}'.format(0,self.stream.title)
+                    started.debug('Downloaing '+self.stream.title[:9]+'..')
+                    self.title(percent)
+                    self.PB=ttk.Progressbar(self.ProgressArea,orient=HORIZONTAL,mode = 'determinate',maximum=self.stream.filesize,length=300)
+                    self.PB.pack(side=LEFT,padx=6)
+                    while True:
+                        if self.pause:
+                            continue
+                        if self.cancelled:
+                            break
+                        percent='Downloaded {}% {}'.format(round(downloaded/self.stream.filesize,2)*100,self.stream.title)
+                        self.title(percent)
+                        self.PB['value']=downloaded
+                        chunk=next(streams,None)
+                        if chunk:
+                            hand.write(chunk)
+                            downloaded+=len(chunk)
+                        else:
+                            break
+                self.title('Downloaded')
+                
+                if self.cancelled:
+                    if os.path.exists(self.location):
+                        os.remove(self.location)
+                    started.warning('Cancelled '+self.stream.title[:9]+'..')
+                else:
+                    started.debug('Downlaoded '+self.stream.title[:9]+'..')
+                break
+            except Exception as e:
+                print(e)
+                started.error('Network Error for '+self.stream.title[:9]+'..')
+                test=messagebox.askyesno('Distrubted','Might be Low Internet connection! Want to Retry?',parent=self)
+                if not test:
+                    if os.path.exists(self.location):
+                        os.remove(self.location)
+                    break
+        self.canclose=True
+        pygame.mixer.Sound(STARTTIME).play()
+        self.destroy()
+    def addMember(self,stream,loc):
+        self.stream=stream
+        self.location=loc
+        omega=threading.Thread(target=self.download,daemon=True)
+        omega.start()
 class DisplayBox(Frame):
     def __init__(self,parent,streams,status):
         super().__init__(parent)
         self.streams=streams
         self.status=status
-    def streamsToList(self,stream):
+    def streamsToList(self,stream,op1,op2):
         ans=[]
+        allowvarient,allowvideo,allowaudio=False,False,False
+        if op1==0:
+            allowaudio=True
+            allowvideo=True
+            allowvarient=True
+        elif op1==1:
+            allowvarient=True
+        elif op1==2:
+            allowvideo=True
+        elif op1==3:
+            allowaudio=True
         for i in stream:
             type=i.type
-            if type=='audio':                
-                current=[str(i.itag),str(type),str(i.subtype),str(Converter.sizething(i.filesize)),str(i.abr)]
-                if i.abr is None or i.abr=="None": print(i)
+            current=[]
+            if type=='audio': 
+                if allowaudio:  
+                    exe='mp3' if str(i.subtype)=='mp4' else str(i.subtype)
+                    current=[str(i.itag),str(type),exe,str(Converter.sizething(i.filesize)),str(i.abr),i.filesize]
+                    if i.abr is None or i.abr=="None": 
+                        print(i)
             else:
-                extra=''
-                if not i.is_progressive:extra+='Only '
-                current=[str(i.itag),extra+str(type),str(i.subtype),str(Converter.sizething(i.filesize)),str(i.resolution)]
-                if i.resolution is None or i.resolution=='None':
-                    current.pop()
-                    current.append(str(i.fps)+" fps")
-            ans.append(current)
+                if allowvideo or allowvarient:
+                    flag=False
+                    if not i.is_progressive:
+                        if allowvideo:
+                            current=[str(i.itag),'Only '+str(type),str(i.subtype),str(Converter.sizething(i.filesize)),str(i.resolution)]
+                            flag=True
+                    if  i.is_progressive:
+                        if allowvarient:
+                            current=[str(i.itag),str(type),str(i.subtype),str(Converter.sizething(i.filesize)),str(i.resolution)]
+                            flag=True
+                    if flag:
+                        if current[4]=='None':
+                            current.pop()
+                            current.append(str(i.fps)+" fps")
+                        current.append(i.filesize)
+            if len(current)!=0:ans.append(current)
+            if op2==0:ans=sorted(ans,key=lambda x:x[-1])
+            elif op2==1:ans=sorted(ans,key=lambda x:x[2])
+            elif op2==2:
+                if op1==0:ans=sorted(ans,key=lambda x:x[1])
+                else:
+                    if op1==3:
+                        ans=sorted(ans,key=lambda x:Converter.sortBits(x[4]))
+                    else:
+                        ans=sorted(ans,key=lambda x:x[4])
         return ans
     def getReady(self):
         self.MCanvas=Canvas(self)
         self.VFrame=Frame(self.MCanvas)
         self.MCanvas.bind('<Configure>',lambda e:self.MCanvas.configure(scrollregion=self.MCanvas.bbox('all')))
-        self.MCanvas.bind_all('<MouseWheel>',self.orientScreen)
         self.MCanvas.create_window((0,0),window=self.VFrame,anchor='nw',width=1350)
         self.Vbar=Scrollbar(self,orient=VERTICAL,command=self.MCanvas.yview)        
         self.MCanvas.config(yscrollcommand=self.Vbar.set)
@@ -108,12 +249,17 @@ class DisplayBox(Frame):
         quality.bind('<Leave>',lambda x:self.status.set("ZzzzZZZzZZZ"))
         Back.bind('<Enter>',lambda x:Back.config(relief=FLAT))
         Back.bind('<Leave>',lambda x:Back.config(relief=RAISED))
-        Back.bind('<Button-1>',lambda x:self.selectit(itag['text'],Back))
-        Type.bind('<Button-1>',lambda x:self.selectit(itag['text'],Back))
-        filesize.bind('<Button-1>',lambda x:self.selectit(itag['text'],Back))
-        subtype.bind('<Button-1>',lambda x:self.selectit(itag['text'],Back))
-        quality.bind('<Button-1>',lambda x:self.selectit(itag['text'],Back))
-        itag.bind('<Button-1>',lambda x:self.selectit(itag['text'],Back))
+        Back.bind('<Double-Button-1>',lambda x:self.selectit(itag['text'],Back))
+        Type.bind('<Double-Button-1>',lambda x:self.selectit(itag['text'],Back))
+        filesize.bind('<Double-Button-1>',lambda x:self.selectit(itag['text'],Back))
+        subtype.bind('<Double-Button-1>',lambda x:self.selectit(itag['text'],Back))
+        quality.bind('<Double-Button-1>',lambda x:self.selectit(itag['text'],Back))
+        itag.bind('<Double-Button-1>',lambda x:self.selectit(itag['text'],Back))
+        Back.bind('<Button-1>',lambda x:Back.config(relief=RAISED))
+        Type.bind('<Button-1>',lambda x:Back.config(relief=RAISED))
+        subtype.bind('<Button-1>',lambda x:Back.config(relief=RAISED))
+        quality.bind('<Button-1>',lambda x:Back.config(relief=RAISED))
+        filesize.bind('<Button-1>',lambda x:Back.config(relief=RAISED))
         Back.bind('<ButtonRelease-1>',lambda x:Back.config(relief=FLAT))
         Type.bind('<ButtonRelease-1>',lambda x:Back.config(relief=FLAT))
         subtype.bind('<ButtonRelease-1>',lambda x:Back.config(relief=FLAT))
@@ -128,8 +274,15 @@ class DisplayBox(Frame):
         Back.pack(fill=X,expand=True)
     def selectit(self,value,w):
         w.config(relief=RAISED)
-        a=messagebox.askyesno('Download ? ','Want to Download this Format?')
-        if a:print(self.streams.get_by_itag(value))
+        a=messagebox.askyesno('Download ? ','Want to Download this Format?',parent=self)
+        if a:
+            do_this=self.streams.get_by_itag(value)
+            extension='.'+do_this.subtype
+            loc=filedialog.asksaveasfilename(title='We can Just Enter the File Name',filetypes=[(do_this.type,extension)],parent=self)+extension
+            if len(loc)!=0:
+                self.downloader=StreamDownloader(self)
+                pygame.mixer.Sound(STOPTIME).play()
+                self.downloader.addMember(do_this,loc)
         else:pass        
     def appendTitle(self):
         Back=Frame(self.VFrame,borderwidth=3,relief=FLAT)
@@ -145,13 +298,15 @@ class DisplayBox(Frame):
         quality.pack(fill=X,side=LEFT)
         Back.pack(fill=X,expand=True)
     def go(self,option1,option2):
-        print(option1,option2)
-        result=self.streamsToList(self.streams)
-        self.appendTitle()
-        for i in result:
-            self.append(i)
-        self.Vbar.pack(side=RIGHT,fill=Y)
-        self.MCanvas.pack(fill=BOTH)
+        try:
+            result=self.streamsToList(self.streams,option1,option2)
+            self.appendTitle()
+            for i in result:
+                self.append(i)
+            self.Vbar.pack(side=RIGHT,fill=Y)
+            self.MCanvas.pack(fill=BOTH)
+        except:
+            print('Neo Armstrong Cyclone Jet Armstrong Cannon')
     def hover(self,lst,status=None,lvl=None):
         if status:
             lst.config(bg='red',font=('helvetica',13,'bold'))
@@ -161,9 +316,7 @@ class DisplayBox(Frame):
         try:self.MCanvas.destroy()
         except:pass
         try:self.Vbar.destroy()
-        except:pass
-    def orientScreen(self,event):
-        self.MCanvas.yview_scroll(int(-1*(event.delta/120)),'units')
+        except:pass    
 class SearchingLabel(Label):
 	def __init__(self,parent):
 		super().__init__(parent)
@@ -173,7 +326,7 @@ class SearchingLabel(Label):
 		self.after(1000,self.change)
 	def change(self):
 		if not self.goon:
-			self.config(text='Click to any stream to know to More/select it')
+			self.config(text='Double Click to Download it')
 			return
 		if self.toggle:self.config(text='Searching....\...')
 		else:self.config(text='Searching.../....')
@@ -186,8 +339,8 @@ class SelectStream(Toplevel):
         self.title(heading)
         self.status=StringVar()
         self.grab_set()
-        self.geometry('400x510')
         self.resizable(0,0)
+        self.geometry('400x510')        
         self.TopFrame=Frame(self,bg='#D9D9D9')
         self.First=LabelFrame(self.TopFrame,text='Type:',bg='#D9D9D9')
         self.Second=LabelFrame(self.TopFrame,text='Sort By: ',bg='#D9D9D9')        
@@ -244,17 +397,16 @@ class SelectStream(Toplevel):
         except:pass
         flag=False
         self.Check5=ttk.Radiobutton(self.Second,variable=self.SecondOp,text=' File Size  ',value=0,style='Customized.TRadiobutton')     
-        self.Check6=ttk.Radiobutton(self.Second,variable=self.SecondOp,text=' File Type',value=1,style='Customized.TRadiobutton')     
+        self.Check6=ttk.Radiobutton(self.Second,variable=self.SecondOp,text=' File Extension',value=1,style='Customized.TRadiobutton')     
         if self.FirstOp.get()==3:
             self.Check7=ttk.Radiobutton(self.Second,variable=self.SecondOp,text=' Bit rate  ',value=2,style='Customized.TRadiobutton')     
             self.Check8=ttk.Radiobutton(self.Second,variable=self.SecondOp,text=' Size  ',value=3,style='Customized.TRadiobutton')     
         elif self.FirstOp.get()==2:
             self.Check7=ttk.Radiobutton(self.Second,variable=self.SecondOp,text=' Resolution  ',value=2,style='Customized.TRadiobutton')     
-            self.Check8=ttk.Radiobutton(self.Second,variable=self.SecondOp,text=' Size  ',value=3,style='Customized.TRadiobutton')     
         elif self.FirstOp.get()==1:
             self.Check7=ttk.Radiobutton(self.Second,variable=self.SecondOp,text=' Quality  ',value=2,style='Customized.TRadiobutton')     
-            self.Check8=ttk.Radiobutton(self.Second,variable=self.SecondOp,text=' Size  ',value=3,style='Customized.TRadiobutton')     
         else:
+            self.Check8=ttk.Radiobutton(self.Second,variable=self.SecondOp,text=' File Type  ',value=3,style='Customized.TRadiobutton')
             flag=True
         self.Check5.bind('<Enter>',lambda x:self.status.set(self.Check5['text']))
         self.Check5.bind('<Leave>',lambda x:self.status.set('ZzZzZzzZzzZZzzZZ')) 
@@ -265,11 +417,11 @@ class SelectStream(Toplevel):
         if not flag:
             self.Check7.bind('<Enter>',lambda x:self.status.set(self.Check7['text']))
             self.Check7.bind('<Leave>',lambda x:self.status.set('ZzZzZzzZzzZZzzZZ')) 
+            self.Check7.pack(side=LEFT)
+        else:
             self.Check8.bind('<Enter>',lambda x:self.status.set(self.Check8['text']))
             self.Check8.bind('<Leave>',lambda x:self.status.set('ZzZzZzzZzzZZzzZZ')) 
-            self.Check7.pack(side=LEFT)
-            self.Check8.pack(side=LEFT)    
-
+            self.Check8.pack(side=LEFT)  
     def setLastOptions(self):        
         self.ConfirmThis=Button(self.Confirm,text='Confirm',command=self.initiated)
         self.ConfirmThis.bind('<Enter>',lambda x:self.status.set('Display Formats?'))
@@ -424,7 +576,7 @@ class Tester:
             STATUSE=False
             return False
         note=time.time()
-        for i in range(3):
+        for i in range(6):
             print(i)
             if i>=1:
                 if time.time()-note>10:
@@ -480,9 +632,9 @@ class YTFrame(Frame):
         self.Templength='Length: '+self.Backend.Length
         self.Dlist.addEntry(self.Templength,'orange')   
         self.TempRating='Rating: '+self.Backend.Rating
-        self.Dlist.addEntry(self.TempRating,'orange')
+        self.Dlist2.addEntry(self.TempRating,'orange')
         self.TempViews='Views: '+self.Backend.Views
-        self.Dlist.addEntry(self.TempViews,'orange')
+        self.Dlist2.addEntry(self.TempViews,'orange')
         self.TempDesc='Description:\n\n'+self.Backend.Desc.strip()
         self.Dlist2.addTextBox(self.TempDesc,'orange')     
         self.Dlist.arrange()
@@ -490,9 +642,15 @@ class YTFrame(Frame):
         self.Dlist.pack(fill=X,side=TOP)
         self.Dlist2.pack(fill=X,expand=True,side=TOP)
         self.MoreInfo.pack(fill=X)
-        Button(self.SearchFormats,text='Open',command=lambda :SelectStream(self,self.Backend.streams,StringVar(),self.Backend.Title)).pack()
+        self.SearchingFrame=Frame(self.SearchFormats)
+        self.SearchForit=Label(self.SearchFormats,text='Search Streams: ')
+        self.Searchit=Button(self.SearchFormats,text='Open',command=lambda :SelectStream(self,self.Backend.streams,StringVar(),self.Backend.Title),bg='#FFFF00',fg='#194D00')
+        self.Searchit.bind('<Enter>',lambda x:self.Searchit.config(bg='#E6E600'))
+        self.Searchit.bind('<Leave>',lambda x:self.Searchit.config(bg='#FFFF00'))
+        self.SearchForit.pack(side=LEFT,pady=3)
+        self.Searchit.pack(padx=6,pady=6,side=LEFT)
+        self.SearchingFrame.pack(fill=X)
         self.SearchFormats.pack(fill=X)
-        
     def arrange(self):
         self.MFrame.pack(expand=True,fill=BOTH)
         self.DetailsFrame.pack(fill=BOTH,side=LEFT)
@@ -555,7 +713,7 @@ class YT(Frame):
         self.SearchButton.config(state=DISABLED)
         link=self.link.get()
         if self.READY is True:
-            a=messagebox.askyesno('Alert!!!','Ready to Lose Current Details?',icon='warning')
+            a=messagebox.askyesno('Alert!!!','Ready to Lose Current Details?',icon='warning',parent=self)
             if a is False:
                 self.SearchButton.config(state=NORMAL)
                 return

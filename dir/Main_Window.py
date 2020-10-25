@@ -245,6 +245,10 @@ class MainWindow(Tk):
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            if os.path.exists('temp'):
+                for file in os.listdir('temp'):
+                    os.remove('temp//'+file)
+                os.rmdir('temp')
             self.destroy()
     def arrange(self):
         self.MFrame.pack(fill=BOTH,expand=True)
