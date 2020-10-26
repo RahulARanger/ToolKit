@@ -181,6 +181,7 @@ class Selector(Frame):
     def __init__(self,parent,which_one):
         super().__init__(parent)
         self.MCanvas=Canvas(self,bg='#252526')
+        self.config(bg='#252526')
         self.VBar=ttk.Scrollbar(self,orient=VERTICAL,command=self.MCanvas.yview)
         self.HBar=ttk.Scrollbar(self,orient=HORIZONTAL,command=self.MCanvas.xview)
         self.VFrame=Frame(self.MCanvas,bg='#252526')
@@ -202,17 +203,21 @@ class Selector(Frame):
         if self.whichone==0:
             started.info('Opened Main Tab')
             self.AcFrame=Settings(self.VFrame,STATUS)
+            self.config(bg='#252526')
             started.info('Closed Main Tab')
         elif self.whichone==1:
             started.info('Opened Calculator Tab')
+            self.config(bg='#252526')
             self.AcFrame=Calc(self.VFrame)
             started.info('Closed Calculator Tab')
         elif self.whichone==2:
             started.info('Opened Translator Tab')
-            self.AcFrame=GT(self.VFrame,STATUS)   
+            self.AcFrame=GT(self.VFrame,STATUS) 
+            self.MCanvas.config(bg='#80D4FF')  
             started.info('Closed Translator Tab')
         elif self.whichone==3:
             started.info('Opened Yt Downloader Tab')
+            self.MCanvas.config(bg='#FF4D4D')
             self.AcFrame=YT(self.VFrame,STATUS)
             started.info('Closed YT Downloader Tab')
         self.AcFrame.pack(expand=True,fill=BOTH)
