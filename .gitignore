@@ -3,4 +3,4 @@ Resources/Logs/Calculator.log
 Resources/Logs/Opening.log
 dir/root/settings.json
 dir/__pycache__/
-dir/__pycache__/root
+dir/root/__pycache__
