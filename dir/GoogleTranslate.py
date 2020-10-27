@@ -83,7 +83,7 @@ class SearchBox(Frame):
         super().__init__(parent)
         self.lst=lst
         self.var=var
-        self.config(bg='#80D4FF')
+        self.config(bg='#7DF6FF')
         self.var.trace('w',self.track)
         self.Search=Entry(self,text='',textvariable=self.var,font=('Arial',10),bg='#E6FFFB')
         self.DummyFrame=Frame(self)
@@ -269,14 +269,14 @@ class Status(Text):
 class GT(Frame):
     def __init__(self,parent,status):
         super().__init__(parent)
-        self.config(bg='#80D4FF')
+        self.config(bg='#80D4FF',relief=RAISED,borderwidth=6)
         self.status=status
-        self.ContainFrame=Frame(self,bg='#80D4FF')        
-        self.SearchFrame=Frame(self.ContainFrame,bg='#80D4FF')
         self.GTBack=GTBackend()
         self.checker=NetworkCheck()
-        self.DisplayFrame=Frame(self.ContainFrame,bg='#80D4FF')
-        self.MoreFrame=Frame(self,bg='#80D4FF')
+        self.ContainFrame=Frame(self,bg='#7DF6FF',relief=RIDGE,borderwidth=3)        
+        self.MoreFrame=Frame(self,bg='#7DF6FF',relief=RIDGE,borderwidth=3)
+        self.SearchFrame=Frame(self.ContainFrame,bg='#7DF6FF')
+        self.DisplayFrame=Frame(self.ContainFrame,bg='#7DF6FF')
         self.fs=StringVar()
         self.failed=False
         self.ts=StringVar()        
@@ -292,8 +292,9 @@ class GT(Frame):
         self.TranslateButt=SpecialButton(self.DisplayFrame)
         self.To=InputBox(self.DisplayFrame,True)
         self.photos2=['Resources\Media\Translator-Chan\TranslatorChan{}.jpg'.format(i) for i in range(11)]                
-        self.StatusBar=Status(self.MoreFrame)
-        self.TranslatorChan=ButtonAlbum(self.MoreFrame,self.photos2,300,300,'#80D4FF')
+        self.onHoldFrame=Frame(self.MoreFrame,bg='#7DF6FF')
+        self.StatusBar=Status(self.onHoldFrame)
+        self.TranslatorChan=ButtonAlbum(self.onHoldFrame,self.photos2,300,300,'#7DF6FF')
         self.TranslatorChan.bind('<ButtonRelease-1>',lambda x:Open('https://translate.google.co.in/'))
         self.From.bind("<<TextModified>>", lambda x:self.StatusBar.enter_text(self.From.get_it(),True))
         try:Title=ToolTip(self.TranslatorChan,'Click to view parent Tool')
@@ -340,19 +341,20 @@ class GT(Frame):
         self.toggle=not(self.toggle)
         self.after(600,self.StartTranslating)
     def arrange(self):        
-        self.ContainFrame.pack(fill=X,expand=True,ipady=20)
-        self.MoreFrame.pack(fill=X,expand=True,ipady=10)
-        self.SearchFrame.pack(fill=X,expand=True)
-        self.DisplayFrame.pack(fill=X,expand=True)
+        self.ContainFrame.pack(fill=X,side=TOP)
+        self.MoreFrame.pack(fill=X,expand=True,ipady=50,side=BOTTOM)
+        self.SearchFrame.pack(fill=X)
+        self.DisplayFrame.pack(fill=X)
         self.FromLabel.pack(side=LEFT,expand=True,ipady=10,padx=(0,30))
-        self.FromBox.pack(side=LEFT,pady=3)
-        self.ToBox.pack(side=RIGHT,padx=(100,),pady=3)
+        self.FromBox.pack(side=LEFT,pady=(4,))
+        self.ToBox.pack(side=RIGHT,padx=(100,),pady=(6,))
         self.ToLabel.pack(side=RIGHT,expand=True,ipady=10,padx=(270,0))
         self.From.pack(side=LEFT,expand=True)
         self.TranslateButt.pack(side=LEFT,expand=True)
         self.To.pack(side=RIGHT,expand=True)
-        self.TranslatorChan.pack(side=RIGHT,padx=(0,50),pady=6)
-        self.StatusBar.pack(side=LEFT,padx=(30,0),pady=6,ipady=10)
+        self.onHoldFrame.pack(side=TOP,fill=BOTH,pady=6)
+        self.StatusBar.pack(side=LEFT,padx=(320,0),pady=0,ipady=3)
+        self.TranslatorChan.pack(side=RIGHT,padx=(0,50),pady=0)
     def checknet(self):
         if self.checker.MTest() is False:
             if self.failed is False:
