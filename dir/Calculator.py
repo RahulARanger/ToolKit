@@ -18,7 +18,7 @@ try:
     from dir.root.LogFiles import *
 except:
     from root.LogFiles import *
-CONN=sqlite3.connect('dir\\root\\CalculatorDB.sqlite')
+CONN=sqlite3.connect('Resources\\Database\\CalculatorDB.sqlite')
 INDEX=0
 SINDEX=0
 class DBManager:
@@ -33,7 +33,6 @@ class DBManager:
             DBManager.Cursor.execute('select count(*) from CalcLog;')
             INDEX=DBManager.Cursor.fetchone()[0]
             SINDEX=INDEX
-
             print('->',INDEX)
     @staticmethod
     def insertData(col0,col1,col2,col3):
@@ -50,16 +49,14 @@ class DBManager:
         else:SINDEX-=1
         DBManager.Cursor.execute('''Select * from Calclog where id={}'''.format(SINDEX))
         lol=(DBManager.Cursor.fetchone())
-        print(SINDEX)
         return lol[-1]
     @staticmethod
     def goForward():
         global INDEX,SINDEX
-        if SINDEX+1>=INDEX:return False
+        if SINDEX+1>INDEX:return False
         else:SINDEX+=1
         DBManager.Cursor.execute('''Select * from Calclog where id={}'''.format(SINDEX))
         lol=(DBManager.Cursor.fetchone())
-        print(SINDEX)
         return lol[-1]
 DBManager.check()
 class BackEnd:
@@ -168,13 +165,12 @@ class LogButton(Frame):
         self.Action.bind('<ButtonRelease-1>',lambda x:self.pressed(False))
     def hover(self,status):
         if status:
-            
+            self.status.set('Previous Log?' if self.sym=='B' else 'Forward Log?')
             self.Action['bg'],self.Action['fg']='#f78419','black'
         else:
             self.status.set('ZzZzZzzZzzZZzzZZ')
             self.Action['fg'],self.Action['bg']='black','#FFFF19'
     def pressed(self,status):
-        print(status)
         if status:
             if self.sym=='B':
                 answer=DBManager.goBackward()

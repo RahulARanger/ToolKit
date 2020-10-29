@@ -10,6 +10,11 @@ def createPreFiles():
             pass
     else:
         os.mkdir('temp')
+    if os.path.exists('Resources//Database'):
+        pass
+    else:
+        os.mkdir('Resources//Database')
+
 createPreFiles()
 from dir.root.LogFiles import *
 from dir.instwin import *
