@@ -4,6 +4,8 @@ import string
 from tkinter import font
 from tkinter import messagebox
 import json
+import sqlite3
+import datetime
 try:
     from root.ImageViewer import *
 except:
@@ -16,6 +18,50 @@ try:
     from dir.root.LogFiles import *
 except:
     from root.LogFiles import *
+CONN=sqlite3.connect('dir\\root\\CalculatorDB.sqlite')
+INDEX=0
+SINDEX=0
+class DBManager:
+    Cursor=None
+    @staticmethod
+    def check():
+        DBManager.Cursor=CONN.cursor()
+        with open('dir\\root\CreatingCalcTab.query','r') as hand:
+            query=hand.read()
+            DBManager.Cursor.execute(query)
+            global INDEX,SINDEX
+            DBManager.Cursor.execute('select count(*) from CalcLog;')
+            INDEX=DBManager.Cursor.fetchone()[0]
+            SINDEX=INDEX
+
+            print('->',INDEX)
+    @staticmethod
+    def insertData(col0,col1,col2,col3):
+        DBManager.Cursor.execute('''insert into CalcLog(id,dtstore,result,operationsseq) values({},"{}","{}","{}");'''.format(col0,col1,col2,col3))
+        CONN.commit()
+    @staticmethod
+    def timeformatter(time):
+        time='{}/{}/{} {}:{}:{}'.format(time.strftime('%d'),time.strftime('%m'),time.strftime('%Y'),time.strftime('%H'),time.strftime('%M'),time.strftime('%S'))
+        return time
+    @staticmethod
+    def goBackward():
+        global INDEX,SINDEX
+        if SINDEX-1<=0:return False
+        else:SINDEX-=1
+        DBManager.Cursor.execute('''Select * from Calclog where id={}'''.format(SINDEX))
+        lol=(DBManager.Cursor.fetchone())
+        print(SINDEX)
+        return lol[-1]
+    @staticmethod
+    def goForward():
+        global INDEX,SINDEX
+        if SINDEX+1>=INDEX:return False
+        else:SINDEX+=1
+        DBManager.Cursor.execute('''Select * from Calclog where id={}'''.format(SINDEX))
+        lol=(DBManager.Cursor.fetchone())
+        print(SINDEX)
+        return lol[-1]
+DBManager.check()
 class BackEnd:
     def __init__(self,exp):
         self.exp=exp
@@ -23,6 +69,7 @@ class BackEnd:
         self.ans=eval(self.exp)
         return self.ans
 def Fill(variable,text,status=None):
+    global INDEX,SINDEX
     if status is None:variable.insert(INSERT,text)
     else:
         if status is True:
@@ -41,7 +88,11 @@ def Fill(variable,text,status=None):
                 expression=variable.get()
                 result=int(eval(expression))
                 print(expression,result)
+                INDEX+=1
+                SINDEX=INDEX
+                DBManager.insertData(INDEX,DBManager.timeformatter(datetime.datetime.now()),str(result),expression)
                 calculator.info(str(expression)+str(result))
+                
                 variable.set(result)
         elif status==69:
             try:
@@ -59,7 +110,10 @@ def Fill(variable,text,status=None):
                 expression=variable.get()
                 result=int(eval(expression))
                 print(expression,result)
+                INDEX+=1
+                SINDEX=INDEX
                 calculator.info(str(expression)+str(result))
+                DBManager.insertData(INDEX,DBManager.timeformatter(datetime.datetime.now()),str(result),expression)
                 if len(a)>300:
                     assert(False)
                 variable.set(a)
@@ -95,7 +149,43 @@ class NumButton(Frame):
             self.Number.config(relief=SUNKEN)
         else:
             self.Number.config(relief=RAISED)
-
+class LogButton(Frame):
+    def __init__(self,parent,sym,font,var,screen,status):
+        super().__init__(parent)
+        self.OFont=font
+        self.status=status
+        self.screen=screen
+        self.var=var
+        self.sym=sym
+        self.Action=Label(self,text=sym,width=4,height=2,cursor='hand2')
+        self.config(bg='#FFFF4D')
+        self.Action.config(relief=RAISED)
+        self.Action.config(bg='#FFFF19',fg='black',font=self.OFont)
+        self.Action.pack(padx=3,pady=3)
+        self.Action.bind('<Enter>',lambda x:self.hover(True))
+        self.Action.bind('<Leave>',lambda x:self.hover(False))
+        self.Action.bind('<Button-1>',lambda x:self.pressed(True))
+        self.Action.bind('<ButtonRelease-1>',lambda x:self.pressed(False))
+    def hover(self,status):
+        if status:
+            
+            self.Action['bg'],self.Action['fg']='#f78419','black'
+        else:
+            self.status.set('ZzZzZzzZzzZZzzZZ')
+            self.Action['fg'],self.Action['bg']='black','#FFFF19'
+    def pressed(self,status):
+        print(status)
+        if status:
+            if self.sym=='B':
+                answer=DBManager.goBackward()
+            else:
+                answer=DBManager.goForward()
+            if answer is False:return None
+            self.screen.delete(0,END)
+            self.screen.insert(0,answer)
+            self.Action.config(relief=SUNKEN)
+        else:
+            self.Action.config(relief=RAISED)
 class SymButton(Frame):
     def __init__(self,parent,sym,font,var,screen,status):
         super().__init__(parent)
@@ -104,7 +194,7 @@ class SymButton(Frame):
         self.var=var
         self.sym=sym
         self.status=status
-        self.function={'➕':'Addition','C':'Clear','✖️':'Product','➗':'Divide','➖':'Subtract','R':'Rounding','⌫':'BackSpace','=':'Math Time','.':'Decimal Point','(':'Left Bracs',')':'Right Bracs','^':'Power'}
+        self.function={'➕':'Addition','C':'Clear','✖️':'Product','/':'Divide','➖':'Subtract','R':'Rounding','⌫':'BackSpace','=':'Math Time','.':'Decimal Point','(':'Left Bracs',')':'Right Bracs','^':'Power','%':'Remainder'}
         self.config(bg='#a5de03')
         self.Symbol=Label(self,text=sym,width=4,height=2,cursor='hand2')
         self.Symbol.config(relief=RAISED)
@@ -126,9 +216,7 @@ class SymButton(Frame):
         if status:
             self.Symbol.config(relief=SUNKEN)
             if self.sym not in '⌫C=R':
-                if self.sym in '➗':
-                    Fill(self.screen,'/')
-                elif self.sym=='➕':
+                if self.sym=='➕':
                     Fill(self.screen,'+')
                 elif self.sym=='➖':
                     Fill(self.screen,'-')
@@ -187,9 +275,12 @@ class Calc(Frame):
         self.OutputFrame=Frame(self.OFrame,bg='#E6F2FF',height=23)
         self.OutputScreen=Entry(self.OutputFrame,bg='#E6F2FF',justify=RIGHT,width=69,textvariable=self.OVar,cursor='xterm',insertwidth=6,insertbackground='orange')        
         self.Plus=SymButton(self.Row3,'➕',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Revert=LogButton(self.Row3,'B',self.OFont,self.OVar,self.OutputScreen,self.status)
         self.Minus=SymButton(self.Row4,'➖',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Undo=LogButton(self.Row4,'F',self.OFont,self.OVar,self.OutputScreen,self.status)
         self.Multiply=SymButton(self.Row2,'✖️',self.OFont,self.OVar,self.OutputScreen,self.status)
-        self.Divide=SymButton(self.Row1,'➗',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Remainder=SymButton(self.Row2,'%',self.OFont,self.OVar,self.OutputScreen,self.status)
+        self.Divide=SymButton(self.Row1,'/',self.OFont,self.OVar,self.OutputScreen,self.status)
         self.Round=SymButton(self.Row1,'R',self.OFont,self.OVar,self.OutputScreen,self.status)        
         self.LB=SymButton(self.Row4,'(',self.OFont,self.OVar,self.OutputScreen,self.status)
         self.RB=SymButton(self.Row4,')',self.OFont,self.OVar,self.OutputScreen,self.status)
@@ -206,6 +297,7 @@ class Calc(Frame):
         self.Numbers.extend([NumButton(self.Row3,str(i),self.OFont,self.OVar,self.OutputScreen,self.status) for i in {3,2,1}])
         self.Error=Label(self.OFrame,text='',relief=GROOVE)
         self.ErrorFont=font.Font(family='Century Gothic',size=10)
+        self.bind("<Destroy>", self._destroy)
         self.arrange()
         if self.tut:
             self.tutorial()
@@ -234,8 +326,11 @@ class Calc(Frame):
         self.Divide.pack(side=LEFT)
         self.Round.pack(side=LEFT)
         self.Multiply.pack(side=LEFT)
+        self.Remainder.pack(side=LEFT)
         self.Plus.pack(side=LEFT)
+        self.Revert.pack(side=LEFT)
         self.Minus.pack(side=LEFT)
+        self.Undo.pack(side=LEFT)
         self.Zero.pack(side=LEFT)
         self.Equal.pack(side=LEFT)
         self.Back.pack(side=LEFT)
@@ -295,11 +390,12 @@ class Calc(Frame):
                 self.OutputScreen.unbind('<Return>')
                 self.is_there=True
     def printResult(self,e):
+
         self.Equal.just_call()
     def filter(self,exp):
             ans=[]
             for letter in exp:
-                if letter in string.digits or letter in ['+','/','-','(',')','*','^','.']:
+                if letter in string.digits or letter in ['+','/','-','(',')','*','^','.','%']:
                     ans.append(letter)
                 elif letter=='r':
                     self.OVar.set(self.OVar.get()[:-1])
@@ -308,9 +404,26 @@ class Calc(Frame):
                 elif letter=='c':
                     self.OutputScreen.delete(0,END)
                     return None
+                elif letter=='b':
+                    answer=DBManager.goBackward()
+                    if answer is False:
+                        pass
+                    else:
+                        self.OVar.set(answer)
+                        return None
+                elif letter=='f':
+                    answer=DBManager.goForward()
+                    if answer is False:
+                        pass
+                    else:
+                        self.OVar.set(answer)
+                        return None
                 else:
                     pass
             self.OVar.set(''.join(ans))
+    def _destroy(self,*args):
+        print('adios')
+        CONN.close()
 if __name__=='__main__':
     root=Tk()
     root.geometry('600x600')

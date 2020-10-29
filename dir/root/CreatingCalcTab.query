@@ -1,0 +1,7 @@
+Create table if not exists CalcLog(
+    id integer,
+    dtstore varchar(30),
+    result varchar(100),
+    operationsseq varchar(1000)
+    
+);

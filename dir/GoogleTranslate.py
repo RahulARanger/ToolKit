@@ -114,9 +114,10 @@ class SearchBox(Frame):
     def selected(self,*args):
         self.var.set(self.lstbox.get(ACTIVE))
 class HoverLabel(Label):
-    def __init__(self,parent,text_):
+    def __init__(self,parent,text_,status):
         super().__init__(parent)
         self.config(text=text_)
+        self.status=status
         self.config(font=('Helvetica',16,'bold','underline'))
         self.backcolor=('#E6FFFB','#FF8000')
         self.textcolor=('#000000','#FFFFFF')
@@ -126,8 +127,10 @@ class HoverLabel(Label):
     def bthover(self,status):        
         if status:            
             self.config(bg=self.backcolor[1],fg=self.textcolor[1],relief=RAISED)
+            self.status.set(self['text'])
         else:
             self.config(bg=self.backcolor[0],fg=self.textcolor[0],relief=FLAT)
+            self.status.set('ZzZzZzzZzzZZzzZZ')
 class InputBox(scrolledtext.ScrolledText):
     def __init__(self,parent,special=False):
         super().__init__(parent)
@@ -282,13 +285,13 @@ class GT(Frame):
         self.ts=StringVar()        
         self.fs.set('Detect Language')
         self.ts.set('Japanese')
-        self.FromLabel=HoverLabel(self.SearchFrame,'From Language: ')
-        self.ToLabel=HoverLabel(self.SearchFrame,'To Language: ')     
+        self.FromLabel=HoverLabel(self.SearchFrame,'From Language: ',self.status)
+        self.ToLabel=HoverLabel(self.SearchFrame,'To Language: ',self.status)     
         self.FromBox=SearchBox(self.SearchFrame,self.GTBack.FromLanguages,self.fs)
         self.ToBox=SearchBox(self.SearchFrame,self.GTBack.ToLanguages,self.ts)
         self.bind('<Button-1>',lambda cx:self.cleanit())
         self.From=InputBox(self.DisplayFrame)
-        self.toggle=False
+        self.toggle=None
         self.TranslateButt=SpecialButton(self.DisplayFrame)
         self.To=InputBox(self.DisplayFrame,True)
         self.photos2=['Resources\Media\Translator-Chan\TranslatorChan{}.jpg'.format(i) for i in range(11)]                
@@ -303,19 +306,16 @@ class GT(Frame):
             self.TranslatorChan.bind('<Leave>',lambda x:self.TranslatorChan.config(relief=FLAT,borderwidth=0))
         self.TranslateButt.bind('<ButtonRelease-1>',self.TranslateThem)
         self.arrange()   
-        self.after(3000,self.checknet)  
-    def cleanit(self):
-        print('He')
-        try:
-            self.FromBox.lstbox.pack_forget()
-        except:pass
-        try:
-            self.ToBox.lstbox.pack_forget()
-        except:pass
     def TranslatorThread(self):
-        text=self.From.get_it()        
-        try:translated,pronounciation,setto=self.GTBack.translation(text,self.fs.get(),self.ts.get())
-        except:return None
+        text=self.From.get_it()   
+        if len(text)==0:
+            self.stop=True
+            self.status.set('ZzZzZzzZzzZZzzZZ')
+            return
+        try:
+            translated,pronounciation,setto=self.GTBack.translation(text,self.fs.get(),self.ts.get())
+        except:
+            return None
         if translated==False:
             return None
         # TODO: need to add the waiting or translating thing here

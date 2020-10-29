@@ -33,10 +33,6 @@ try:
     from dir.root.LogFiles import *
 except:
     from root.LogFiles import *
-try:
-    from dir.root.LogFiles import *
-except:
-    from root.LogFiles import *
 import tkinter.scrolledtext as scrolledtext
 pytube.__main__.apply_descrambler = apply_descrambler
 YTOBJ=None
