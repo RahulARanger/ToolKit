@@ -8,10 +8,6 @@ try:
 except:
     from dir.root.ImageViewer import *
 try:
-    from root.ToolTip import *
-except:
-    from dir.root.ToolTip import *
-try:
     from root.Dialogs import *
 except:
     from dir.root.Dialogs import *
@@ -79,20 +75,39 @@ class GTBackend:
             pronunciation=text
         return result.text,pronunciation,name    
 class SearchBox(Frame):
-    def __init__(self,parent,lst,var):
+    def __init__(self,parent,lst,var,status):
         super().__init__(parent)
         self.lst=lst
         self.var=var
+        self.status=status
         self.config(bg='#7DF6FF')
         self.var.trace('w',self.track)
         self.Search=Entry(self,text='',textvariable=self.var,font=('Arial',10),bg='#E6FFFB')
         self.DummyFrame=Frame(self)
         self.Search.config(highlightthickness=2,highlightcolor='#3399FF',highlightbackground='#003333',relief=RAISED)
         self.HBar=Scrollbar(self.DummyFrame,orient=VERTICAL)
-        self.lstbox=Listbox(self.DummyFrame,yscrollcommand=self.HBar.set,height=6,width=22,exportselection=0,bg='#E6FFFB',selectbackground='orange',highlightthickness=1,highlightcolor='#3399FF',highlightbackground='#003333',setgrid=1,relief=RAISED)
+        self.lstbox=Listbox(self.DummyFrame,yscrollcommand=self.HBar.set,height=6,width=22,exportselection=0,bg='#E6FFFB',selectbackground='orange',highlightthickness=2,highlightcolor='#3399FF',highlightbackground='#003333',setgrid=1,relief=RAISED)
         self.HBar.config(command=self.lstbox.yview)
         self.lstbox.bind('<Double-Button-1>',self.selected)        
+        self.Search.bind('<Enter>',lambda x:self.hoverEntry(True))
+        self.Search.bind('<Leave>',lambda x:self.hoverEntry(False))
+        self.lstbox.bind('<Enter>',lambda x:self.hoverbox(True))
+        self.lstbox.bind('<Leave>',lambda x:self.hoverbox(False))
         self.arrange()
+    def hoverEntry(self,status):
+        if status:
+            self.Search.config(relief=RIDGE,highlightbackground='#3399FF')
+            self.status.set('Type to Search')
+        else:
+            self.Search.config(relief=RAISED,highlightbackground='#003333')
+            self.status.set('ZzZzZzzZzzZZzzZZ')
+    def hoverbox(self,status):
+        if status:
+            self.lstbox.config(relief=RIDGE,highlightbackground='#3399FF')
+            self.status.set('Double Click on any to select')
+        else:
+            self.lstbox.config(relief=RAISED,highlightbackground='#003333')
+            self.status.set('ZzZzZzzZzzZZzzZZ')
     def track(self,*args):
         text=self.var.get()
         for i in range(len(self.lstbox.get(0,END))):
@@ -118,7 +133,7 @@ class HoverLabel(Label):
         super().__init__(parent)
         self.config(text=text_)
         self.status=status
-        self.config(font=('Helvetica',16,'bold','underline'))
+        self.config(font=('Helvetica',16,'bold','underline'),highlightthickness=3,highlightcolor='#3399FF')
         self.backcolor=('#E6FFFB','#FF8000')
         self.textcolor=('#000000','#FFFFFF')
         self.config(bg=self.backcolor[0],fg=self.textcolor[0])
@@ -126,30 +141,40 @@ class HoverLabel(Label):
         self.bind('<Leave>',lambda x: self.bthover(False))
     def bthover(self,status):        
         if status:            
-            self.config(bg=self.backcolor[1],fg=self.textcolor[1],relief=RAISED)
+            self.config(bg=self.backcolor[1],fg=self.textcolor[1],relief=RAISED,highlightthickness=6,highlightbackground='#3399FF')
             self.status.set(self['text'])
         else:
-            self.config(bg=self.backcolor[0],fg=self.textcolor[0],relief=FLAT)
+            self.config(bg=self.backcolor[0],fg=self.textcolor[0],relief=FLAT,highlightthickness=3,highlightcolor='#3399FF')
             self.status.set('ZzZzZzzZzzZZzzZZ')
 class InputBox(scrolledtext.ScrolledText):
-    def __init__(self,parent,special=False):
+    def __init__(self,parent,special,status):
         super().__init__(parent)
         if not special: self.config(font= ('consolas', '15'))
         self.config(width=50,height=10)        
         self.config(undo=True)
+        self.status=status
         self.config(autoseparators=True,maxundo=-1) # ? for unlocking the undo power
         self.config(borderwidth=6) # ? design matters
         self.config(wrap=WORD)
         self.bind('<Control-Z>',lambda x:self.redoit())        
         self.bind('<FocusIn>',self.change)
-        self.bind('<FocusOut>',self.revert)        
+        self.bind('<FocusOut>',self.revert)     
+        self.bind('<Enter>',lambda x:self.boxhover(True))
+        self.bind('<Leave>',lambda x:self.boxhover(False))
+        self.config(relief=RAISED)   
         self.special=special  
         if self.special:                        
             self.config(state=DISABLED)  
-            self.config(relief=RAISED)     
             self.config(width=45,height=10)
             self.config(font= ('consolas', '16'))
         self.arrange()
+    def boxhover(self,status):
+        if status:
+            self.status.set('Display box')
+            self.config(relief=GROOVE)
+        else:
+            self.config(relief=RAISED)
+            self.status.set('ZZzZzZZZZZZzzz')
     def redoit(self):
         try:
             self.edit_redo()
@@ -189,8 +214,9 @@ class InputBox(scrolledtext.ScrolledText):
         self.delete('1.0',END)
         self.config(state=DISABLED)
 class SpecialButton(Label):
-    def __init__(self,parent):
+    def __init__(self,parent,status):
         super().__init__(parent)
+        self.status=status
         self.backcolor=('orange','yellow')
         self.textcolor=('white','black')
         self.config(text='Translate')
@@ -202,15 +228,18 @@ class SpecialButton(Label):
     def bthover(self,status):
         if status is True:
             self.config(bg=self.backcolor[1],fg=self.textcolor[1]) 
-            self.config(relief=RAISED)     
+            self.config(relief=RAISED)  
+            self.status.set('Translate it?')
         else:
             self.config(relief=FLAT)  
             self.config(bg=self.backcolor[0],fg=self.textcolor[0])           
+            self.status.set('ZzZzZzzZzzZZzzZZ')   
 class Status(Text):
-    def __init__(self,parent):
+    def __init__(self,parent,status):
         super().__init__(parent)
         self.config(bg='#006655')
-        self.config(relief=RAISED,state=DISABLED)
+        self.status=status
+        self.config(relief=RAISED,state=DISABLED,highlightthickness=0,highlightbackground='#3399FF')
         self.config(width=70,height=11)   
         self.typed=0
         self.TitleFont=("Times", "24", "bold italic",True) 
@@ -237,6 +266,15 @@ class Status(Text):
         self.tag_configure('Line2',foreground='#FFE6CC',font=self.NormalFont)
         self.tag_configure('Line3',foreground='#FFE6CC',font=self.NormalFont)
         self.config(state=DISABLED)
+        self.bind('<Enter>',lambda x:self.hoverbox(True))
+        self.bind('<Leave>',lambda x:self.hoverbox(False))
+    def hoverbox(self,status):
+        if status:
+            self.config(relief=RIDGE,highlightthickness=2,highlightbackground='#3399FF')
+            self.status.set('Log box')
+        else:
+            self.config(relief=RAISED,highlightthickness=0,highlightbackground='#3399FF')
+            self.status.set('ZzZzZzzZzzZZzzZZ')
     def enter_text(self,text,status,frm='',to=''):
         if frm!='':
             update='( '+frm+' ➜ '+to+' )'
@@ -287,25 +325,30 @@ class GT(Frame):
         self.ts.set('Japanese')
         self.FromLabel=HoverLabel(self.SearchFrame,'From Language: ',self.status)
         self.ToLabel=HoverLabel(self.SearchFrame,'To Language: ',self.status)     
-        self.FromBox=SearchBox(self.SearchFrame,self.GTBack.FromLanguages,self.fs)
-        self.ToBox=SearchBox(self.SearchFrame,self.GTBack.ToLanguages,self.ts)
+        self.FromBox=SearchBox(self.SearchFrame,self.GTBack.FromLanguages,self.fs,self.status)
+        self.ToBox=SearchBox(self.SearchFrame,self.GTBack.ToLanguages,self.ts,self.status)
         self.bind('<Button-1>',lambda cx:self.cleanit())
-        self.From=InputBox(self.DisplayFrame)
+        self.From=InputBox(self.DisplayFrame,False,self.status)
         self.toggle=None
-        self.TranslateButt=SpecialButton(self.DisplayFrame)
-        self.To=InputBox(self.DisplayFrame,True)
+        self.TranslateButt=SpecialButton(self.DisplayFrame,self.status)
+        self.To=InputBox(self.DisplayFrame,True,self.status)
         self.photos2=['Resources\Media\Translator-Chan\TranslatorChan{}.jpg'.format(i) for i in range(11)]                
         self.onHoldFrame=Frame(self.MoreFrame,bg='#7DF6FF')
-        self.StatusBar=Status(self.onHoldFrame)
+        self.StatusBar=Status(self.onHoldFrame,self.status)
         self.TranslatorChan=ButtonAlbum(self.onHoldFrame,self.photos2,300,300,'#7DF6FF')
         self.TranslatorChan.bind('<ButtonRelease-1>',lambda x:Open('https://translate.google.co.in/'))
         self.From.bind("<<TextModified>>", lambda x:self.StatusBar.enter_text(self.From.get_it(),True))
-        try:Title=ToolTip(self.TranslatorChan,'Click to view parent Tool')
-        except:
-            self.TranslatorChan.bind('<Enter>',lambda x:self.TranslatorChan.config(relief=RAISED,borderwidth=6))
-            self.TranslatorChan.bind('<Leave>',lambda x:self.TranslatorChan.config(relief=FLAT,borderwidth=0))
+        self.TranslatorChan.bind('<Enter>',lambda x:self.HoverChan(True))
+        self.TranslatorChan.bind('<Leave>',lambda x:self.HoverChan(False))
         self.TranslateButt.bind('<ButtonRelease-1>',self.TranslateThem)
         self.arrange()   
+    def HoverChan(self,status):
+        if status:
+            self.TranslatorChan.config(relief=RAISED,borderwidth=6)
+            self.status.set('Redirects to https://translate.google.co.in/')
+        else:
+            self.TranslatorChan.config(relief=FLAT,borderwidth=0)
+            self.status.set('ZzZzZzzZzzZZzzZZ')
     def TranslatorThread(self):
         text=self.From.get_it()   
         if len(text)==0:
