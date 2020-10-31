@@ -119,7 +119,7 @@ class Installer(Tk):
         self.textcolor=('#74878f','#f1f1ff')
         self.backcolor=("#424242",'#5a5a5c')
         self.ModuleNames=['googletrans','mutagen','pytube']
-        self.PackageNames={'mutagen':'mutagen','googletrans':'googletrans','pytube':'pytube3'}
+        self.PackageNames={'mutagen':'mutagen','googletrans':'googletrans','pytube':'pytubex'}
         self.file='dir\\root\\settings.json' 
         self.toInstall=[]
         if self.checkFirst():

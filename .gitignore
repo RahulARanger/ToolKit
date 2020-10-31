@@ -6,3 +6,4 @@ dir/__pycache__/
 dir/root/__pycache__
 dir/root/CalculatorDB.sqlite
 Resources/Database/CalculatorDB.sqlite
+.vscode/settings.json
