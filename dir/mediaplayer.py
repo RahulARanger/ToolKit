@@ -249,7 +249,7 @@ class MediaPlayer(Frame):
     def playlist(self):        
         a=FutureUpdate(self)
     def single_player(self):        
-        file=filedialog.askopenfilename(title='Open the Audio File',initialdir=os.getcwd(),filetypes=(('Audio Files','.mp3'),))
+        file=filedialog.askopenfilename(title='Open the Audio File',initialdir=os.getcwd(),filetypes=(('Audio Files (.mp3)','.mp3'),))
         if len(file)==0:
             pass
         else:

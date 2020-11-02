@@ -5,6 +5,7 @@ path=input('Enter the Path: ')
 name=input('Enter the name: ')
 import os
 a=(os.listdir(path))
+a.sort()
 print(a)
 path2=path+'\\'
 for i in range(len(os.listdir(path))):

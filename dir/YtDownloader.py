@@ -550,8 +550,8 @@ class WaitingFrame(Frame):
     def __init__(self,p):
         super().__init__(p)
         self.config(bg='#FF4D4D')
-        self.photos=['Resources\Media\Waiting\Waiting{}.jpg'.format(i) for i in range(45)]
-        self.WaitingScreen=ImageAlbum(self,self.photos,800,800,100,'#FF4D4D')
+        self.photos=['Resources\Media\Lalala\Lalala{}.jpg'.format(i) for i in range(10)]
+        self.WaitingScreen=ImageAlbum(self,self.photos,400,400,100,'#FF4D4D')
         self.WaitingScreen.pack(fill=BOTH,expand=True)
     def unhide(self):
         self.WaitingScreen.pack(fill=BOTH,expand=True)
@@ -612,7 +612,7 @@ class YTFrame(Frame):
         self.config(borderwidth=10,relief=RIDGE)
         self.sfont=font.Font(family="Lucida Grande", size=14)
         self.config(borderwidth=6,relief=RIDGE,bg='purple')
-        self.DetailsFrame=LabelFrame(self.MFrame,text='Details 🛈:',bg='#FF3333',font=self.sfont,borderwidth=3,relief=RAISED)
+        self.DetailsFrame=LabelFrame(self.MFrame,text='Details :',bg='#FF3333',font=self.sfont,borderwidth=3,relief=RAISED)
         self.SelectedFrame=LabelFrame(self.MFrame,text='Selected Format:',bg='#FF3333',font=self.sfont,borderwidth=3,relief=RAISED)
         self.Backend=YTBackend()    
         self.parse()
