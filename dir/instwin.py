@@ -4,7 +4,6 @@ from tkinter.ttk import Progressbar
 from tkinter import messagebox
 from tkinter import *
 import sys
-import json
 import threading
 try:
     from dir.root.NetTest import *
@@ -120,7 +119,7 @@ class Installer(Tk):
         self.backcolor=("#424242",'#5a5a5c')
         self.ModuleNames=['googletrans','mutagen','pytube']
         self.PackageNames={'mutagen':'mutagen','googletrans':'googletrans','pytube':'pytubex'}
-        self.file='dir\\root\\settings.json' 
+        
         self.toInstall=[]
         if self.checkFirst():
             self.register()
@@ -170,11 +169,6 @@ class Installer(Tk):
             else:
                 self.noNet=True
     def register(self):
-        with open(self.file,'r') as hand:
-            container=json.loads(hand.read())
-        container['Times']+=1
-        with open(self.file,'w') as hand:
-            hand.write(json.dumps(container,indent=4))
         self.completed=True   
         self.destroy()
     def bthover(self,status):
