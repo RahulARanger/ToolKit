@@ -238,7 +238,7 @@ class Selector(Frame):
             BACK.revive()
             started.info('Opened Calculator Tab')
             self.config(bg='#252526')
-            self.AcFrame=Calc(self.VFrame)
+            self.AcFrame=Calc(self.VFrame,STATUS)
             started.info('Closed Calculator Tab')
         elif self.whichone==2:
             BACK.revive()

@@ -3,7 +3,6 @@ import tkinter.ttk as ttk
 import string
 from tkinter import font
 from tkinter import messagebox
-import json
 import sqlite3
 import datetime
 try:
@@ -246,16 +245,13 @@ class SymButton(Frame):
             self.Symbol.bind('<ButtonRelease-1>',lambda x:self.pressed(False,self.sym)) 
             self.isthere=True
 class Calc(Frame):
-    def __init__(self,parent):
+    def __init__(self,parent,status):
         super().__init__(parent)
         self['bg']='#1e1e1e'
-        self.tut=None
-        self.file='dir\\root\\settings.json'  
-        self.checktut()
         self.failed=False
         self.OFont=font.Font(family='verdana',size=20,weight='bold')
         self.OVar=StringVar()
-        self.status=StringVar()
+        self.status=status
         self.status.set('Welcome to Our Calculator!!! Cykla Bylat')
         self.is_there=False
         self.is_therebar=False
@@ -266,8 +262,6 @@ class Calc(Frame):
         self.Row3=Frame(self.CFrame,bg='#a5de03')
         self.Row4=Frame(self.CFrame,bg='#a5de03')
         self.Row5=Frame(self.CFrame,bg='#a5de03')
-        self.StatusFrame=Frame(self.CFrame,bg='#a5de03')
-        self.checkinglabel=Label(self.StatusFrame,textvariable=self.status, justify=LEFT,background="#ffffe0", relief=SOLID, borderwidth=1,font=("Comic Sans MS", "10", "normal"))
         self.OutputFrame=Frame(self.OFrame,bg='#E6F2FF',height=23)
         self.OutputScreen=Entry(self.OutputFrame,bg='#E6F2FF',justify=RIGHT,width=69,textvariable=self.OVar,cursor='xterm',insertwidth=6,insertbackground='orange')        
         self.Plus=SymButton(self.Row3,'➕',self.OFont,self.OVar,self.OutputScreen,self.status)
@@ -295,8 +289,6 @@ class Calc(Frame):
         self.ErrorFont=font.Font(family='Century Gothic',size=10)
         self.bind("<Destroy>", self._destroy)
         self.arrange()
-        if self.tut:
-            self.tutorial()
     def arrange(self):
         self.OVar.trace('w',self.check)
         self.CFrame.pack(padx=5,pady=5)
@@ -311,8 +303,6 @@ class Calc(Frame):
         self.Row3.pack()   
         self.Row4.pack()  
         self.Row5.pack()        
-        self.StatusFrame.pack(fill=X,side=BOTTOM)
-        self.checkinglabel.pack(side=LEFT)
         for i in range(len(self.Numbers)):
             if i in [0,3,6]:self.Numbers[i].pack(side=LEFT)
             else:self.Numbers[i].pack(side=LEFT)
@@ -335,18 +325,6 @@ class Calc(Frame):
         self.Error.pack(fill=X,expand=True)
         self.OutputScreen.focus_set()
         self.OutputScreen.bind('<Return>',lambda x: self.printResult(x))
-    def checktut(self):
-        c=dict()
-        with open(self.file,'r') as hand:
-            c=json.loads(hand.read())
-        self.tut=True if c['Tuts']['Calculator'] else False
-        if self.tut:
-            c['Tuts']['Calculator']=False
-            with open(self.file,'w') as hand:
-                hand.write(json.dumps(c,indent=4))
-    def tutorial(self):
-        photos=['Resources\\Instructions\\Calculator\\#{}.jpeg'.format(i) for i in range(1,4)]
-        a=Instructions(self,photos)
     def backspace(self,e):
         b=self.OutputScreen.index(INSERT)
         a=b-1
@@ -423,6 +401,6 @@ class Calc(Frame):
 if __name__=='__main__':
     root=Tk()
     root.geometry('600x600')
-    a=Calc(root)
+    a=Calc(root,StringVar())
     a.pack()
     root.mainloop()
