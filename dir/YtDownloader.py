@@ -577,7 +577,6 @@ class Tester:
             if i>=1:
                 if time.time()-note>10:
                     break
-            a=pytube.YouTube(self.link)
             try:
                 a=pytube.YouTube(self.link)
                 YTOBJ=a

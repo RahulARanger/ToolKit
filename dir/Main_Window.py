@@ -38,6 +38,7 @@ except:
 import time
 import pygame
 STATUS=None
+BACK=None
 hoversound='Resources\Media\\button.wav'
 pygame.mixer.init()
 def do_this():
@@ -151,15 +152,40 @@ class Wifi(Label):
             STATUS.set('Not Connected' if self.status['text']=='❌ ' else 'Connected')
         else:
             STATUS.set('ZzZzZzzZzzZZzzZZ')
+class BackButton:
+    def __init__(self,parent,variable):
+        self.var=variable
+        image_=PIL.Image.open('Resources\Media\\back-button.png')
+        self.image__=PIL.ImageTk.PhotoImage(image_)
+        self.bt=Button(parent,bg='#f1f1ff',font=("Comic Sans MS", "10", "normal"),command=lambda : self.var.set('Main'))
+        self.parent=parent
+        self.arrange()
+    def arrange(self):
+        self.bt.config(relief=FLAT,image=self.image__)
+    def forget(self):
+        self.bt.pack_forget()
+    def revive(self):
+        self.bt.pack(side=LEFT,padx=(10,20),ipadx=3)
+        self.arrange()
+    
 class Tab(Frame):
-    def __init__(self,parent):
+    def __init__(self,parent,var):
         super().__init__(parent)
-        global STATUS
+        global STATUS,BACK
         self['bg']='#2d2d2d'
-        self.Name=Label(self,text='Main',bg='#1e1e1e',fg='#f1f1ff',font=("Comic Sans MS", "10", "normal"))
+        self.DummyFrame=Frame(self,bg='#2d2d2d')
+        self.D1=Frame(self.DummyFrame,bg='#2d2d2d')
+        self.D2=Frame(self.DummyFrame,bg='#2d2d2d')
+        self.Back=BackButton(self.D1,var)
+        self.Name=Label(self.D2,text='Main',bg='#1e1e1e',fg='#f1f1ff',font=("Comic Sans MS", "10", "normal"))
         STATUS=StringVar()
         STATUS.set('')
+        BACK=self.Back
         self.checkinglabel=Label(self,textvariable=STATUS, justify=LEFT,background="#ffffe0", relief=SOLID,font=("Comic Sans MS", "10", "normal"),borderwidth=2)
+        self.DummyFrame.pack(side=LEFT)
+        self.D1.pack(side=LEFT)
+        self.D2.pack(side=LEFT)
+        self.Back.revive()
         self.Name.pack(ipadx=10,ipady=1,side=LEFT,anchor=N)        
         self.checkinglabel.pack(anchor=NE)
 class Version(Label):
@@ -178,9 +204,10 @@ class Version(Label):
             self.config(text='v1.0',fg=self.textcolor[0],bg=self.backcolor[0])
             STATUS.set('ZzzzZZZzZZZZzZZZZZz')
 class Selector(Frame):
-    def __init__(self,parent,which_one):
+    def __init__(self,parent,which_one,var):
         super().__init__(parent)
         self.MCanvas=Canvas(self,bg='#252526')
+        self.variable=var
         self.config(bg='#252526')
         self.VBar=ttk.Scrollbar(self,orient=VERTICAL,command=self.MCanvas.yview)
         self.HBar=ttk.Scrollbar(self,orient=HORIZONTAL,command=self.MCanvas.xview)
@@ -191,6 +218,7 @@ class Selector(Frame):
     def orientScreen(self,event):
         self.MCanvas.yview_scroll(int(-1*(event.delta/120)),'units')
     def arrange(self):
+        global BACK
         self.HBar.config(cursor='hand2')
         self.VBar.config(cursor='hand2')
         self.MCanvas.configure(yscrollcommand=self.VBar.set,xscrollcommand=self.HBar.set)
@@ -202,20 +230,24 @@ class Selector(Frame):
         a.play()        
         if self.whichone==0:
             started.info('Opened Main Tab')
-            self.AcFrame=Settings(self.VFrame,STATUS)
+            BACK.forget()
+            self.AcFrame=Settings(self.VFrame,STATUS,self.variable)
             self.config(bg='#252526')
             started.info('Closed Main Tab')
         elif self.whichone==1:
+            BACK.revive()
             started.info('Opened Calculator Tab')
             self.config(bg='#252526')
             self.AcFrame=Calc(self.VFrame)
             started.info('Closed Calculator Tab')
         elif self.whichone==2:
+            BACK.revive()
             started.info('Opened Translator Tab')
             self.AcFrame=GT(self.VFrame,STATUS) 
             self.MCanvas.config(bg='#80D4FF')  
             started.info('Closed Translator Tab')
         elif self.whichone==3:
+            BACK.revive()
             started.info('Opened Yt Downloader Tab')
             self.MCanvas.config(bg='#FF4D4D')
             self.AcFrame=YT(self.VFrame,STATUS)
@@ -235,7 +267,7 @@ class MainWindow(Tk):
         self.state('zoomed')
         self.MFrame=Frame(self,bg='#323233')
         self.MeFrame=Frame(self.MFrame,bg="#424242")
-        self.TabFrame=Tab(self.MFrame)
+        self.TabFrame=Tab(self.MFrame,self.var)
         self.ActiveFrame=None
         self.SFrame=Frame(self.MFrame)
         self.SFrame.config(bg='#007acc')
@@ -285,7 +317,7 @@ class MainWindow(Tk):
             self.whichone=note.index(got)
             self.TabFrame.Name.config(text=note[self.whichone])
             self.ActiveFrame.destroy()
-            self.ActiveFrame=Selector(self.MFrame,self.whichone)
+            self.ActiveFrame=Selector(self.MFrame,self.whichone,self.var)
             self.ActiveFrame.pack(expand=True,fill=BOTH)
     def selectTools(self,whichone,special=False):        
         if self.whichone==whichone and not special:
@@ -295,7 +327,7 @@ class MainWindow(Tk):
             self.whichone=whichone
             if self.whichone!=0:
                 pass
-            self.ActiveFrame=Selector(self.MFrame,whichone)
+            self.ActiveFrame=Selector(self.MFrame,whichone,self.var)
             self.ActiveFrame.pack(expand=True,fill=BOTH)
 if __name__=='__main__':
     a=MainWindow()
