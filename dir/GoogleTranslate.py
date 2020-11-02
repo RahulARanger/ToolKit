@@ -330,6 +330,7 @@ class GT(Frame):
         self.bind('<Button-1>',lambda cx:self.cleanit())
         self.From=InputBox(self.DisplayFrame,False,self.status)
         self.toggle=None
+        self.started=False
         self.TranslateButt=SpecialButton(self.DisplayFrame,self.status)
         self.To=InputBox(self.DisplayFrame,True,self.status)
         self.photos2=['Resources\Media\Translator-Chan\TranslatorChan{}.jpg'.format(i) for i in range(11)]                
@@ -340,8 +341,9 @@ class GT(Frame):
         self.From.bind("<<TextModified>>", lambda x:self.StatusBar.enter_text(self.From.get_it(),True))
         self.TranslatorChan.bind('<Enter>',lambda x:self.HoverChan(True))
         self.TranslatorChan.bind('<Leave>',lambda x:self.HoverChan(False))
-        self.TranslateButt.bind('<ButtonRelease-1>',self.TranslateThem)
+        self.TranslateButt.bind('<Button-1>',self.TranslateThem)
         self.arrange()   
+        self.after(3000,self.checknet)  
     def HoverChan(self,status):
         if status:
             self.TranslatorChan.config(relief=RAISED,borderwidth=6)
@@ -350,16 +352,25 @@ class GT(Frame):
             self.TranslatorChan.config(relief=FLAT,borderwidth=0)
             self.status.set('ZzZzZzzZzzZZzzZZ')
     def TranslatorThread(self):
+        if self.started:
+            self.stop=True
+            return
+        self.started=True
         text=self.From.get_it()   
         if len(text)==0:
             self.stop=True
             self.status.set('ZzZzZzzZzzZZzzZZ')
+            self.started=False
             return
         try:
             translated,pronounciation,setto=self.GTBack.translation(text,self.fs.get(),self.ts.get())
         except:
+            self.stop=True
+            self.started=False
             return None
         if translated==False:
+            self.stop=True
+            self.started=False
             return None
         # TODO: need to add the waiting or translating thing here
         self.after(500)
@@ -370,6 +381,7 @@ class GT(Frame):
         self.To.enter_text('\n\n'+pronounciation,False)
         self.stop=True
         self.status.set('ZzZzZzzZzzZZzzZZ')
+        self.started=False
     def TranslateThem(self,*args):
         self.after(100)
         if True:

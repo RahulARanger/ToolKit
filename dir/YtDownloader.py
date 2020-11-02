@@ -544,7 +544,7 @@ class LoadingFrame(Frame):
         super().__init__(p)
         self.config(bg='#FF4D4D')
         self.photos=['Resources\Media\Loading\Loading{}.jpg'.format(i) for i in range(8)]
-        self.LoadingScreen=ImageAlbum(self,self.photos,1000,1000,110,'#FF4D4D')
+        self.LoadingScreen=ImageAlbum(self,self.photos,800,800,110,'#FF4D4D')
         self.LoadingScreen.pack(fill=BOTH,expand=True)
 class WaitingFrame(Frame):
     def __init__(self,p):
@@ -703,7 +703,7 @@ class YT(Frame):
         self.SearchButton.pack(side=LEFT,fill=Y)
         self.Enter.pack(fill=BOTH)
         self.hbar.pack(fill=X,side=BOTTOM)
-        self.ContainFrame.pack(fill=BOTH,expand=True)
+        self.ContainFrame.pack(fill=BOTH,expand=True,ipady=20)
     def check(self,*args):
         self.status.set('Loading...')
         self.SearchButton.config(state=DISABLED)
@@ -732,7 +732,7 @@ class YT(Frame):
                 self.ContainFrame.unbind('<Enter>')
                 self.ContainFrame.unbind('<Leave>')
                 self.ContainFrame=YTFrame(self.SecondFrame,self.status)
-                self.ContainFrame.pack(fill=BOTH,expand=True)
+                self.ContainFrame.pack(fill=BOTH,expand=True,ipady=20)
                 
                 self.link.set(self.LINK)
                 self.Enter.icursor(self.Enter.index(END))
@@ -741,7 +741,7 @@ class YT(Frame):
                 self.ContainFrame.unbind('<Enter>')
                 self.ContainFrame.unbind('<Leave>')
                 self.ContainFrame=YTFrame(self.SecondFrame,self.status)
-                self.ContainFrame.pack(fill=BOTH,expand=True)
+                self.ContainFrame.pack(fill=BOTH,expand=True,ipady=20)
                 
             self.READY=True
             self.status.set('ZzZzZzzZzzZZzzZZ')
