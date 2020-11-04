@@ -1,4 +1,5 @@
 from tkinter import *
+import os
 from tkinter import messagebox
 try:
     from dir.root.AddLogFile import *
@@ -7,8 +8,15 @@ except:
         from root.AddLogFile import *
     except:
         from AddLogFile import *
-started=setup_logger('Beginning','Resources\Logs\Opening.log')
-calculator=setup_logger('Calculator','Resources\Logs\Calculator.log')
+log_files=['Resources\Logs\MainLog.log','Resources\Logs\CalculatorLog.log']
+for i in log_files:
+    if os.path.exists(i):
+        pass
+    else:
+        with open(i,'w') as hand:
+            pass
+started=setup_logger('Beginning','Resources\Logs\MainLog.log')
+calculator=setup_logger('Calculator','Resources\Logs\CalculatorLog.log')
 class LogBox(Canvas):
     def __init__(self,p,var):
         super().__init__(p)
