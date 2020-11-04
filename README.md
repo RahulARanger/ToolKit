@@ -4,7 +4,6 @@
 
 > * <i> Python 3.7.x-3.8.x Interpreter <br>
 > * <i> Please have a glance at <a href='https://github.com/RahulARanger/ToolKit/issues/14'>#14</a> and <a href='https://github.com/RahulARanger/ToolKit/issues/15'>#15</a>
->> <a title='Link for the latest Version' href='https://www.python.org/downloads/'> Python Interpreter (Latest Version)</a>
 >* Internet Connection (While setting this Application)<br></i>
 > ***Soon More details will be updated***
 
