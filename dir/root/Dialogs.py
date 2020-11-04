@@ -11,6 +11,7 @@ class Common(Toplevel):
         super().__init__(parent)
         self.ok=Button(self,text='Ok',command=self.on_closing,borderwidth=6)
         self.ok.config(relief=FLAT)
+        self.geometry('+{}+{}'.format(self.winfo_screenwidth()//4,self.winfo_screenheight()//4))
         self.ok.config(bg='#FF8000')
         self.ok.bind('<Enter>',lambda x:self.bthover(True))
         self.ok.bind('<Leave>',lambda x:self.bthover(False))
@@ -40,43 +41,22 @@ class FutureUpdate(Common):
         self.ok.pack(fill=X)    
     def on_closing(self):
         self.destroy()
-class Instructions(Common):
-    def __init__(self,parent,photos):
+class Loading(Toplevel):
+    def __init__(self,parent):
         super().__init__(parent)
-        self.config(bg='orange')        
+        self.loadingpics=['Resources\Media\Loading\Loading{}.jpg'.format(i) for i in range(8)]
+        self.display=ImageAlbum(self,self.loadingpics,800,800,110)
+        self.display.pack(fill=BOTH,expand=True)
+        self.geometry('+{}+{}'.format(self.winfo_screenwidth()//4,self.winfo_screenheight()//4))
         self.grab_set()
-        self.resizable(0,0)        
-        self.Contain=Frame(self,bg='#FF8000')       
-        self.index=0
-        self.Notify=Label(self.Contain,bg='orange',borderwidth=6,relief=FLAT)
-        self.entered=False
-        self.photos=photos
-        self.focus_set()
-        self.Notify.config(text='{} of {}'.format(1,len(self.photos)))
-        self.collections=[ImageLabel(self,self.photos[i],500,500) for i in range(len(self.photos))]   
-        self.collections[0].pack(side=TOP)
-        self.Contain.pack(side=BOTTOM,fill=X)        
-        self.Notify.pack(side=RIGHT,fill=BOTH)
-        self.bind('<Left>',lambda x:self.change(False))     
-        self.bind('<Right>',lambda x:self.change(True))
-    def change(self,next):        
-        if self.index==0 and not next:return None
-        elif self.index==len(self.photos)-1 and next:return None
-        if not self.entered:
-            self.ok.pack(side=BOTTOM,fill=BOTH)
-            self.entered=True    
-        self.collections[self.index].pack_forget()
-        if next:                
-            self.index+=1
-        else:
-            self.index-=1
-        self.Notify.config(text='{} of {}'.format(self.index+1,len(self.photos)))
-        self.collections[self.index].pack(side=TOP)   
-    def on_closing(self):
+        self.overrideredirect(True) 
+        self.resizable(0,0)
+    def stopIt(self):
         self.destroy()
+
 if __name__=='__main__':
     root=Tk()
-    bt=Button(root,text='Warning',command=lambda :Warning(root,bt))
+    bt=Button(root,text='Warning',command=lambda :Loading(root))
     bt.pack()
     Button(root,text='Next Update',command=lambda :FutureUpdate(root)).pack()
     root.mainloop()

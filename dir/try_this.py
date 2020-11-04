@@ -1,11 +1,15 @@
-
-# TODO: THis is the file where new modules are either tested or added
-from tkinter import *
-import PIL.Image
-import PIL.ImageTk
-a=Tk()
-image_=PIL.Image.open('Resources\Media\\back-button.png')
-image__=PIL.ImageTk.PhotoImage(image_)
-bt=Button(a,image=image__,bg='#f1f1ff',relief=FLAT)
-bt.pack()
-a.mainloop()
+import googletrans
+class GT:
+    def __init__(self):
+        while True:
+            self.translator=googletrans.Translator(service_urls=['translate.google.com'])
+            try:
+                trial=self.translator.detect('Hello there')
+                break
+            except Exception as e:
+                print(e)   # can be commented
+    def doThings(self):
+        pass
+if __name__=='__main__':
+    a=GT()
+    

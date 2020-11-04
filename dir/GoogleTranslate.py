@@ -26,11 +26,13 @@ try:
 except:
     from root.LogFiles import *
 class GTBackend:
-    def __init__(self):
+    def __init__(self,parent):
         self.lines=['']
         self.from_,self.to_=None,None
         self.detect=None
-        self.translator=googletrans.Translator(service_urls=['translate.google.com','translate.google.co.kr',])
+        self.parent=parent
+        beta=threading.Thread(target=self.getThingsReady)
+        beta.start()
         self.c_from,self.c_to=None,None
         self.origin,self.translated,self.pronunciation=str(),str(),str()
         self.Languages=[] # has the list of the Languages
@@ -46,28 +48,44 @@ class GTBackend:
             for i in self.LanCodes['Languages']:
                 self.Languages.append(i.title())    
             self.LanCodes=self.LanCodes['Languages']  
+    def getThingsReady(self):
+        print('doing')
+        zawardu=Loading(self.parent)
+        while True:
+            self.translator=googletrans.Translator(service_urls=['translate.google.com'])
+            try:
+                trial=self.translator.detect('Hello there')
+                break
+            except Exception as e:
+                print(e)    
+        zawardu.stopIt()
+        print('done')
     def Detect(self,text):
         self.detect=False
-        results=self.translator.detect(text)        
-        detected=results.lang
-        ans=self.trace[detected]
-        conf=results.confidence
-        return detected,ans
+        for i in range(6):
+            try:
+                results=self.translator.detect(text)
+                detected=results.lang
+                ans=self.trace[detected]
+                return detected,ans
+            except Exception as e:
+                print(e)
+        return None
     def translation(self,text,from_='english',to_='japanese'):
-        if len(text)==0:return '',''
+        if len(text)==0:return False,'',from_
         from_=from_.lower()
         to_=to_.lower()
         fromcode=self.LanCodes[from_]
         tocode=self.LanCodes[to_]            
         name=None
-        try:
-            if fromcode=='special':
+        if fromcode=='special':
+            try:
                 fromcode,name=self.Detect(text)
-            else:
-                fromcode,name=self.Detect(text)
-            result=self.translator.translate(text,src=fromcode,dest=tocode)    
-        except:
-            return None
+            except:
+                return False,'',from_
+        else:
+            fromcode,name=self.Detect(text)
+        result=self.translator.translate(text,src=fromcode,dest=tocode)    
         try:
             pronunciation=result.pronunciation
             if type(pronunciation)!=str:pronunciation=''
@@ -109,7 +127,7 @@ class SearchBox(Frame):
             self.lstbox.config(relief=RAISED,highlightbackground='#003333')
             self.status.set('ZzZzZzzZzzZZzzZZ')
     def track(self,*args):
-        text=self.var.get()
+        text=self.var.get().title()
         for i in range(len(self.lstbox.get(0,END))):
             self.lstbox.delete(0)
         if len(text)==0:
@@ -198,7 +216,9 @@ class InputBox(scrolledtext.ScrolledText):
         return result
     def enter_text(self,text,status):
         self.config(state=NORMAL)
-        self.markindex=self.index(CURRENT)
+        print('*',text,'->',status)
+        if status is False:
+            self.markindex=self.index(END)
         self.insert(END,text)
         if status:
             pass
@@ -228,10 +248,8 @@ class SpecialButton(Label):
     def bthover(self,status):
         if status is True:
             self.config(bg=self.backcolor[1],fg=self.textcolor[1]) 
-            self.config(relief=RAISED)  
             self.status.set('Translate it?')
         else:
-            self.config(relief=FLAT)  
             self.config(bg=self.backcolor[0],fg=self.textcolor[0])           
             self.status.set('ZzZzZzzZzzZZzzZZ')   
 class Status(Text):
@@ -312,14 +330,15 @@ class GT(Frame):
         super().__init__(parent)
         self.config(bg='#80D4FF',relief=RAISED,borderwidth=6)
         self.status=status
-        self.GTBack=GTBackend()
         self.checker=NetworkCheck()
-        self.ContainFrame=Frame(self,bg='#7DF6FF',relief=RIDGE,borderwidth=3)        
+        self.failed=False
+        self.checknet()
+        self.GTBack=GTBackend(self)
+        self.ContainFrame=Frame(self,bg='#7DF6FF',relief=GROOVE,borderwidth=3)        
         self.MoreFrame=Frame(self,bg='#7DF6FF',relief=RIDGE,borderwidth=3)
         self.SearchFrame=Frame(self.ContainFrame,bg='#7DF6FF')
         self.DisplayFrame=Frame(self.ContainFrame,bg='#7DF6FF')
         self.fs=StringVar()
-        self.failed=False
         self.ts=StringVar()        
         self.fs.set('Detect Language')
         self.ts.set('Japanese')
@@ -330,7 +349,6 @@ class GT(Frame):
         self.bind('<Button-1>',lambda cx:self.cleanit())
         self.From=InputBox(self.DisplayFrame,False,self.status)
         self.toggle=None
-        self.started=False
         self.TranslateButt=SpecialButton(self.DisplayFrame,self.status)
         self.To=InputBox(self.DisplayFrame,True,self.status)
         self.photos2=['Resources\Media\Translator-Chan\TranslatorChan{}.jpg'.format(i) for i in range(11)]                
@@ -341,7 +359,8 @@ class GT(Frame):
         self.From.bind("<<TextModified>>", lambda x:self.StatusBar.enter_text(self.From.get_it(),True))
         self.TranslatorChan.bind('<Enter>',lambda x:self.HoverChan(True))
         self.TranslatorChan.bind('<Leave>',lambda x:self.HoverChan(False))
-        self.TranslateButt.bind('<Button-1>',self.TranslateThem)
+        self.TranslateButt.bind('<ButtonRelease-1>',self.TranslateThem)
+        self.TranslateButt.bind('<Button-1>',lambda c:self.TranslateButt.config(relief=RAISED))
         self.arrange()   
         self.after(3000,self.checknet)  
     def HoverChan(self,status):
@@ -352,25 +371,21 @@ class GT(Frame):
             self.TranslatorChan.config(relief=FLAT,borderwidth=0)
             self.status.set('ZzZzZzzZzzZZzzZZ')
     def TranslatorThread(self):
-        if self.started:
-            self.stop=True
-            return
-        self.started=True
         text=self.From.get_it()   
+        self.TranslateButt.config(relief=FLAT)
         if len(text)==0:
             self.stop=True
             self.status.set('ZzZzZzzZzzZZzzZZ')
-            self.started=False
             return
         try:
             translated,pronounciation,setto=self.GTBack.translation(text,self.fs.get(),self.ts.get())
+            print(translated,'}')
+            print(pronounciation)
         except:
             self.stop=True
-            self.started=False
             return None
         if translated==False:
             self.stop=True
-            self.started=False
             return None
         # TODO: need to add the waiting or translating thing here
         self.after(500)
@@ -381,16 +396,20 @@ class GT(Frame):
         self.To.enter_text('\n\n'+pronounciation,False)
         self.stop=True
         self.status.set('ZzZzZzzZzzZZzzZZ')
-        self.started=False
     def TranslateThem(self,*args):
-        self.after(100)
+        self.after(10)
         if True:
             self.stop=False
             self.after(10,self.StartTranslating)
+            self.alpha=Loading(self)
+            print('Clicked')
             omega=threading.Thread(target=self.TranslatorThread)
             omega.start()
     def StartTranslating(self):
-        if self.stop:return
+        if self.stop:
+            self.alpha.stopIt()
+            print('over')
+            return
         if self.toggle:self.status.set('Translating.../...')
         else:self.status.set('Translating...\...')
         self.toggle=not(self.toggle)

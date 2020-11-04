@@ -118,8 +118,7 @@ class Installer(Tk):
         self.textcolor=('#74878f','#f1f1ff')
         self.backcolor=("#424242",'#5a5a5c')
         self.ModuleNames=['googletrans','mutagen','pytube']
-        self.PackageNames={'mutagen':'mutagen','googletrans':'googletrans','pytube':'pytubex'}
-        
+        self.PackageNames={'mutagen':'mutagen','googletrans':'googletrans','pytube':'pytube'}        
         self.toInstall=[]
         if self.checkFirst():
             self.register()
@@ -129,7 +128,6 @@ class Installer(Tk):
             #self.attributes('-disabled', True)   
             self.step=100/len(self.ModuleNames)
             self.height=300
-            print(self.toInstall)
             self.geometry('{}x{}+{}+{}'.format(360,400,int((self.winfo_screenwidth()-360)/2),int((self.winfo_screenheight()-360)/2)))
             self.MFrame=Frame(self,background='#84bbf8',cursor='coffee_mug')
             self.HiFrame=Frame(self.MFrame,background='#84bbf8')
