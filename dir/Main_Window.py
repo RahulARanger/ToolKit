@@ -36,7 +36,6 @@ try:
 except:
     from YtDownloader import*
 import time
-import pygame
 STATUS=None
 BACK=None
 hoversound='Resources\Media\\button.wav'
@@ -66,6 +65,7 @@ class MenuFrame(Frame):
     def bthover(self,status):
         if status is None:
             started.info('Opened Browser, pressed {}'.format(self.name['text']))
+            BS1.play()
             Open(self.link)
         else:
             if status:
@@ -271,7 +271,7 @@ class MainWindow(Tk):
         self.ActiveFrame=None
         self.SFrame=Frame(self.MFrame)
         self.SFrame.config(bg='#007acc')
-        self.Mp3Player=MediaPlayer(self.SFrame)
+        self.Mp3Player=MediaPlayer(self.SFrame,STATUS)
         self.TimeNow=Clock(self.SFrame)
         self.WifiCheck=Wifi(self.SFrame)
         self.VersionInfo=Version(self.MeFrame)

@@ -31,7 +31,7 @@ class DBManager:
             global INDEX,SINDEX
             DBManager.Cursor.execute('select count(*) from CalcLog;')
             INDEX=DBManager.Cursor.fetchone()[0]
-            SINDEX=INDEX
+            SINDEX=INDEX+1
             print('->',INDEX)
     @staticmethod
     def insertData(col0,col1,col2,col3):
@@ -66,6 +66,7 @@ class BackEnd:
         return self.ans
 def Fill(variable,text,status=None):
     global INDEX,SINDEX
+    print('?',INDEX)
     if status is None:variable.insert(INSERT,text)
     else:
         if status is True:
@@ -83,12 +84,10 @@ def Fill(variable,text,status=None):
             else:
                 expression=variable.get()
                 result=int(eval(expression))
-                print(expression,result)
                 INDEX+=1
-                SINDEX=INDEX
+                SINDEX=INDEX+1
                 DBManager.insertData(INDEX,DBManager.timeformatter(datetime.datetime.now()),str(result),expression)
                 calculator.info(str(expression)+str(result))
-                
                 variable.set(result)
         elif status==69:
             try:
@@ -105,9 +104,8 @@ def Fill(variable,text,status=None):
                 a=str(a)
                 expression=variable.get()
                 result=int(eval(expression))
-                print(expression,result)
                 INDEX+=1
-                SINDEX=INDEX
+                SINDEX=INDEX+1
                 calculator.info(str(expression)+str(result))
                 DBManager.insertData(INDEX,DBManager.timeformatter(datetime.datetime.now()),str(result),expression)
                 if len(a)>300:
@@ -381,16 +379,18 @@ class Calc(Frame):
                 elif letter=='b':
                     answer=DBManager.goBackward()
                     if answer is False:
-                        pass
+                        self.OutputScreen.icursor(END)
                     else:
                         self.OVar.set(answer)
+                        self.OutputScreen.icursor(END)
                         return None
                 elif letter=='f':
                     answer=DBManager.goForward()
                     if answer is False:
-                        pass
+                        self.OutputScreen.icursor(END)
                     else:
                         self.OVar.set(answer)
+                        self.OutputScreen.icursor(END)
                         return None
                 else:
                     pass

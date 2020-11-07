@@ -242,9 +242,24 @@ class SpecialButton(Label):
         self.config(text='Translate')
         self.config(width=10,height=2)
         self.config(relief=FLAT)
+        self.store=[]
+        self.index=0
+        with open('dir\\root\\Translate.lang','rb') as hand:
+            lines=hand.readlines()
+            for i in lines:
+                self.store.append(i.decode()[:-1])
+        self.note=len(self.store)
         self.config(bg=self.backcolor[0],fg=self.textcolor[0],font=('Comic Sans MS', 12))        
         self.bind('<Enter>',lambda c:self.bthover(True))
         self.bind('<Leave>',lambda c:self.bthover(False))
+        self.config(text=self.store[self.index])
+        self.after(1000,self.change)
+    def change(self):
+        self.index+=1
+        if self.index>=self.note:
+            self.index=0
+        self.config(text=self.store[self.index])
+        self.after(1000,self.change)
     def bthover(self,status):
         if status is True:
             self.config(bg=self.backcolor[1],fg=self.textcolor[1]) 
@@ -335,7 +350,7 @@ class GT(Frame):
         self.checknet()
         self.GTBack=GTBackend(self)
         self.ContainFrame=Frame(self,bg='#7DF6FF',relief=GROOVE,borderwidth=3)        
-        self.MoreFrame=Frame(self,bg='#7DF6FF',relief=RIDGE,borderwidth=3)
+        self.MoreFrame=Frame(self,bg='#7DF6FF',relief=GROOVE,borderwidth=3)
         self.SearchFrame=Frame(self.ContainFrame,bg='#7DF6FF')
         self.DisplayFrame=Frame(self.ContainFrame,bg='#7DF6FF')
         self.fs=StringVar()

@@ -1,6 +1,9 @@
 from tkinter import *
 from tkinter import font
-from tkinter import messagebox
+try:
+    from  dir.root.OtherButtonClick import *
+except:
+    from root.OtherButtonClick import *
 try:
     from root.ImageViewer import *
 except:
@@ -73,10 +76,13 @@ class Settings(Frame):
         self.Ctut=ChooseButton(self.CSFrame,self.status,self.variable,'Calculator')
         self.Mtut=ChooseButton(self.MSFrame,self.status,self.variable,'Translator')
         self.Ttut=ChooseButton(self.TSFrame,self.status,self.variable,'Youtube Downloader')
-        self.Log=Button(self.SFrame,text='Show Logs',bg=self.Ctut.backcolor[0],fg=self.textcolor[0],activebackground=self.Ctut.backcolor[0],relief=FLAT,activeforeground=self.textcolor[1],command=lambda :ShowLogs(self,'Resources\Logs\Opening.log'))
+        self.Log=Button(self.SFrame,text='Show Logs',bg=self.Ctut.backcolor[0],fg=self.textcolor[0],activebackground=self.Ctut.backcolor[0],relief=FLAT,activeforeground=self.textcolor[1],command=lambda :self.displayLogs())
         self.Log.bind('<Enter>',lambda x:self.bthover(True,self.Log))
         self.Log.bind('<Leave>',lambda x:self.bthover(False,self.Log))
         self.arrange()
+    def displayLogs(self):
+        BS1.play()
+        ShowLogs(self,'Resources\Logs\MainLog.log',BS1)
     def arrange(self):
         self.SFrame.pack(fill=X)
         self.TFrame.pack(fill=X)

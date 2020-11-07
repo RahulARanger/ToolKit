@@ -28,8 +28,9 @@ class ComboBox(ttk.Combobox):
         self.config(textvariable=self.var,values=self.options,state='readonly')
 
 class LabelButtons(Label):
-    def __init__(self,parent,sym,x='bold'):
+    def __init__(self,parent,sym,status=None,x='bold'):
         super().__init__(parent)
+        self.status=status
         self.config(text=sym)
         self.textcolor=('#f1f1ff',)
         self.backcolor=('#007acc','#33BBFF')
@@ -57,9 +58,11 @@ class LabelButtons(Label):
         self.after(800,self.toggle)
     def bthover(self,status):
         if status is True:
+            self.status.set(self['text']+'  ?')
             self.config(bg=self.backcolor[1])
             self.config(relief=GROOVE)
         else:
+            self.status.set('ZzZzZzzZzzZZzzZZ')
             self.config(bg=self.backcolor[0])
             self.config(relief=FLAT)
     def btaffect(self,status):
@@ -88,13 +91,16 @@ class Display(Label):
             self.after(1000,self.slide)
         else:self.config(text=' '.join(self.checkpoint))
 class MediaPlayer(Frame):
-    def __init__(self,parent):
+    def __init__(self,parent,status):
         super().__init__(parent)
+        global MSTATUS
+        MSTATUS=status
+        self.report=status
         pygame.mixer.music.get_endevent()
         self.config(bg='#007acc')
-        self.play=LabelButtons(self,'  ▶ ')
+        self.play=LabelButtons(self,'  ▶ ',self.report)
         self.parent=parent
-        self.replay=LabelButtons(self,'Re')
+        self.replay=LabelButtons(self,'Re',self.report)
         self.playing=False 
         self.status=None
         self.failed=False
@@ -109,7 +115,7 @@ class MediaPlayer(Frame):
         self.play.bind('<Button-1>',lambda x:self.flip(True))
         self.replay.bind('<Button-1>',lambda x:self.flip(False))
         self.selected.trace('w',self.go_for_it)
-        self.Import=LabelButtons(self,'Import','normal')
+        self.Import=LabelButtons(self,'Import',self.report,'normal')
         self.barstatus=IntVar()
         self.Import.bind('<Button-1>',lambda x:self.go_for_it())
         self.arrange()
@@ -284,6 +290,6 @@ class MediaPlayer(Frame):
             self.replay.enable=True
 if __name__=='__main__':
     a=Tk()
-    b=MediaPlayer(a)
+    b=MediaPlayer(a,StringVar())
     b.pack(fill=X,expand=True)
     a.mainloop()

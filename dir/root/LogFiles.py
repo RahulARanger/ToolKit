@@ -56,10 +56,11 @@ class LogBox(Canvas):
         clip.clipboard_append(text)
         clip.destroy()
 class ShowLogs(Toplevel):
-    def __init__(self,parent,file):
+    def __init__(self,parent,file,sound=None):
         super().__init__(parent)
         self.geometry('{}x{}+10+10'.format(600,600))
         self.file=file
+        if sound is not None:self.sound=sound
         self.config(bg='#252526')
         self.focus_set()
         self.grab_set()
@@ -144,6 +145,7 @@ class ShowLogs(Toplevel):
         self.statusFrame.pack(side=BOTTOM,fill=X)
         self.checkinglabel.pack(side=LEFT)
     def refresh(self):
+        self.sound.play()
         self.MFrame.destroy()
         self.lstbox.destroy()
         self.MFrame=Frame(self)
