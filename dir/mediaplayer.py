@@ -1,9 +1,12 @@
 from tkinter import *
 import tkinter.ttk as ttk
-import pygame
 import os
 import re
 from mutagen.mp3 import MP3
+try:
+    from  dir.root.OtherButtonClick import *
+except:
+    from root.OtherButtonClick import *
 from tkinter import messagebox
 from tkinter import filedialog
 try:
@@ -31,6 +34,7 @@ class LabelButtons(Label):
     def __init__(self,parent,sym,status=None,x='bold'):
         super().__init__(parent)
         self.status=status
+        self.displaythings={'  ▶ ':'Click to play','Re':'Click to Replay',' | | ':'Click to Pause','Import':'Click to Select Music Files'}
         self.config(text=sym)
         self.textcolor=('#f1f1ff',)
         self.backcolor=('#007acc','#33BBFF')
@@ -58,7 +62,8 @@ class LabelButtons(Label):
         self.after(800,self.toggle)
     def bthover(self,status):
         if status is True:
-            self.status.set(self['text']+'  ?')
+            BTHOVER.play()
+            self.status.set(self.displaythings[self['text']])
             self.config(bg=self.backcolor[1])
             self.config(relief=GROOVE)
         else:
@@ -108,6 +113,7 @@ class MediaPlayer(Frame):
         self.modifier=None
         self.options=['Single File','PlayList']
         self.selected=StringVar()
+        self.file=StringVar()
         self.uploaded=False
         self.started=False
         self.pause=False
@@ -171,12 +177,12 @@ class MediaPlayer(Frame):
                 MUSIC_END = pygame.USEREVENT+1
                 pygame.mixer.music.set_endevent(MUSIC_END)
                 self.reset('replay')
-                pygame.mixer.music.load(self.file)
+                pygame.mixer.music.load(self.file.get())
                 pygame.mixer.music.play()
-                temp=AudioB(self.file)
+                temp=AudioB(self.file.get())
                 self.totallength=temp.length
                 self.reset('end')
-                self.title=(re.findall(r'([^/]+).mp3',self.file)[0])
+                self.title=(re.findall(r'([^/]+).mp3',self.file.get())[0])
                 self.titleshow=Display(self,self.title)
                 self.showl=Label(self,text='{}:{}'.format(0,0),bg='#007acc',fg='white')
                 self.showr=Label(self,text='{}:{}'.format(temp.minutes,temp.seconds),bg='#007acc',fg='white')            
@@ -259,12 +265,12 @@ class MediaPlayer(Frame):
         if len(file)==0:
             pass
         else:
-            self.file=file
+            self.file.set(file)
             self.play.config(text='  ▶ ')
             self.started=False
             MUSIC_END = pygame.USEREVENT+1
             pygame.mixer.music.set_endevent(MUSIC_END)
-            pygame.mixer.music.load(self.file)
+            pygame.mixer.music.load(self.file.get())
             self.uploaded=True
             try:
                 self.scale.destroy()
@@ -273,10 +279,10 @@ class MediaPlayer(Frame):
                 self.titleshow.destroy()
                 self.replay.enable=False
             except:pass
-            self.title=(re.findall(r'([^/]+).mp3',self.file)[0])
+            self.title=(re.findall(r'([^/]+).mp3',self.file.get())[0])
             self.titleshow=Display(self,self.title)
             self.replay.enable=True
-            temp=AudioB(self.file)
+            temp=AudioB(self.file.get())
             print('changed')
             self.totallength=temp.length
             self.showl=Label(self,text='{}:{}'.format(0,0),bg='#007acc',fg='white')

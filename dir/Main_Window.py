@@ -38,7 +38,7 @@ except:
 import time
 STATUS=None
 BACK=None
-hoversound='Resources\Media\\button.wav'
+
 pygame.mixer.init()
 def do_this():
     style = ttk.Style()
@@ -73,8 +73,7 @@ class MenuFrame(Frame):
                 self.config(bg=self.backcolor[0])
                 self.name.config(fg=self.textcolor[0],bg=self.backcolor[0])
             else:
-                global hoversound
-                pygame.mixer.Sound(hoversound).play()
+                hoversound.play()
                 STATUS.set('Redirects to {}'.format(self.link))
                 self.config(bg=self.backcolor[1])
                 self.name.config(fg=self.textcolor[1],bg=self.backcolor[1])        
@@ -94,8 +93,7 @@ class MenuOptionFrame(Frame):
         self.bind('<Leave>',lambda x:self.bthover(False))
     def bthover(self,status):
         if status:
-            global hoversound
-            pygame.mixer.Sound(hoversound).play()
+            hoversound.play()
             STATUS.set('Select the Tool')
             self.config(bg=self.backcolor[1])
         else:
@@ -198,6 +196,7 @@ class Version(Label):
         self.bind('<Leave>',lambda x:self.bthover(False))
     def bthover(self,status):
         if status:
+            hoversound.play()
             self.config(text='v1.0',fg=self.textcolor[1],bg=self.backcolor[1])
             STATUS.set('Current Version is {}'.format(self['text']))
         else:
@@ -218,7 +217,7 @@ class Selector(Frame):
     def orientScreen(self,event):
         self.MCanvas.yview_scroll(int(-1*(event.delta/120)),'units')
     def arrange(self):
-        global BACK
+        global BACK,UPLOADED,FILE,STORE
         self.HBar.config(cursor='hand2')
         self.VBar.config(cursor='hand2')
         self.MCanvas.configure(yscrollcommand=self.VBar.set,xscrollcommand=self.HBar.set)
@@ -272,6 +271,7 @@ class MainWindow(Tk):
         self.SFrame=Frame(self.MFrame)
         self.SFrame.config(bg='#007acc')
         self.Mp3Player=MediaPlayer(self.SFrame,STATUS)
+        Warning.object=self.Mp3Player
         self.TimeNow=Clock(self.SFrame)
         self.WifiCheck=Wifi(self.SFrame)
         self.VersionInfo=Version(self.MeFrame)
@@ -327,7 +327,7 @@ class MainWindow(Tk):
             self.whichone=whichone
             if self.whichone!=0:
                 pass
-            self.ActiveFrame=Selector(self.MFrame,whichone,self.var)
+            self.ActiveFrame=Selector(self.MFrame,self.whichone,self.var)
             self.ActiveFrame.pack(expand=True,fill=BOTH)
 if __name__=='__main__':
     a=MainWindow()

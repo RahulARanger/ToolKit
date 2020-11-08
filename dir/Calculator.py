@@ -6,6 +6,10 @@ from tkinter import messagebox
 import sqlite3
 import datetime
 try:
+    from  dir.root.OtherButtonClick import *
+except:
+    from root.OtherButtonClick import *
+try:
     from root.ImageViewer import *
 except:
     from dir.root.ImageViewer import *
@@ -80,7 +84,7 @@ def Fill(variable,text,status=None):
                 if i not in string.digits and i!='.':
                     flag=False
             if not flag:
-                x=messagebox.showerror('OMG!!!!!!!','Senpai, For rounding i need an answer i cannot do with expression')
+                x=messagebox.showerror('OMG!!!!!!!','Senpai, For rounding i need an answer! i cannot do with expression')
             else:
                 expression=variable.get()
                 result=int(eval(expression))
@@ -112,7 +116,14 @@ def Fill(variable,text,status=None):
                     assert(False)
                 variable.set(a)
             except:
-                x=messagebox.showerror('OMG!!!!!!!','Senpai, This is just a simple Calculator')
+                errormsg='''
+Senpai Please Don't tease my incompetence with large inputs.
+
+>_< or maybe did you ask me to  find the indefinite value. Oops even i don't know about that. I personally think it is 0 but nvm
+
+I can handle any given operations which produces the results within 300 digits
+'''
+                x=messagebox.showerror('OMG!!!!!!!',errormsg)
 class NumButton(Frame):
     def __init__(self,parent,number,font,var,screen,status):
         super().__init__(parent)
@@ -132,6 +143,7 @@ class NumButton(Frame):
         self.Number.bind('<ButtonRelease-1>',lambda x:self.pressed(False,number))
     def hover(self,status):
         if status:
+            BTHOVER.play()
             self.status.set('On Number '+str(self.number))
             self.Number['bg'],self.Number['fg']='#f78419','black'
         else:
@@ -162,6 +174,7 @@ class LogButton(Frame):
         self.Action.bind('<ButtonRelease-1>',lambda x:self.pressed(False))
     def hover(self,status):
         if status:
+            BTHOVER.play()
             self.status.set('Previous Log?' if self.sym=='B' else 'Forward Log?')
             self.Action['bg'],self.Action['fg']='#f78419','black'
         else:
@@ -200,6 +213,7 @@ class SymButton(Frame):
         self.Symbol.bind('<ButtonRelease-1>',lambda x:self.pressed(False,sym))        
     def hover(self,status):
         if status:
+            BTHOVER.play()
             self.Symbol['bg'],self.Symbol['fg']='#f78419','black'
             self.status.set(self.function[self.sym])
         else:

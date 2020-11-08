@@ -34,6 +34,7 @@ class ChooseButton(Label):
         self.bind('<Leave>',lambda x:self.hover(False))
     def hover(self,status):
         if status:
+            hoversound.play()
             self.config(bg=self.backcolor[1],fg=self.textcolor[1])
             self.status.set('Open this tool?')
         else:

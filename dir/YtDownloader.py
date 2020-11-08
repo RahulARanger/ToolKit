@@ -7,7 +7,10 @@ import pytube
 import threading 
 import time
 import os
-import pygame
+try:
+    from  dir.root.OtherButtonClick import *
+except:
+    from root.OtherButtonClick import *
 import tkinter.ttk as ttk
 try:
     from dir.root.__pre__ import *
@@ -38,8 +41,23 @@ pytube.__main__.apply_descrambler = apply_descrambler
 YTOBJ=None
 STATUSE=None
 THUMBNAIL=None
-STOPTIME='Resources\Media\\stoptime.ogg'
-STARTTIME='Resources\Media\\resumetime.ogg'
+class Warning:
+    object=None
+    stopped=False
+    store=[]
+    @staticmethod
+    def checkThis():
+        if Warning.object.uploaded is True:
+            Warning.stopped=True
+            Warning.store.append(Warning.object.file)
+            Warning.store.append(Warning.object.selected.get())
+            Warning.object.selected.set('')
+    @staticmethod
+    def restoreThis():
+        if Warning.stopped:
+            Warning.object.selected.set(Warning.store[1])
+            Warning.object.file=(Warning.store[0])
+            Warning.object.uploaded=True
 pygame.mixer.init()
 class Converter:
     @staticmethod
@@ -158,7 +176,7 @@ class StreamDownloader(Toplevel):
                         os.remove(self.location)
                     break
         self.canclose=True
-        pygame.mixer.Sound(STARTTIME).play()
+        STARTTIME.play()
         self.destroy()
     def addMember(self,stream,loc):
         self.stream=stream
@@ -277,7 +295,7 @@ class DisplayBox(Frame):
             loc=filedialog.asksaveasfilename(title='We can Just Enter the File Name',filetypes=[(do_this.type,extension)],parent=self)+extension
             if len(loc)!=0:
                 self.downloader=StreamDownloader(self)
-                pygame.mixer.Sound(STOPTIME).play()
+                STOPTIME.play()
                 self.downloader.addMember(do_this,loc)
         else:pass        
     def appendTitle(self):
@@ -331,6 +349,17 @@ class SearchingLabel(Label):
 class SelectStream(Toplevel):
     def __init__(self,parent,options,var,heading):
         super().__init__(parent)
+        if Warning.object.uploaded is True:
+            errormsg='''
+    Well it seems the media Player has imported Mp3 file 
+
+    For some instance music wil be stopped unless the stream Window is Closed 
+
+    Sorry for inconvivence i will try my best to work on this as soon as possible
+
+'''
+            messagebox.showerror('Sorry for inconvivence',errormsg,parent=self)
+            Warning.checkThis()
         self.config(bg='#D9D9D9')
         self.title(heading)
         self.status=StringVar()
@@ -352,6 +381,7 @@ class SelectStream(Toplevel):
     def on_closing(self):
         style = ttk.Style(self)
         style.theme_use('clam')
+        Warning.restoreThis()
         self.destroy()
     def setOptions(self):
         self.FirstOp=IntVar()
@@ -631,6 +661,9 @@ class YTFrame(Frame):
         self.Dlist2.addEntry(self.TempRating,'orange')
         self.TempViews='Views: '+self.Backend.Views
         self.Dlist2.addEntry(self.TempViews,'orange')
+        check=len(self.Backend.Desc.strip())
+        if check==0 or check==1:
+            self.Backend.Desc='<Empty Description>'
         self.TempDesc='Description:\n\n'+self.Backend.Desc.strip()
         self.Dlist2.addTextBox(self.TempDesc,'orange')     
         self.Dlist.arrange()
@@ -639,14 +672,22 @@ class YTFrame(Frame):
         self.Dlist2.pack(fill=X,expand=True,side=TOP)
         self.MoreInfo.pack(fill=X)
         self.SearchingFrame=Frame(self.SearchFormats)
-        self.SearchForit=Label(self.SearchFormats,text='Search Streams: ')
-        self.Searchit=Button(self.SearchFormats,text='Open',command=lambda :SelectStream(self,self.Backend.streams,StringVar(),self.Backend.Title),bg='#FFFF00',fg='#194D00')
-        self.Searchit.bind('<Enter>',lambda x:self.Searchit.config(bg='#E6E600'))
-        self.Searchit.bind('<Leave>',lambda x:self.Searchit.config(bg='#FFFF00'))
+        self.SearchForit=Label(self.SearchFormats,text='Search Streams: ',bg='#FF3333',font=self.sfont)
+        self.Searchit=Button(self.SearchFormats,text='Open',command=lambda :self.openStreamWindow(),bg='#FFFF00',fg='#194D00',font=self.sfont)
+        self.Searchit.bind('<Enter>',lambda x:self.bthover(True))
+        self.Searchit.bind('<Leave>',lambda x:self.bthover(False))
         self.SearchForit.pack(side=LEFT,pady=3)
         self.Searchit.pack(padx=6,pady=6,side=LEFT)
         self.SearchingFrame.pack(fill=X)
         self.SearchFormats.pack(fill=X)
+    def bthover(self,status):
+        if status:
+            self.Searchit.config(bg='#E6E600')
+        else:
+            self.Searchit.config(bg='#FFFF00')
+    def openStreamWindow(self):
+        SelectStream(self,self.Backend.streams,StringVar(),self.Backend.Title)
+        self.status.set('Opening Stream Window....')
     def arrange(self):
         self.MFrame.pack(expand=True,fill=BOTH)
         self.DetailsFrame.pack(fill=BOTH,side=LEFT)
@@ -715,6 +756,7 @@ class YT(Frame):
                 return
         self.ContainFrame.pack_forget()  
         self.Justasec.pack(fill=BOTH,expand=True)
+        LOADING.play(loops=-1)
         if True:
             tester=Tester(link,self.soNext)
             Hire=threading.Thread(target=tester.checkLink)
@@ -724,6 +766,7 @@ class YT(Frame):
         print(STATUSE)
         try:
             self.Justasec.pack_forget()
+            LOADING.stop()
         except:pass
         self.ContainFrame.hide()
         if STATUSE:
@@ -746,7 +789,22 @@ class YT(Frame):
             self.READY=True
             self.status.set('ZzZzZzzZzzZZzzZZ')
         else:
-            a=messagebox.showwarning('Alert!!!','This is not Youtube Related Link or Try again',icon='warning')
+            warningmsg='''
+Sorry we were not able to fetch info. from the given Link
+
+Possible Reasons are:
+
+*  Given Link is not related to Youtube Video at all
+
+*  Given Link contains Age Restricted or Restricted  Towards certain age group
+
+*  Due to Some Connection Errors
+
+* If this is not the case, then please Use the Help Button and post an issue in the repo.
+
+Most Importantly Try to open the link again this app it may work!
+            '''
+            a=messagebox.showwarning('Alert!!!',warningmsg,icon='warning')
             if self.READY is False:
                 self.link.set('Enter the Link: ')
                 self.Enter.icursor(self.Enter.index(END))
@@ -774,7 +832,7 @@ if __name__=='__main__':
     g=StringVar()
     g.set('')
     checkinglabel=Label(f,textvariable=g, justify=LEFT,background="#ffffe0", relief=SOLID, borderwidth=1,font=("Comic Sans MS", "10", "normal"))
-    b=YT(a,g)
+    b=YT(a,g,None,None)
     f.pack()
     checkinglabel.pack(side=RIGHT)
     b.pack(expand=True,fill=BOTH)
