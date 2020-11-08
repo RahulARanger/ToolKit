@@ -2,20 +2,60 @@ from tkinter import *
 import tkinter.messagebox as tkMessageBox
 import sqlite3
 import tkinter.ttk as ttk
-root = Tk()
+root=None
+USERNAME,PASSWORD,PRODUCT_NAME,PRODUCT_PRICE,SEARCH,PRODUCT_QTY=None,None,None,None,None,None
+LOG,ending=None,None
+def Exit():
+    global LOG,ending
+    result = tkMessageBox.askquestion('billing records', 'Are you sure you want to exit?', icon="warning")
+    if result == 'yes':
+        ending.set('Main')
+        LOG.info('Bill Counter is Closed')
+        root.destroy()
+class MukulisGay:
+    @staticmethod
+    def start(parent,log,var):
+        global root,USERNAME,PASSWORD,PRODUCT_NAME,PRODUCT_PRICE,SEARCH,PRODUCT_QTY,ending,LOG
+        root=Toplevel(parent)
+        ending=var
+        LOG=log
+        root.title("billing records")
+        root.geometry("1350x700+0+0")
+        root.protocol("WM_DELETE_WINDOW", Exit)
+        USERNAME = StringVar()
+        PASSWORD = StringVar()
+        PRODUCT_NAME = StringVar()
+        PRODUCT_PRICE = IntVar()
+        PRODUCT_QTY = IntVar()
+        SEARCH = StringVar()
+        #=================manage frame====================
+        Manage_Frame=Frame(root,bd=4,relief=RIDGE,bg="#660000")
+        Manage_Frame.place(x=20,y=110,width=450,height=560)
+
+        login_btn=Button(Manage_Frame,text="Login",font=("times new roman",20,"bold"),pady=20,padx=50,bd=10,relief=GROOVE, command=LoginForm)
+        login_btn.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 
-root.title("billing records")
-root.geometry("1350x700+0+0")
 
+        Man_Frame=Frame(root,bd=4,relief=RIDGE,bg="#660000")
+        Man_Frame.place(x=500,y=110,width=840,height=560)
+        #========================================MENUBAR WIDGETS==================================
+        menubar = Menu(root)
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Exit", command=Exit)
+        menubar.add_cascade(label="File", menu=filemenu)
+        root.config(menu=menubar)
+
+        #========================================FRAME============================================
+        Title = Frame(root, bd=10, relief=GROOVE,bg="#660000",)
+        Title.pack(side=TOP,fill=X)
+
+        #========================================LABEL WIDGET=====================================
+        lbl_display = Label(Title, text="Billing records", font=('times new roman', 45),bg="#660000",fg="yellow")
+        lbl_display.pack()
 
 #========================================VARIABLES==========================================
-USERNAME = StringVar()
-PASSWORD = StringVar()
-PRODUCT_NAME = StringVar()
-PRODUCT_PRICE = IntVar()
-PRODUCT_QTY = IntVar()
-SEARCH = StringVar()
+
 
 #========================================METHODS==========================================
 
@@ -30,17 +70,14 @@ def Database():
         cursor.execute("INSERT INTO `admin` (username, password) VALUES('admin', '12345678')")
         conn.commit()
 
-def Exit():
-    result = tkMessageBox.askquestion('billing records', 'Are you sure you want to exit?', icon="warning")
-    if result == 'yes':
-        root.destroy()
-        exit()
+
+        
 
 def Exit2():
     result = tkMessageBox.askquestion('billing records', 'Are you sure you want to exit?', icon="warning")
     if result == 'yes':
         Home.destroy()
-        exit()
+        
 
 
 def LoginForm():
@@ -65,9 +102,9 @@ def LoginForm():
     btn_login.grid(row=2, columnspan=2, pady=20)
     btn_login.bind('<Return>', Login)
     
-def Home():
+def MukulisHomo():
     global Home
-    Home = Tk()
+    Home = Toplevel()
     Home.title("billing records")
     width = 1024
     height = 520
@@ -266,40 +303,18 @@ def Login(event=None):
 
 def ShowHome():
     root.withdraw()
-    Home()
-    loginform.destroy()
+    MukulisHomo()
+    try:
+        loginform.destroy()
+    except:pass
 
 
-#=================manage frame====================
-
-Manage_Frame=Frame(root,bd=4,relief=RIDGE,bg="#660000")
-Manage_Frame.place(x=20,y=110,width=450,height=560)
-
-login_btn=Button(Manage_Frame,text="Login",font=("times new roman",20,"bold"),pady=20,padx=50,bd=10,relief=GROOVE, command=LoginForm)
-login_btn.place(relx=0.5, rely=0.5, anchor=CENTER)
-
-
-
-Man_Frame=Frame(root,bd=4,relief=RIDGE,bg="#660000")
-Man_Frame.place(x=500,y=110,width=840,height=560)
-#========================================MENUBAR WIDGETS==================================
-menubar = Menu(root)
-filemenu = Menu(menubar, tearoff=0)
-filemenu.add_command(label="Exit", command=Exit)
-menubar.add_cascade(label="File", menu=filemenu)
-root.config(menu=menubar)
-
-#========================================FRAME============================================
-Title = Frame(root, bd=10, relief=GROOVE,bg="#660000",)
-Title.pack(side=TOP,fill=X)
-
-#========================================LABEL WIDGET=====================================
-lbl_display = Label(Title, text="Billing records", font=('times new roman', 45),bg="#660000",fg="yellow")
-lbl_display.pack()
 
 #========================================INITIALIZATION===================================
 if __name__ == '__main__':
-    root.mainloop()
+    a=Tk()
+    MukulisGay.start(a)
+    a.mainloop()
 
 
 

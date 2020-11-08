@@ -46,8 +46,9 @@ class ChooseButton(Label):
         else:
             pass
 class Settings(Frame):
-    def __init__(self,parent,var,variable):
+    def __init__(self,parent,var,variable,can):
         super().__init__(parent)
+        self.can=can
         self.file='dir\\root\\settings.json'        
         self['bg']='#252526'   
         self.failed=False
@@ -62,6 +63,7 @@ class Settings(Frame):
         self.CSFrame=LabelFrame(self.SFrame,text='Calculator ',bg='#252526',fg=self.textcolor[0],padx=50,pady=50)        
         self.MSFrame=LabelFrame(self.SFrame,text='Translator ',bg='#252526',fg=self.textcolor[0],padx=50,pady=50)        
         self.TSFrame=LabelFrame(self.SFrame,text='Youtube Downloader ',bg='#252526',fg=self.textcolor[0],padx=50,pady=50)        
+        self.BSFrame=LabelFrame(self.SFrame,text='Bill Counter ',bg='#252526',fg=self.textcolor[0],padx=50,pady=50)        
         self.SFrame.config(relief=RAISED)
         self.SFrame.bind('<Enter>',lambda x:self.hover(True,self.SFrame))
         self.SFrame.bind('<Leave>',lambda x:self.hover(False,self.SFrame))
@@ -74,28 +76,35 @@ class Settings(Frame):
         self.TSFrame.config(relief=RAISED)
         self.TSFrame.bind('<Enter>',lambda x:self.hover(True,self.TSFrame))
         self.TSFrame.bind('<Leave>',lambda x:self.hover(False,self.TSFrame))
+        self.BSFrame.config(relief=RAISED)
+        self.BSFrame.bind('<Enter>',lambda x:self.hover(True,self.BSFrame))
+        self.BSFrame.bind('<Leave>',lambda x:self.hover(False,self.BSFrame))
         self.Ctut=ChooseButton(self.CSFrame,self.status,self.variable,'Calculator')
         self.Mtut=ChooseButton(self.MSFrame,self.status,self.variable,'Translator')
         self.Ttut=ChooseButton(self.TSFrame,self.status,self.variable,'Youtube Downloader')
+        self.Btut=ChooseButton(self.BSFrame,self.status,self.variable,'Bill Counter')
         self.Log=Button(self.SFrame,text='Show Logs',bg=self.Ctut.backcolor[0],fg=self.textcolor[0],activebackground=self.Ctut.backcolor[0],relief=FLAT,activeforeground=self.textcolor[1],command=lambda :self.displayLogs())
         self.Log.bind('<Enter>',lambda x:self.bthover(True,self.Log))
         self.Log.bind('<Leave>',lambda x:self.bthover(False,self.Log))
         self.arrange()
     def displayLogs(self):
         BS1.play()
-        ShowLogs(self,'Resources\Logs\MainLog.log',BS1)
+        ShowLogs(self,'Resources\Logs\MainLog.log',BS1,self.can)
     def arrange(self):
-        self.SFrame.pack(fill=X)
+        self.SFrame.pack(fill=X,ipady=30)
         self.TFrame.pack(fill=X)
         self.CSFrame.pack(fill=X)
         self.MSFrame.pack(fill=X)
         self.TSFrame.pack(fill=X)
+        self.BSFrame.pack(fill=X)
         self.Ctut.pack(side=LEFT)
         self.Mtut.pack(side=LEFT)
         self.Ttut.pack(side=LEFT)
+        self.Btut.pack(side=LEFT)
         self.Log.pack(side=RIGHT,pady=20,padx=(0,30))    
     def bthover(self,status,w):
         if status:
+            hoversound.play()
             w.config(fg=self.textcolor[1],bg=self.Ctut.backcolor[1])
             self.status.set(w['text'])
         else:

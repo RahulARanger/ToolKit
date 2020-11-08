@@ -35,6 +35,10 @@ try:
     from dir.YtDownloader import *
 except:
     from YtDownloader import*
+try:
+    from dir.br import *
+except:
+    from br import *
 import time
 STATUS=None
 BACK=None
@@ -84,7 +88,7 @@ class MenuOptionFrame(Frame):
         self.options.set('Main')
         self.textcolor=('#74878f','#f1f1ff')
         self.backcolor=("#424242",'#5a5a5c')
-        self.select=OptionMenu(self,self.options,'Main','Calculator','Translator','Youtube Downloader')
+        self.select=OptionMenu(self,self.options,'Main','Calculator','Translator','Youtube Downloader','Bill Counter')
         self.select.config(background=self.backcolor[0],fg=self.textcolor[0],relief=FLAT,activeforeground=self.textcolor[1],activebackground=self.backcolor[1],highlightthickness=0,indicatoron=0)
         self.select['menu'].config(bg='#1e1e1e',activeforeground='#f1f1ff',fg=self.textcolor[0])
         self.select['menu']['cursor']='hand2'
@@ -214,6 +218,9 @@ class Selector(Frame):
         self.whichone=which_one
         self.switchsound='Resources\Media\switch.wav'
         self.arrange()
+    def revive(self):
+        print('Revived')
+        self.MCanvas.bind_all('<MouseWheel>',self.orientScreen)
     def orientScreen(self,event):
         self.MCanvas.yview_scroll(int(-1*(event.delta/120)),'units')
     def arrange(self):
@@ -230,7 +237,7 @@ class Selector(Frame):
         if self.whichone==0:
             started.info('Opened Main Tab')
             BACK.forget()
-            self.AcFrame=Settings(self.VFrame,STATUS,self.variable)
+            self.AcFrame=Settings(self.VFrame,STATUS,self.variable,self.revive)
             self.config(bg='#252526')
             started.info('Closed Main Tab')
         elif self.whichone==1:
@@ -251,6 +258,12 @@ class Selector(Frame):
             self.MCanvas.config(bg='#FF4D4D')
             self.AcFrame=YT(self.VFrame,STATUS)
             started.info('Closed YT Downloader Tab')
+        elif self.whichone==4:
+            started.info('Bill Counter is Opened')
+            MukulisGay.start(self,started,self.variable)
+            BACK.forget()
+            self.AcFrame=Settings(self.VFrame,STATUS,self.variable,self.revive)
+            self.config(bg='#252526')
         self.AcFrame.pack(expand=True,fill=BOTH)
         self.HBar.pack(side=BOTTOM,fill=X)
         self.VBar.pack(side=RIGHT,fill=Y)
@@ -309,7 +322,7 @@ class MainWindow(Tk):
         self.fullsize=not self.fullsize
         self.attributes('-fullscreen',self.fullsize)
     def selectTools_2(self,*args):
-        note=['Main','Calculator','Translator','Youtube Downloader']
+        note=['Main','Calculator','Translator','Youtube Downloader','Bill Counter']
         got=self.var.get()
         if note.index(got)==self.whichone:
             pass

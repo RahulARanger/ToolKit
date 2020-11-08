@@ -56,10 +56,11 @@ class LogBox(Canvas):
         clip.clipboard_append(text)
         clip.destroy()
 class ShowLogs(Toplevel):
-    def __init__(self,parent,file,sound=None):
+    def __init__(self,parent,file,sound=None,can=None):
         super().__init__(parent)
         self.geometry('{}x{}+10+10'.format(600,600))
         self.file=file
+        self.can=can
         if sound is not None:self.sound=sound
         self.config(bg='#252526')
         self.focus_set()
@@ -79,9 +80,14 @@ class ShowLogs(Toplevel):
         self.Clear.bind('<Leave>',lambda x:self.bthover(False,self.Clear,'Clear'))
         self.Refresh.bind('<Enter>',lambda x:self.bthover(True,self.Refresh,'Refresh'))
         self.Refresh.bind('<Leave>',lambda x:self.bthover(False,self.Refresh,'Refresh'))
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.findDetails()
         self.insertThem()
         self.arrange()
+    def on_closing(self):
+        if self.can is not None:
+            self.can()
+        self.destroy()
     def findLevel(self,line):
         if 'DEBUG' in line:
             note=line.index('DEBUG')

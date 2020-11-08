@@ -21,7 +21,7 @@ try:
     from dir.root.LogFiles import *
 except:
     from root.LogFiles import *
-CONN=sqlite3.connect('Resources\\Database\\CalculatorDB.sqlite')
+CONN=None
 INDEX=0
 SINDEX=0
 class DBManager:
@@ -36,7 +36,7 @@ class DBManager:
             DBManager.Cursor.execute('select count(*) from CalcLog;')
             INDEX=DBManager.Cursor.fetchone()[0]
             SINDEX=INDEX+1
-            print('->',INDEX)
+            #print('->',INDEX)
     @staticmethod
     def insertData(col0,col1,col2,col3):
         DBManager.Cursor.execute('''insert into CalcLog(id,dtstore,result,operationsseq) values({},"{}","{}","{}");'''.format(col0,col1,col2,col3))
@@ -61,7 +61,6 @@ class DBManager:
         DBManager.Cursor.execute('''Select * from Calclog where id={}'''.format(SINDEX))
         lol=(DBManager.Cursor.fetchone())
         return lol[-1]
-DBManager.check()
 class BackEnd:
     def __init__(self,exp):
         self.exp=exp
@@ -70,7 +69,7 @@ class BackEnd:
         return self.ans
 def Fill(variable,text,status=None):
     global INDEX,SINDEX
-    print('?',INDEX)
+    #print('?',INDEX)
     if status is None:variable.insert(INSERT,text)
     else:
         if status is True:
@@ -258,10 +257,17 @@ class SymButton(Frame):
             self.isthere=True
 class Calc(Frame):
     def __init__(self,parent,status):
+        global CONN,INDEX,SINDEX
         super().__init__(parent)
+        #print(CONN)
+        CONN=None
+        INDEX=0
+        SINDEX=0
+        CONN=sqlite3.connect('Resources\\Database\\CalculatorDB.sqlite')
+        self.OFont=font.Font(family='verdana',size=20,weight='bold')
+        DBManager.check()
         self['bg']='#1e1e1e'
         self.failed=False
-        self.OFont=font.Font(family='verdana',size=20,weight='bold')
         self.OVar=StringVar()
         self.status=status
         self.status.set('Welcome to Our Calculator!!! Cykla Bylat')
@@ -410,7 +416,7 @@ class Calc(Frame):
                     pass
             self.OVar.set(''.join(ans))
     def _destroy(self,*args):
-        print('adios')
+        #print('adios')
         CONN.close()
 if __name__=='__main__':
     root=Tk()
