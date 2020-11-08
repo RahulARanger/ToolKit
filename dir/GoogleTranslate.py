@@ -49,7 +49,7 @@ class GTBackend:
                 self.Languages.append(i.title())    
             self.LanCodes=self.LanCodes['Languages']  
     def getThingsReady(self):
-        print('doing')
+        #print('doing')
         zawardu=Loading(self.parent)
         while True:
             self.translator=googletrans.Translator(service_urls=['translate.google.com'])
@@ -57,9 +57,10 @@ class GTBackend:
                 trial=self.translator.detect('Hello there')
                 break
             except Exception as e:
-                print(e)    
+                #print(e)
+                pass    
         zawardu.stopIt()
-        print('done')
+        #print('done')
     def Detect(self,text):
         self.detect=False
         for i in range(6):
@@ -69,7 +70,8 @@ class GTBackend:
                 ans=self.trace[detected]
                 return detected,ans
             except Exception as e:
-                print(e)
+                #print(e)
+                pass
         return None
     def translation(self,text,from_='english',to_='japanese'):
         if len(text)==0:return False,'',from_
@@ -216,7 +218,7 @@ class InputBox(scrolledtext.ScrolledText):
         return result
     def enter_text(self,text,status):
         self.config(state=NORMAL)
-        print('*',text,'->',status)
+        #print('*',text,'->',status)
         if status is False:
             self.markindex=self.index(END)
         self.insert(END,text)
@@ -347,7 +349,10 @@ class GT(Frame):
         self.status=status
         self.checker=NetworkCheck()
         self.failed=False
+        self.packed=False
         self.checknet()
+    def reviveThis(self):
+        self.packed=True
         self.GTBack=GTBackend(self)
         self.ContainFrame=Frame(self,bg='#7DF6FF',relief=GROOVE,borderwidth=3)        
         self.MoreFrame=Frame(self,bg='#7DF6FF',relief=GROOVE,borderwidth=3)
@@ -394,8 +399,8 @@ class GT(Frame):
             return
         try:
             translated,pronounciation,setto=self.GTBack.translation(text,self.fs.get(),self.ts.get())
-            print(translated,'}')
-            print(pronounciation)
+            #print(translated,'}')
+            #print(pronounciation)
         except:
             self.stop=True
             return None
@@ -417,13 +422,13 @@ class GT(Frame):
             self.stop=False
             self.after(10,self.StartTranslating)
             self.alpha=Loading(self)
-            print('Clicked')
+            #print('Clicked')
             omega=threading.Thread(target=self.TranslatorThread)
             omega.start()
     def StartTranslating(self):
         if self.stop:
             self.alpha.stopIt()
-            print('over')
+            #print('over')
             return
         if self.toggle:self.status.set('Translating.../...')
         else:self.status.set('Translating...\...')
@@ -452,10 +457,14 @@ class GT(Frame):
             self.failed=True
             self.pack_forget()
         else:
+            if not self.packed:
+                self.reviveThis()
             if self.failed:
                 self.pack(fill=BOTH,expand=True)
                 self.failed=False
+                self.GTBack=GTBackend(self)
                 started.warning('Regained Net Access')
+            
         self.after(3000,self.checknet)  
 if __name__=='__main__':
     root=Tk()
