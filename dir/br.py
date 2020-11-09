@@ -12,6 +12,15 @@ def Exit():
         ending.set('Main')
         LOG.info('Bill Counter is Closed')
         root.destroy()
+def Exit2():
+    global LOG,ending
+    print('Yes')
+    result = tkMessageBox.askquestion('billing records', 'Are you sure you want to exit?', icon="warning")
+    if result == 'yes':
+        ending.set('Main')
+        LOG.info('Bill Counter is Closed')
+        root.destroy()
+        Home.destroy()
 class MukulisGay:
     @staticmethod
     def start(parent,log,var):
@@ -70,16 +79,6 @@ def Database():
         cursor.execute("INSERT INTO `admin` (username, password) VALUES('admin', '12345678')")
         conn.commit()
 
-
-        
-
-def Exit2():
-    result = tkMessageBox.askquestion('billing records', 'Are you sure you want to exit?', icon="warning")
-    if result == 'yes':
-        Home.destroy()
-        
-
-
 def LoginForm():
     global lbl_result
     Man_Frame=Frame(root,bd=10,relief=RIDGE,bg="#660000")
@@ -105,6 +104,7 @@ def LoginForm():
 def MukulisHomo():
     global Home
     Home = Toplevel()
+    Home.protocol("WM_DELETE_WINDOW", Exit2)
     Home.title("billing records")
     width = 1024
     height = 520
