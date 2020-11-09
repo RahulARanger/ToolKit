@@ -35,10 +35,6 @@ try:
     from dir.YtDownloader import *
 except:
     from YtDownloader import*
-try:
-    from dir.br import *
-except:
-    from br import *
 import time
 STATUS=None
 BACK=None
@@ -258,12 +254,6 @@ class Selector(Frame):
             self.MCanvas.config(bg='#FF4D4D')
             self.AcFrame=YT(self.VFrame,STATUS)
             started.info('Closed YT Downloader Tab')
-        elif self.whichone==4:
-            started.info('Bill Counter is Opened')
-            MukulisGay.start(self,started,self.variable)
-            BACK.forget()
-            self.AcFrame=Settings(self.VFrame,STATUS,self.variable,self.revive)
-            self.config(bg='#252526')
         self.AcFrame.pack(expand=True,fill=BOTH)
         self.HBar.pack(side=BOTTOM,fill=X)
         self.VBar.pack(side=RIGHT,fill=Y)

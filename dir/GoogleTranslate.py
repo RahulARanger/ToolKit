@@ -347,13 +347,14 @@ class GT(Frame):
         super().__init__(parent)
         self.config(bg='#80D4FF',relief=RAISED,borderwidth=6)
         self.status=status
+        self.parent=parent
         self.checker=NetworkCheck()
         self.failed=False
         self.packed=False
         self.checknet()
     def reviveThis(self):
         self.packed=True
-        self.GTBack=GTBackend(self)
+        self.GTBack=GTBackend(self.parent)
         self.ContainFrame=Frame(self,bg='#7DF6FF',relief=GROOVE,borderwidth=3)        
         self.MoreFrame=Frame(self,bg='#7DF6FF',relief=GROOVE,borderwidth=3)
         self.SearchFrame=Frame(self.ContainFrame,bg='#7DF6FF')
@@ -462,7 +463,7 @@ class GT(Frame):
             if self.failed:
                 self.pack(fill=BOTH,expand=True)
                 self.failed=False
-                self.GTBack=GTBackend(self)
+                self.GTBack=GTBackend(self.parent)
                 started.warning('Regained Net Access')
             
         self.after(3000,self.checknet)  

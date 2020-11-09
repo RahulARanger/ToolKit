@@ -607,6 +607,7 @@ class Tester:
             if i>=1:
                 if time.time()-note>10:
                     break
+            a=pytube.YouTube(self.link)
             try:
                 a=pytube.YouTube(self.link)
                 YTOBJ=a
@@ -614,6 +615,7 @@ class Tester:
                 break
             except:
                 STATUSE=False  
+                
         if STATUSE:
             x=Downloader(YTOBJ.thumbnail_url,'temp')
             THUMBNAIL=x.manual_install()
@@ -799,6 +801,8 @@ Possible Reasons are:
 *  Given Link contains Age Restricted or Restricted  Towards certain age group
 
 *  Due to Some Connection Errors
+
+*  Can't Open the Playlist yet i will update this feature later
 
 * If this is not the case, then please Use the Help Button and post an issue in the repo.
 
