@@ -5,6 +5,7 @@
 > * <i> Python 3.7.x-3.8.x Interpreter <br>
 > * <i> Please have a glance at <a href='https://github.com/RahulARanger/ToolKit/issues/14'>#14</a> and <a href='https://github.com/RahulARanger/ToolKit/issues/15'>#15</a>
 >* Internet Connection (While setting this Application)<br></i>
+> * <i> Tested on Windows for now (More regarding this will be updated)
 > ***Soon More details will be updated***
 
 <h2><u>How To?</u></h2>

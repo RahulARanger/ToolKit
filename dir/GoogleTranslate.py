@@ -12,7 +12,6 @@ try:
 except:
     from dir.root.Dialogs import *
 from tkinter import *
-from tkinter import *
 try:
     from dir.root.NetTest import *
 except:
@@ -31,8 +30,14 @@ class GTBackend:
         self.from_,self.to_=None,None
         self.detect=None
         self.parent=parent
-        beta=threading.Thread(target=self.getThingsReady)
-        beta.start()
+        while True:
+            self.translator=googletrans.Translator(service_urls=['translate.google.com'])
+            try:
+                trial=self.translator.detect('Hello there')
+                break
+            except Exception as e:
+                #print(e)
+                pass    
         self.c_from,self.c_to=None,None
         self.origin,self.translated,self.pronunciation=str(),str(),str()
         self.Languages=[] # has the list of the Languages
@@ -48,19 +53,6 @@ class GTBackend:
             for i in self.LanCodes['Languages']:
                 self.Languages.append(i.title())    
             self.LanCodes=self.LanCodes['Languages']  
-    def getThingsReady(self):
-        #print('doing')
-        zawardu=Loading(self.parent)
-        while True:
-            self.translator=googletrans.Translator(service_urls=['translate.google.com'])
-            try:
-                trial=self.translator.detect('Hello there')
-                break
-            except Exception as e:
-                #print(e)
-                pass    
-        zawardu.stopIt()
-        #print('done')
     def Detect(self,text):
         self.detect=False
         for i in range(6):
